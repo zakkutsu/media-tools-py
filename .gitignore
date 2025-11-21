@@ -27,6 +27,10 @@ Thumbs.db
 desktop.ini
 
 # Media Tools Specific
+# User configuration (personal preferences - DO NOT COMMIT)
+.language_config.json
+language_config.py.backup
+
 # Downloaded files (user content - DO NOT COMMIT)
 **/Downloads/
 **/YouTube_Downloads/

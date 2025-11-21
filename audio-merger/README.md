@@ -1,5 +1,13 @@
 # Audio Merger 🎵
 
+<!-- Language Selection -->
+**Languages:** [🇮🇩 Bahasa Indonesia](#indonesian) | [🇺🇸 English](#english) | [🇯🇵 日本語](#japanese)
+
+---
+
+<a name="indonesian"></a>
+## 🇮🇩 Bahasa Indonesia
+
 Program Python untuk menggabungkan multiple file audio menjadi satu file menggunakan pydub dan FFmpeg. Tersedia dalam versi **GUI (Flet)** dan **Command Line**.
 
 ## Fitur
@@ -460,3 +468,68 @@ Program untuk memudahkan penggabungan file audio dengan berbagai efek transisi.
 ## License
 
 Free to use and modify.
+
+---
+
+<a name="english"></a>
+## 🇺🇸 English
+
+Python program to merge multiple audio files into one using pydub and FFmpeg.
+
+### ✨ Features
+
+- **Multi-format Support**: MP3, WAV, FLAC, M4A, OGG, AAC, WMA
+- **Crossfade Effect**: Smooth transitions between songs
+- **Gap/Silence**: Add silence between tracks
+- **Modern GUI**: User-friendly graphical interface (Flet)
+- **CLI Mode**: Command line support for automation
+- **Auto-sorting**: Files automatically sorted by name
+- **Real-time Progress**: Detailed progress indicators
+
+### 🚀 Quick Start
+
+```bash
+# 1. Navigate to folder
+cd audio-merger
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Run GUI
+python audio_merger_gui.py
+```
+
+For detailed documentation, see the Indonesian section above.
+
+
+---
+
+<a name="japanese"></a>
+## 🇯🇵 日本語
+
+pydubとFFmpegを使用して複数の音声ファイルを1つに結合するPythonプログラム。
+
+### ✨ 機能
+
+- **マルチフォーマット対応**: MP3, WAV, FLAC, M4A, OGG, AAC, WMA
+- **クロスフェード効果**: 曲間のスムーズな遷移
+- **ギャップ/無音**: トラック間に無音を追加
+- **モダンGUI**: ユーザーフレンドリーなグラフィカルインターフェース（Flet）
+- **CLIモード**: 自動化のためのコマンドラインサポート
+- **自動ソート**: ファイル名で自動的にソート
+- **リアルタイム進行状況**: 詳細な進行状況インジケーター
+
+### 🚀 クイックスタート
+
+```bash
+# 1. フォルダに移動
+cd audio-merger
+
+# 2. 依存関係をインストール
+pip install -r requirements.txt
+
+# 3. GUIを実行
+python audio_merger_gui.py
+```
+
+詳細なドキュメントについては、上記のインドネシア語セクションを参照してください。

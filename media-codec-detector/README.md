@@ -1,5 +1,13 @@
 # Media Codec Detector 🎬
 
+<!-- Language Selection -->
+**Languages:** [🇮🇩 Bahasa Indonesia](#indonesian) | [🇺🇸 English](#english) | [🇯🇵 日本語](#japanese)
+
+---
+
+<a name="indonesian"></a>
+## 🇮🇩 Bahasa Indonesia
+
 Program Python untuk mendeteksi format kontainer dan codec dari file media (gambar, video, audio). Tersedia dalam versi **GUI (Flet)** dan **Command Line**.
 
 ## Fitur
@@ -312,3 +320,66 @@ Program ini dibuat untuk membantu analisis codec dan format file media.
 ## License
 
 Free to use and modify.
+
+---
+
+<a name="english"></a>
+## 🇺🇸 English
+
+Python program to detect container format and codecs from media files.
+
+### ✨ Features
+
+- **Image Format Detection**: PNG, JPEG, GIF, BMP, and more
+- **Video Analysis**: Detect video codecs (H.264, H.265, VP9, etc.)
+- **Audio Analysis**: Detect audio codecs (MP3, AAC, FLAC, etc.)
+- **Modern GUI**: User-friendly interface with Flet
+- **Batch Processing**: Analyze multiple files or entire folders
+- **Dummy File Creator**: Generate test files for demonstration
+
+### 🚀 Quick Start
+
+```bash
+# 1. Navigate to folder
+cd media-codec-detector
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Run GUI
+python media_codec_detector_gui.py
+```
+
+For detailed documentation, see the Indonesian section above.
+
+
+---
+
+<a name="japanese"></a>
+## 🇯🇵 日本語
+
+メディアファイルからコンテナ形式とコーデックを検出するPythonプログラム。
+
+### ✨ 機能
+
+- **画像形式検出**: PNG、JPEG、GIF、BMPなど
+- **動画解析**: 動画コーデック検出（H.264、H.265、VP9など）
+- **音声解析**: 音声コーデック検出（MP3、AAC、FLACなど）
+- **モダンGUI**: Fletを使用したユーザーフレンドリーなインターフェース
+- **バッチ処理**: 複数ファイルまたはフォルダ全体を解析
+- **ダミーファイル作成**: デモンストレーション用のテストファイル生成
+
+### 🚀 クイックスタート
+
+```bash
+# 1. フォルダに移動
+cd media-codec-detector
+
+# 2. 依存関係をインストール
+pip install -r requirements.txt
+
+# 3. GUIを実行
+python media_codec_detector_gui.py
+```
+
+詳細なドキュメントについては、上記のインドネシア語セクションを参照してください。

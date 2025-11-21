@@ -1,6 +1,12 @@
-# 🎵 YouTube Playlist Downloader# 🎵 YouTube Playlist Downloader
+# YouTube Playlist Downloader 🎵
 
+<!-- Language Selection -->
+**Languages:** [🇮🇩 Bahasa Indonesia](#indonesian) | [🇺🇸 English](#english) | [🇯🇵 日本語](#japanese)
 
+---
+
+<a name="indonesian"></a>
+## 🇮🇩 Bahasa Indonesia
 
 Tool untuk mendownload **full playlist YouTube** dengan mudah dan otomatis. Mendukung download video dan audio dengan berbagai kualitas, auto-numbering, dan metadata lengkap.Tool untuk mendownload playlist YouTube dengan mudah dan otomatis menggunakan `yt-dlp`. Mendukung download video dan audio dengan berbagai kualitas.
 
@@ -651,3 +657,70 @@ Free to use and modify.
 ---
 
 **Happy playlist downloading! 🎉**
+
+---
+
+<a name="english"></a>
+## 🇺🇸 English
+
+Tool to download complete YouTube playlists with auto-numbering.
+
+### ✨ Features
+
+- **Full Playlist Download**: Download entire playlist at once
+- **Multiple Quality Options**: Best, 720p, 480p
+- **Audio-Only Mode**: Extract MP3 with unified album art
+- **Auto Numbering**: Files numbered by playlist order
+- **Progress Tracking**: Per-video and overall progress
+- **Resume Capability**: Continue interrupted downloads
+- **Thumbnail & Metadata**: Auto-embed for all files
+- **Modern GUI**: Flet-based interface
+
+### 🚀 Quick Start
+
+```bash
+# 1. Navigate to folder
+cd yt-playlist-downloader
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Run GUI
+python playlist_downloader_gui_flet.py
+```
+
+For detailed documentation, see the Indonesian section above.
+
+
+---
+
+<a name="japanese"></a>
+## 🇯🇵 日本語
+
+自動番号付けでYouTubeプレイリスト全体をダウンロードするツール。
+
+### ✨ 機能
+
+- **プレイリスト全体ダウンロード**: プレイリスト全体を一度にダウンロード
+- **複数の品質オプション**: 最高品質、720p、480p
+- **音声のみモード**: 統一アルバムアート付きMP3抽出
+- **自動番号付け**: プレイリスト順でファイル番号付け
+- **進行状況追跡**: 動画ごとおよび全体の進行状況
+- **再開機能**: 中断されたダウンロードを続行
+- **サムネイルとメタデータ**: すべてのファイルに自動埋め込み
+- **モダンGUI**: Fletベースのインターフェース
+
+### 🚀 クイックスタート
+
+```bash
+# 1. フォルダに移動
+cd yt-playlist-downloader
+
+# 2. 依存関係をインストール
+pip install -r requirements.txt
+
+# 3. GUIを実行
+python playlist_downloader_gui_flet.py
+```
+
+詳細なドキュメントについては、上記のインドネシア語セクションを参照してください。

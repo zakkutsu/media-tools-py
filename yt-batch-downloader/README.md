@@ -1,6 +1,12 @@
-# 🎬 YouTube Batch Downloader# 🎬 YouTube Batch Downloader
+# YouTube Batch Downloader 🎬
 
+<!-- Language Selection -->
+**Languages:** [🇮🇩 Bahasa Indonesia](#indonesian) | [🇺🇸 English](#english) | [🇯🇵 日本語](#japanese)
 
+---
+
+<a name="indonesian"></a>
+## 🇮🇩 Bahasa Indonesia
 
 Tool untuk mendownload **multiple individual YouTube videos** sekaligus dari daftar URL. Berbeda dengan playlist downloader, tool ini untuk download banyak video terpisah/individual dalam satu batch.Tool untuk mendownload **multiple individual YouTube videos** sekaligus dari daftar URL yang diberikan. Berbeda dengan playlist downloader, tool ini untuk download banyak video terpisah/individual dalam satu bat## 🎨 Thumbnail & Metadata Feature
 
@@ -706,3 +712,70 @@ Free to use and modify.
 ---
 
 **Happy downloading! 🎉**
+
+---
+
+<a name="english"></a>
+## 🇺🇸 English
+
+Tool to download multiple individual YouTube videos at once.
+
+### ✨ Features
+
+- **Batch Download**: Download multiple individual videos
+- **Multiple Quality Options**: Best, 720p, 480p
+- **Audio-Only Mode**: Extract MP3 with album art
+- **URL Management**: Load/save URL lists, retry failed
+- **Auto Numbering**: Optional file numbering
+- **Progress Tracking**: Real-time speed, ETA, statistics
+- **Thumbnail & Metadata**: Auto-embed for media files
+- **Modern GUI**: Flet-based responsive interface
+
+### 🚀 Quick Start
+
+```bash
+# 1. Navigate to folder
+cd yt-batch-downloader
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Run GUI
+python batch_downloader_gui_flet.py
+```
+
+For detailed documentation, see the Indonesian section above.
+
+
+---
+
+<a name="japanese"></a>
+## 🇯🇵 日本語
+
+複数の個別YouTube動画を一度にダウンロードするツール。
+
+### ✨ 機能
+
+- **バッチダウンロード**: 複数の個別動画をダウンロード
+- **複数の品質オプション**: 最高品質、720p、480p
+- **音声のみモード**: アルバムアート付きMP3抽出
+- **URL管理**: URLリストの読み込み/保存、失敗の再試行
+- **自動番号付け**: オプションのファイル番号付け
+- **進行状況追跡**: リアルタイムの速度、ETA、統計
+- **サムネイルとメタデータ**: メディアファイルへの自動埋め込み
+- **モダンGUI**: Fletベースのレスポンシブインターフェース
+
+### 🚀 クイックスタート
+
+```bash
+# 1. フォルダに移動
+cd yt-batch-downloader
+
+# 2. 依存関係をインストール
+pip install -r requirements.txt
+
+# 3. GUIを実行
+python batch_downloader_gui_flet.py
+```
+
+詳細なドキュメントについては、上記のインドネシア語セクションを参照してください。

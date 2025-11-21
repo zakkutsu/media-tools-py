@@ -3,6 +3,11 @@ import os
 import glob
 import threading
 from pathlib import Path
+import sys
+
+# Add parent directory to path for language_config
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from language_config import get_language, get_all_texts
 
 # Konfigurasi FFmpeg path sebelum import pydub
 FFMPEG_PATH = r"C:\Users\nonion\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0-essentials_build\bin\ffmpeg.exe"
@@ -27,6 +32,11 @@ class AudioMergerGUI:
         self.page.scroll = ft.ScrollMode.AUTO
         self.page.padding = 10
         
+        # Language configuration
+        self.current_language = get_language()
+        self.translations = get_all_texts("audio_merger", self.current_language)
+        self.common_translations = get_all_texts("common", self.current_language)
+        
         # State variables
         self.selected_folder = ""
         self.output_folder = r"C:\Users\nonion\Music"  # Default folder tujuan penyimpanan
@@ -47,9 +57,11 @@ class AudioMergerGUI:
             content=ft.Column([
                 ft.Row([
                     ft.Icon(ft.icons.AUDIOTRACK, size=40, color=ft.colors.BLUE),
-                    ft.Text("Audio Merger", size=28, weight=ft.FontWeight.BOLD),
+                    ft.Text(self.translations.get("title", "🎵 Audio Merger"), 
+                           size=28, weight=ft.FontWeight.BOLD),
                 ], alignment=ft.MainAxisAlignment.CENTER),
-                ft.Text("Gabungkan file audio menjadi satu dengan efek transisi", 
+                ft.Text(self.translations.get("description", 
+                       "Gabungkan file audio menjadi satu dengan efek transisi"), 
                        size=14, color=ft.colors.GREY_700, text_align=ft.TextAlign.CENTER),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER),
             padding=15,

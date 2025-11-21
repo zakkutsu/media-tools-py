@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 import importlib.util
 import subprocess
+from language_config import get_language, set_language, get_available_languages, get_all_texts
 
 # Import the GUI classes from both tools
 current_dir = Path(__file__).parent
@@ -173,6 +174,11 @@ class MediaToolsLauncher:
         self.page.window_min_height = 500
         self.page.theme_mode = ft.ThemeMode.LIGHT
         
+        # Language configuration
+        self.current_language = get_language()
+        self.translations = get_all_texts("launcher", self.current_language)
+        self.common_translations = get_all_texts("common", self.current_language)
+        
         # State management
         self.current_app = None
         self.home_view = None
@@ -181,11 +187,38 @@ class MediaToolsLauncher:
         # Initialize UI
         self.setup_home_ui()
         
+    def change_language(self, e):
+        """Handle language change"""
+        new_lang = e.control.value
+        if set_language(new_lang):
+            self.current_language = new_lang
+            self.translations = get_all_texts("launcher", self.current_language)
+            self.common_translations = get_all_texts("common", self.current_language)
+            # Refresh UI
+            self.setup_home_ui()
+    
     def setup_home_ui(self):
         """Setup the main home interface"""
         
         # Clear page
         self.page.controls.clear()
+        
+        # Language selector dropdown
+        languages = get_available_languages()
+        language_options = [
+            ft.dropdown.Option(key=lang_code, text=f"{lang_data['flag']} {lang_data['name']}")
+            for lang_code, lang_data in languages.items()
+        ]
+        
+        language_selector = ft.Dropdown(
+            value=self.current_language,
+            options=language_options,
+            width=250,
+            on_change=self.change_language,
+            border_color=ft.colors.DEEP_PURPLE,
+            focused_border_color=ft.colors.DEEP_PURPLE_400,
+            label=self.common_translations.get("select_language", "Pilih Bahasa"),
+        )
         
         # Header
         header = ft.Container(
@@ -193,11 +226,15 @@ class MediaToolsLauncher:
                 ft.Row([
                     ft.Icon(ft.icons.BUILD_CIRCLE, size=50, color=ft.colors.DEEP_PURPLE),
                     ft.Column([
-                        ft.Text("Media Tools", size=32, weight=ft.FontWeight.BOLD),
-                        ft.Text("Suite", size=24, weight=ft.FontWeight.W_300, color=ft.colors.GREY_600),
-                    ], spacing=0)
+                        ft.Text(self.translations.get("title", "Media Tools"), 
+                               size=32, weight=ft.FontWeight.BOLD),
+                        ft.Text(self.translations.get("subtitle", "Suite"), 
+                               size=24, weight=ft.FontWeight.W_300, color=ft.colors.GREY_600),
+                    ], spacing=0),
+                    ft.Container(expand=True),  # Spacer
+                    language_selector,
                 ], alignment=ft.MainAxisAlignment.CENTER, spacing=20),
-                ft.Text("Pilih tool yang ingin Anda gunakan", 
+                ft.Text(self.translations.get("description", "Pilih tool yang ingin Anda gunakan"), 
                        size=16, color=ft.colors.GREY_700, text_align=ft.TextAlign.CENTER),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=15),
             padding=30,
@@ -208,8 +245,9 @@ class MediaToolsLauncher:
         
         # Tool cards
         audio_merger_card = self.create_tool_card(
-            title="🎵 Audio Merger",
-            description="Gabungkan multiple file audio menjadi satu dengan efek transisi seperti crossfade dan gap",
+            title=self.translations.get("tool_audio_merger", "🎵 Audio Merger"),
+            description=self.translations.get("audio_merger_desc", 
+                "Gabungkan multiple file audio menjadi satu dengan efek transisi seperti crossfade dan gap"),
             features=[
                 "✨ Crossfade & Gap effects",
                 "🎚️ Multi-format support",
@@ -221,8 +259,9 @@ class MediaToolsLauncher:
         )
         
         media_detector_card = self.create_tool_card(
-            title="🎬 Media Codec Detector", 
-            description="Deteksi format kontainer dan codec dari file media (gambar, video, audio)",
+            title=self.translations.get("tool_media_detector", "🎬 Media Codec Detector"), 
+            description=self.translations.get("media_detector_desc",
+                "Deteksi format kontainer dan codec dari file media (gambar, video, audio)"),
             features=[
                 "🕵️ Comprehensive codec detection", 
                 "📱 Image format analysis",
@@ -234,8 +273,9 @@ class MediaToolsLauncher:
         )
         
         batch_downloader_card = self.create_tool_card(
-            title="📥 Batch Downloader",
-            description="Download multiple individual YouTube videos dengan modern Flet interface",
+            title=self.translations.get("tool_batch_downloader", "📥 Batch Downloader"),
+            description=self.translations.get("batch_downloader_desc",
+                "Download multiple individual YouTube videos dengan modern Flet interface"),
             features=[
                 "� Modern Flet GUI interface",
                 "📝 URL management & batch loading",
@@ -247,8 +287,9 @@ class MediaToolsLauncher:
         )
         
         playlist_downloader_card = self.create_tool_card(
-            title="🎵 Playlist Downloader",
-            description="Download complete YouTube playlists dengan elegant interface",
+            title=self.translations.get("tool_playlist_downloader", "🎵 Playlist Downloader"),
+            description=self.translations.get("playlist_downloader_desc",
+                "Download complete YouTube playlists dengan elegant interface"),
             features=[
                 "📱 Modern Flet GUI interface",
                 "🎵 Full playlist downloading",
@@ -262,7 +303,8 @@ class MediaToolsLauncher:
         # Tool selection section
         tools_section = ft.Container(
             content=ft.Column([
-                ft.Text("Pilih Tool", size=20, weight=ft.FontWeight.BOLD, text_align=ft.TextAlign.CENTER),
+                ft.Text(self.translations.get("select_tool", "Pilih Tool"), 
+                       size=20, weight=ft.FontWeight.BOLD, text_align=ft.TextAlign.CENTER),
                 ft.Row([
                     audio_merger_card,
                     media_detector_card,
@@ -282,13 +324,17 @@ class MediaToolsLauncher:
                 ft.Divider(height=1, color=ft.colors.GREY_300),
                 ft.Row([
                     ft.Icon(ft.icons.INFO_OUTLINE, size=20, color=ft.colors.GREY_600),
-                    ft.Text("Kedua tool memerlukan FFmpeg untuk berfungsi dengan optimal", 
+                    ft.Text(self.translations.get("info_message", 
+                           "Kedua tool memerlukan FFmpeg untuk berfungsi dengan optimal"), 
                            size=14, color=ft.colors.GREY_600),
                 ], alignment=ft.MainAxisAlignment.CENTER),
                 ft.Row([
-                    ft.TextButton("📖 Dokumentasi", on_click=self.show_docs),
-                    ft.TextButton("⚙️ System Requirements", on_click=self.show_requirements),
-                    ft.TextButton("❌ Exit", on_click=self.exit_app),
+                    ft.TextButton(self.translations.get("documentation", "📖 Dokumentasi"), 
+                                 on_click=self.show_docs),
+                    ft.TextButton(self.translations.get("system_requirements", "⚙️ System Requirements"), 
+                                 on_click=self.show_requirements),
+                    ft.TextButton(self.translations.get("exit", "❌ Exit"), 
+                                 on_click=self.exit_app),
                 ], alignment=ft.MainAxisAlignment.CENTER, spacing=20),
             ], spacing=15),
             padding=20,
@@ -340,7 +386,7 @@ class MediaToolsLauncher:
                         ft.Column(feature_items, spacing=5),
                         ft.Container(height=15),  # Spacing
                         ft.ElevatedButton(
-                            "Launch Tool",
+                            self.translations.get("launch_tool", "Launch Tool"),
                             icon=ft.icons.ROCKET_LAUNCH,
                             bgcolor=color,
                             color=ft.colors.WHITE,
@@ -418,7 +464,7 @@ class MediaToolsLauncher:
         # Create back button
         back_button = ft.Container(
             content=ft.ElevatedButton(
-                "🏠 Back to Home",
+                self.common_translations.get("back_to_home", "🏠 Back to Home"),
                 icon=ft.icons.HOME,
                 on_click=self.back_to_home,
                 bgcolor=ft.colors.GREY_600,

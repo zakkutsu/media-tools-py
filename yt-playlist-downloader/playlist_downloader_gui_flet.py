@@ -12,6 +12,10 @@ from pathlib import Path
 import asyncio
 import time
 
+# Add parent directory to path for language_config
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from language_config import get_language, get_all_texts
+
 # Import our playlist downloader
 from playlist_downloader import PlaylistDownloader
 
@@ -25,6 +29,11 @@ class PlaylistDownloaderGUI:
         self.page.window_resizable = True
         self.page.theme_mode = ft.ThemeMode.LIGHT
         self.page.padding = 10
+        
+        # Language configuration
+        self.current_language = get_language()
+        self.translations = get_all_texts("youtube_downloader", self.current_language)
+        self.common_translations = get_all_texts("common", self.current_language)
         
         # Initialize downloader
         self.downloader = PlaylistDownloader()

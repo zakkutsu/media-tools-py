@@ -6,6 +6,11 @@ import filetype
 import ffmpeg
 from PIL import Image
 from pathlib import Path
+import sys
+
+# Add parent directory to path for language_config
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from language_config import get_language, get_all_texts
 
 class MediaCodecDetectorGUI:
     def __init__(self, page: ft.Page):
@@ -16,6 +21,10 @@ class MediaCodecDetectorGUI:
         self.page.window_min_width = 700
         self.page.window_min_height = 600
         self.page.theme_mode = ft.ThemeMode.LIGHT
+        
+        # Language configuration
+        self.current_language = get_language()
+        self.common_translations = get_all_texts("common", self.current_language)
         
         # State variables
         self.selected_path = ""

@@ -1,0 +1,22 @@
+# Python Dependencies
+pydub==0.25.1
+flet==0.21.2
+audioop-lts==0.2.2
+ffmpeg-python==0.2.0
+
+# System Requirements (FFmpeg binary):
+# FFmpeg must be installed separately and available in system PATH
+# 
+# Installation options:
+# 1. Windows Package Managers:
+#    - winget: winget install FFmpeg
+#    - Chocolatey: choco install ffmpeg
+# 
+# 2. Manual Installation:
+#    - Download from: https://ffmpeg.org/download.html
+#    - Extract and add to PATH
+# 
+# Required binaries:
+# - ffmpeg.exe (main processing tool)
+# - ffprobe.exe (media analysis tool)
+# - ffplay.exe (media player)

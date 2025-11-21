@@ -86,13 +86,13 @@ class BatchDownloaderGUI:
         title_section = ft.Container(
             content=ft.Column([
                 ft.Text(
-                    "🎬 YouTube Batch Downloader",
+                    self.translations.get("title_batch", "🎬 YouTube Batch Downloader"),
                     size=24,
                     weight=ft.FontWeight.BOLD,
                     text_align=ft.TextAlign.CENTER
                 ),
                 ft.Text(
-                    "Download multiple individual YouTube videos",
+                    self.translations.get("desc_batch", "Download multiple individual YouTube videos"),
                     size=14,
                     color=ft.colors.GREY_600,
                     text_align=ft.TextAlign.CENTER
@@ -103,9 +103,9 @@ class BatchDownloaderGUI:
         main_content.controls.append(title_section)
         
         # yt-dlp Status Section
-        self.ytdlp_status_text = ft.Text("Checking yt-dlp status...", size=12)
+        self.ytdlp_status_text = ft.Text(self.translations.get("ytdlp_status", "Checking yt-dlp status..."), size=12)
         self.install_btn = ft.ElevatedButton(
-            text="Install/Update yt-dlp",
+            text=self.translations.get("install_ytdlp", "📦 Install/Update yt-dlp"),
             on_click=self.install_update_ytdlp,
             icon=ft.icons.DOWNLOAD
         )
@@ -124,14 +124,14 @@ class BatchDownloaderGUI:
         
         # Download Folder Section
         self.folder_field = ft.TextField(
-            label="📁 Download Folder",
+            label=self.translations.get("download_folder", "📁 Download Folder"),
             value=self.download_folder,
             expand=True,
             on_change=self.on_folder_change
         )
         
         browse_btn = ft.ElevatedButton(
-            text="Browse",
+            text=self.common_translations.get("browse", "Browse"),
             icon=ft.icons.FOLDER_OPEN,
             on_click=self.browse_folder
         )
@@ -152,7 +152,7 @@ class BatchDownloaderGUI:
         
         # Download Buttons
         self.download_btn = ft.ElevatedButton(
-            text="🚀 Start Batch Download",
+            text=self.translations.get("start_download", "🚀 Start Batch Download"),
             icon=ft.icons.PLAY_ARROW,
             on_click=self.start_download,
             width=200,
@@ -164,7 +164,7 @@ class BatchDownloaderGUI:
         )
         
         self.retry_failed_btn = ft.ElevatedButton(
-            text="🔄 Retry Failed",
+            text="🔄 " + self.translations.get("retry", "Retry Failed"),
             icon=ft.icons.REFRESH,
             on_click=self.retry_failed_downloads,
             width=150,
@@ -213,14 +213,14 @@ class BatchDownloaderGUI:
         """Create URL management section"""
         # URL Input
         self.url_field = ft.TextField(
-            label="🔗 YouTube URL",
-            hint_text="Paste YouTube video URL here...",
+            label=self.translations.get("url_input", "🔗 YouTube URL"),
+            hint_text=self.translations.get("url_input", "Paste YouTube video URL here..."),
             expand=True,
             on_submit=self.add_url
         )
         
         add_btn = ft.ElevatedButton(
-            text="Add URL",
+            text=self.translations.get("add_url", "Add URL"),
             icon=ft.icons.ADD,
             on_click=self.add_url
         )
@@ -229,27 +229,27 @@ class BatchDownloaderGUI:
         
         # URL Management Buttons
         load_btn = ft.ElevatedButton(
-            text="📄 Load from File",
+            text=self.translations.get("load_from_file", "📄 Load from File"),
             icon=ft.icons.FILE_OPEN,
             on_click=self.load_urls_from_file,
             style=ft.ButtonStyle(bgcolor=ft.colors.GREEN_100)
         )
         
         save_btn = ft.ElevatedButton(
-            text="💾 Save to File",
+            text=self.translations.get("save_to_file", "💾 Save to File"),
             icon=ft.icons.SAVE,
             on_click=self.save_urls_to_file,
             style=ft.ButtonStyle(bgcolor=ft.colors.BLUE_100)
         )
         
         clear_btn = ft.ElevatedButton(
-            text="🗑️ Clear All",
+            text=self.translations.get("clear_all", "🗑️ Clear All"),
             icon=ft.icons.CLEAR,
             on_click=self.clear_all_urls,
             style=ft.ButtonStyle(bgcolor=ft.colors.RED_100)
         )
         
-        self.url_count_text = ft.Text("URLs: 0", weight=ft.FontWeight.BOLD, size=14)
+        self.url_count_text = ft.Text(self.translations.get("url_list", "URLs") + ": 0", weight=ft.FontWeight.BOLD, size=14)
         
         button_row = ft.Row([
             load_btn, save_btn, clear_btn,

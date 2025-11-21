@@ -39,14 +39,18 @@ class MediaCodecDetectorGUI:
     def setup_ui(self):
         """Setup user interface"""
         
+        # Get translations for media detector
+        self.detector_translations = get_all_texts("media_detector", self.current_language)
+        
         # Header
         header = ft.Container(
             content=ft.Column([
                 ft.Row([
                     ft.Icon(ft.icons.MOVIE, size=40, color=ft.colors.PURPLE),
-                    ft.Text("Media Codec Detector", size=28, weight=ft.FontWeight.BOLD),
+                    ft.Text(self.detector_translations.get("title", "Media Codec Detector"), 
+                           size=28, weight=ft.FontWeight.BOLD),
                 ], alignment=ft.MainAxisAlignment.CENTER),
-                ft.Text("Deteksi format kontainer dan codec dari file media", 
+                ft.Text(self.detector_translations.get("description", "Deteksi format kontainer dan codec dari file media"), 
                        size=14, color=ft.colors.GREY_700, text_align=ft.TextAlign.CENTER),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER),
             padding=20,
@@ -58,8 +62,8 @@ class MediaCodecDetectorGUI:
         # Mode selection
         self.mode_radio = ft.RadioGroup(
             content=ft.Row([
-                ft.Radio(value="file", label="📄 Analisis File Tunggal"),
-                ft.Radio(value="folder", label="📁 Analisis Semua File dalam Folder"),
+                ft.Radio(value="file", label=self.detector_translations.get("mode_file", "📄 Analisis File Tunggal")),
+                ft.Radio(value="folder", label=self.detector_translations.get("mode_folder", "📁 Analisis Semua File dalam Folder")),
             ], alignment=ft.MainAxisAlignment.CENTER),
             value="file",
             on_change=self.on_mode_change
@@ -67,7 +71,8 @@ class MediaCodecDetectorGUI:
         
         mode_section = ft.Container(
             content=ft.Column([
-                ft.Text("1. Pilih Mode Analisis", size=16, weight=ft.FontWeight.BOLD),
+                ft.Text(self.detector_translations.get("step1", "1. Pilih Mode Analisis"), 
+                       size=16, weight=ft.FontWeight.BOLD),
                 self.mode_radio,
             ]),
             padding=15,
@@ -77,9 +82,9 @@ class MediaCodecDetectorGUI:
         )
         
         # File/Folder selection
-        self.path_text = ft.Text("📁 Belum ada file/folder dipilih", size=14)
+        self.path_text = ft.Text(self.detector_translations.get("no_selection", "📁 Belum ada file/folder dipilih"), size=14)
         self.select_button = ft.ElevatedButton(
-            "Pilih File",
+            self.detector_translations.get("select_file", "Pilih File"),
             icon=ft.icons.FILE_OPEN,
             on_click=self.pick_file_dialog,
             bgcolor=ft.colors.PURPLE,
@@ -88,7 +93,8 @@ class MediaCodecDetectorGUI:
         
         selection_section = ft.Container(
             content=ft.Column([
-                ft.Text("2. Pilih File/Folder Media", size=16, weight=ft.FontWeight.BOLD),
+                ft.Text(self.detector_translations.get("step2", "2. Pilih File/Folder Media"), 
+                       size=16, weight=ft.FontWeight.BOLD),
                 ft.Row([self.select_button, self.path_text], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
             ]),
             padding=15,
@@ -99,9 +105,11 @@ class MediaCodecDetectorGUI:
         
         # File list (for folder mode)
         self.files_list = ft.Column([], scroll=ft.ScrollMode.AUTO, height=120)
+        self.files_section_title = ft.Text(self.detector_translations.get("files_found", "File Media Ditemukan"), 
+                                           size=16, weight=ft.FontWeight.BOLD)
         self.files_section = ft.Container(
             content=ft.Column([
-                ft.Text("File Media Ditemukan", size=16, weight=ft.FontWeight.BOLD),
+                self.files_section_title,
                 ft.Container(
                     content=self.files_list,
                     border=ft.border.all(1, ft.colors.GREY_300),
@@ -116,7 +124,7 @@ class MediaCodecDetectorGUI:
         
         # Analysis button
         self.analyze_button = ft.ElevatedButton(
-            "🕵️ Mulai Analisis",
+            self.detector_translations.get("start_analysis", "🕵️ Mulai Analisis"),
             icon=ft.icons.SEARCH,
             on_click=self.start_analysis,
             bgcolor=ft.colors.GREEN,
@@ -140,9 +148,11 @@ class MediaCodecDetectorGUI:
         
         # Results section
         self.results_list = ft.Column([], scroll=ft.ScrollMode.AUTO)
+        self.results_section_title = ft.Text(self.detector_translations.get("analysis_results", "📊 Hasil Analisis"), 
+                                             size=16, weight=ft.FontWeight.BOLD)
         self.results_section = ft.Container(
             content=ft.Column([
-                ft.Text("📊 Hasil Analisis", size=16, weight=ft.FontWeight.BOLD),
+                self.results_section_title,
                 ft.Container(
                     content=self.results_list,
                     border=ft.border.all(1, ft.colors.GREY_300),
@@ -200,18 +210,18 @@ class MediaCodecDetectorGUI:
         self.analysis_mode = e.control.value
         
         if self.analysis_mode == "file":
-            self.select_button.text = "Pilih File"
+            self.select_button.text = self.detector_translations.get("select_file", "Pilih File")
             self.select_button.icon = ft.icons.FILE_OPEN
             self.files_section.visible = False
         else:
-            self.select_button.text = "Pilih Folder"
+            self.select_button.text = self.detector_translations.get("select_folder", "Pilih Folder")
             self.select_button.icon = ft.icons.FOLDER_OPEN
             self.files_section.visible = True
         
         # Reset selection
         self.selected_path = ""
         self.media_files = []
-        self.path_text.value = "📁 Belum ada file/folder dipilih"
+        self.path_text.value = self.detector_translations.get("no_selection", "📁 Belum ada file/folder dipilih")
         self.files_list.controls.clear()
         self.results_list.controls.clear()
         self.results_section.visible = False

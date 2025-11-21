@@ -77,13 +77,13 @@ class PlaylistDownloaderGUI:
         title_section = ft.Container(
             content=ft.Column([
                 ft.Text(
-                    "🎵 YouTube Playlist Downloader",
+                    self.translations.get("title_playlist", "🎵 YouTube Playlist Downloader"),
                     size=24,
                     weight=ft.FontWeight.BOLD,
                     text_align=ft.TextAlign.CENTER
                 ),
                 ft.Text(
-                    "Download complete YouTube playlists with ease",
+                    self.translations.get("desc_playlist", "Download complete YouTube playlists with ease"),
                     size=14,
                     color=ft.colors.GREY_600,
                     text_align=ft.TextAlign.CENTER
@@ -94,9 +94,9 @@ class PlaylistDownloaderGUI:
         main_content.controls.append(title_section)
         
         # yt-dlp Status Section
-        self.ytdlp_status_text = ft.Text("Checking yt-dlp status...", size=12)
+        self.ytdlp_status_text = ft.Text(self.translations.get("ytdlp_status", "Checking yt-dlp status..."), size=12)
         self.install_btn = ft.ElevatedButton(
-            text="Install/Update yt-dlp",
+            text=self.translations.get("install_ytdlp", "📦 Install/Update yt-dlp"),
             on_click=self.install_update_ytdlp,
             icon=ft.icons.DOWNLOAD
         )
@@ -115,14 +115,14 @@ class PlaylistDownloaderGUI:
         
         # Download Folder Section
         self.folder_field = ft.TextField(
-            label="📁 Download Folder",
+            label=self.translations.get("download_folder", "📁 Download Folder"),
             value=self.download_folder,
             expand=True,
             on_change=self.on_folder_change
         )
         
         browse_btn = ft.ElevatedButton(
-            text="Browse",
+            text=self.common_translations.get("browse", "Browse"),
             icon=ft.icons.FOLDER_OPEN,
             on_click=self.browse_folder
         )
@@ -135,8 +135,8 @@ class PlaylistDownloaderGUI:
         
         # Playlist URL Section
         self.url_field = ft.TextField(
-            label="🔗 Playlist URL",
-            hint_text="Paste YouTube playlist URL here...",
+            label=self.translations.get("url_input", "🔗 Playlist URL"),
+            hint_text=self.translations.get("url_input", "Paste YouTube playlist URL here..."),
             expand=True,
             on_change=self.on_url_change,
             on_submit=self.get_playlist_info
@@ -169,7 +169,7 @@ class PlaylistDownloaderGUI:
         
         # Download Button
         self.download_btn = ft.ElevatedButton(
-            text="🚀 Start Download",
+            text=self.translations.get("start_download", "🚀 Start Download"),
             icon=ft.icons.PLAY_ARROW,
             on_click=self.start_download,
             width=200,

@@ -1,0 +1,17 @@
+# YouTube Playlist Downloader Requirements
+# 
+# Main dependency untuk download YouTube playlist
+yt-dlp>=2023.12.30
+
+# Dependencies untuk GUI (biasanya sudah included di Python)
+# tkinter sudah built-in di Python standard library
+
+# Optional: untuk handling video/audio processing yang lebih advanced
+# ffmpeg-python>=0.2.0  # Uncomment jika butuh manipulasi video/audio lewat Python
+
+# Catatan instalasi:
+# 1. Install requirements: pip install -r requirements.txt
+# 2. Pastikan FFmpeg sudah terinstall di sistem untuk video processing
+#    - Windows: Download dari https://ffmpeg.org/download.html
+#    - macOS: brew install ffmpeg
+#    - Ubuntu/Debian: sudo apt install ffmpeg

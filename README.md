@@ -19,9 +19,53 @@ Koleksi tools untuk pemrosesan dan analisis file media (audio, video, gambar) de
 
 ### 🚀 Quick Start (Recommended)
 
-#### ⚠️ FIRST TIME SETUP (IMPORTANT!)
+#### ⚡ EASIEST WAY - One-Click Auto Setup!
 
-Jika baru clone repository ini, **jalankan setup terlebih dahulu**:
+**Untuk pengguna Windows**, cukup double-click file ini:
+```
+launch_media_tools.bat
+```
+
+Launcher akan **otomatis** melakukan:
+- ✅ Membuat virtual environment
+- ✅ Install semua dependencies
+- ✅ Setup FFmpeg
+- ✅ Langsung menjalankan aplikasi
+
+**Tampilan terminal saat first-time setup:**
+```
+========================================
+First Time Setup - Auto Installation
+========================================
+
+This is your first time running Media Tools.
+Setting up environment automatically...
+
+Please wait, this may take a few minutes...
+
+[1/3] Creating virtual environment...
+      Done!
+
+[2/3] Installing dependencies...
+      This may take 2-5 minutes depending on your internet speed...
+      [Installing packages...]
+      Done!
+
+[3/3] Checking FFmpeg...
+      FFmpeg is available!
+
+========================================
+Setup Complete!
+========================================
+
+Starting Media Tools Launcher...
+```
+
+Dependencies yang dibutuhkan (seperti `yt-dlp`) akan **auto-install** saat pertama kali tools dibuka!
+
+#### 🔧 Manual Setup (Alternative)
+
+Jika ingin setup manual:
 
 ```bash
 # Navigate to folder
@@ -31,7 +75,7 @@ cd media-tools
 python setup_media_tools.py
 ```
 
-Atau manual:
+Atau cara manual:
 
 ```bash
 # 1. Create virtual environment
@@ -147,9 +191,53 @@ A collection of tools for media file processing and analysis (audio, video, imag
 
 ### 🚀 Quick Start (Recommended)
 
-#### ⚠️ FIRST TIME SETUP (IMPORTANT!)
+#### ⚡ EASIEST WAY - One-Click Auto Setup!
 
-If you just cloned this repository, **run setup first**:
+**For Windows users**, just double-click this file:
+```
+launch_media_tools.bat
+```
+
+The launcher will **automatically**:
+- ✅ Create virtual environment
+- ✅ Install all dependencies
+- ✅ Setup FFmpeg
+- ✅ Launch the application
+
+**Terminal output during first-time setup:**
+```
+========================================
+First Time Setup - Auto Installation
+========================================
+
+This is your first time running Media Tools.
+Setting up environment automatically...
+
+Please wait, this may take a few minutes...
+
+[1/3] Creating virtual environment...
+      Done!
+
+[2/3] Installing dependencies...
+      This may take 2-5 minutes depending on your internet speed...
+      [Installing packages...]
+      Done!
+
+[3/3] Checking FFmpeg...
+      FFmpeg is available!
+
+========================================
+Setup Complete!
+========================================
+
+Starting Media Tools Launcher...
+```
+
+Required dependencies (like `yt-dlp`) will **auto-install** when you first open each tool!
+
+#### 🔧 Manual Setup (Alternative)
+
+If you prefer manual setup:
 
 ```bash
 # Navigate to folder
@@ -275,9 +363,53 @@ pip install -r requirements.txt
 
 ### 🚀 クイックスタート（推奨）
 
-#### ⚠️ 初回セットアップ（重要！）
+#### ⚡ 最も簡単な方法 - ワンクリック自動セットアップ！
 
-このリポジトリをクローンした直後は、**まずセットアップを実行してください**：
+**Windowsユーザーの場合**、このファイルをダブルクリックするだけ：
+```
+launch_media_tools.bat
+```
+
+ランチャーが**自動的に**：
+- ✅ 仮想環境を作成
+- ✅ すべての依存関係をインストール
+- ✅ FFmpegをセットアップ
+- ✅ アプリケーションを起動
+
+**初回セットアップ時のターミナル出力：**
+```
+========================================
+First Time Setup - Auto Installation
+========================================
+
+This is your first time running Media Tools.
+Setting up environment automatically...
+
+Please wait, this may take a few minutes...
+
+[1/3] Creating virtual environment...
+      Done!
+
+[2/3] Installing dependencies...
+      This may take 2-5 minutes depending on your internet speed...
+      [Installing packages...]
+      Done!
+
+[3/3] Checking FFmpeg...
+      FFmpeg is available!
+
+========================================
+Setup Complete!
+========================================
+
+Starting Media Tools Launcher...
+```
+
+必要な依存関係（`yt-dlp`など）は、各ツールを初めて開いたときに**自動インストール**されます！
+
+#### 🔧 手動セットアップ（代替方法）
+
+手動セットアップを希望する場合：
 
 ```bash
 # フォルダに移動

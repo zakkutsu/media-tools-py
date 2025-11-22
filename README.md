@@ -16,6 +16,7 @@ Koleksi tools untuk pemrosesan dan analisis file media (audio, video, gambar) de
 2. **🎬 Media Codec Detector** - Analisis codec dan format file media
 3. **📥 YouTube Batch Downloader** - Download multiple video YouTube individual
 4. **🎵 YouTube Playlist Downloader** - Download playlist YouTube lengkap
+5. **📥 SocMed Downloader** - Download video/audio dari YouTube, TikTok, Instagram, Facebook, Twitter/X (dengan batch download TXT/CSV/JSON)
 
 ### 🚀 Quick Start (Recommended)
 
@@ -155,6 +156,7 @@ python playlist_downloader_gui_flet.py
 - [Media Codec Detector](media-codec-detector/README.md)
 - [YouTube Batch Downloader](yt-batch-downloader/README.md)
 - [YouTube Playlist Downloader](yt-playlist-downloader/README.md)
+- [SocMed Downloader](socmed-downloader/README.md) ⭐ **NEW!**
 
 ### 🔧 Troubleshooting
 
@@ -188,6 +190,7 @@ A collection of tools for media file processing and analysis (audio, video, imag
 2. **🎬 Media Codec Detector** - Analyze codec and media file formats
 3. **📥 YouTube Batch Downloader** - Download multiple individual YouTube videos
 4. **🎵 YouTube Playlist Downloader** - Download complete YouTube playlists
+5. **📥 SocMed Downloader** - Download video/audio from YouTube, TikTok, Instagram, Facebook, Twitter/X (with batch download TXT/CSV/JSON)
 
 ### 🚀 Quick Start (Recommended)
 
@@ -360,6 +363,7 @@ pip install -r requirements.txt
 2. **🎬 Media Codec Detector** - コーデックとメディアファイル形式を分析
 3. **📥 YouTube Batch Downloader** - 複数のYouTube動画を個別にダウンロード
 4. **🎵 YouTube Playlist Downloader** - YouTubeプレイリスト全体をダウンロード
+5. **📥 SocMed Downloader** - YouTube、TikTok、Instagram、Facebook、Twitter/Xから動画/音声をダウンロード（TXT/CSV/JSONバッチダウンロード対応）
 
 ### 🚀 クイックスタート（推奨）
 

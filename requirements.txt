@@ -1,6 +1,62 @@
-pydub==0.25.1
-flet==0.21.2
-audioop-lts==0.2.2
-ffmpeg-python==0.2.0
-Pillow>=10.0.0
-filetype==1.2.0
+# ==========================================
+# MEDIA TOOLS - Unified Requirements
+# ==========================================
+# All dependencies for Media Tools Suite
+# Install with: pip install -r requirements.txt
+#
+# Tools included:
+# - Audio Merger
+# - Media Codec Detector
+# - YouTube Batch Downloader
+# - YouTube Playlist Downloader
+# - SocMed Downloader
+# ==========================================
+
+# ===== Core GUI Framework =====
+flet>=0.25.0              # Modern GUI framework (used by all tools)
+
+# ===== Audio Processing =====
+pydub==0.25.1             # Audio manipulation library
+audioop-lts==0.2.2        # Audio operations support
+
+# ===== Media Processing =====
+ffmpeg-python==0.2.0      # FFmpeg wrapper for Python
+
+# ===== Image Processing =====
+Pillow>=10.0.0            # Image handling and processing
+
+# ===== File Type Detection =====
+filetype==1.2.0           # Detect file types and formats
+
+# ===== Video/Social Media Downloaders =====
+yt-dlp>=2024.11.0         # YouTube and social media downloader
+                          # (YouTube, TikTok, Instagram, Facebook, Twitter/X)
+
+# ==========================================
+# SYSTEM REQUIREMENTS
+# ==========================================
+# FFmpeg Binary (Required!):
+# FFmpeg must be installed separately and available in system PATH
+# 
+# Installation:
+# Windows:
+#   - winget install FFmpeg
+#   - choco install ffmpeg
+#   - Manual: https://ffmpeg.org/download.html
+# 
+# macOS:
+#   - brew install ffmpeg
+# 
+# Linux (Ubuntu/Debian):
+#   - sudo apt update
+#   - sudo apt install ffmpeg
+# 
+# Verify installation:
+#   ffmpeg -version
+#   ffprobe -version
+# ==========================================
+
+# ===== Optional Dependencies =====
+# Uncomment if needed:
+# brotli>=1.0.9           # Compression (for browser cookies)
+# websockets>=10.0        # WebSocket support (advanced features)

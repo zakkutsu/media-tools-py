@@ -46,15 +46,15 @@ class MediaCodecDetectorGUI:
         header = ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Icon(ft.icons.MOVIE, size=40, color=ft.colors.PURPLE),
+                    ft.Icon(ft.Icons.MOVIE, size=40, color=ft.Colors.PURPLE),
                     ft.Text(self.detector_translations.get("title", "Media Codec Detector"), 
                            size=28, weight=ft.FontWeight.BOLD),
                 ], alignment=ft.MainAxisAlignment.CENTER),
                 ft.Text(self.detector_translations.get("description", "Deteksi format kontainer dan codec dari file media"), 
-                       size=14, color=ft.colors.GREY_700, text_align=ft.TextAlign.CENTER),
+                       size=14, color=ft.Colors.GREY_700, text_align=ft.TextAlign.CENTER),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER),
             padding=20,
-            bgcolor=ft.colors.PURPLE_50,
+            bgcolor=ft.Colors.PURPLE_50,
             border_radius=10,
             margin=ft.margin.only(bottom=20)
         )
@@ -76,7 +76,7 @@ class MediaCodecDetectorGUI:
                 self.mode_radio,
             ]),
             padding=15,
-            border=ft.border.all(1, ft.colors.GREY_300),
+            border=ft.border.all(1, ft.Colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=15)
         )
@@ -85,10 +85,10 @@ class MediaCodecDetectorGUI:
         self.path_text = ft.Text(self.detector_translations.get("no_selection", "📁 Belum ada file/folder dipilih"), size=14)
         self.select_button = ft.ElevatedButton(
             self.detector_translations.get("select_file", "Pilih File"),
-            icon=ft.icons.FILE_OPEN,
+            icon=ft.Icons.FILE_OPEN,
             on_click=self.pick_file_dialog,
-            bgcolor=ft.colors.PURPLE,
-            color=ft.colors.WHITE
+            bgcolor=ft.Colors.PURPLE,
+            color=ft.Colors.WHITE
         )
         
         selection_section = ft.Container(
@@ -98,7 +98,7 @@ class MediaCodecDetectorGUI:
                 ft.Row([self.select_button, self.path_text], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
             ]),
             padding=15,
-            border=ft.border.all(1, ft.colors.GREY_300),
+            border=ft.border.all(1, ft.Colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=15)
         )
@@ -112,10 +112,10 @@ class MediaCodecDetectorGUI:
                 self.files_section_title,
                 ft.Container(
                     content=self.files_list,
-                    border=ft.border.all(1, ft.colors.GREY_300),
+                    border=ft.border.all(1, ft.Colors.GREY_300),
                     border_radius=5,
                     padding=10,
-                    bgcolor=ft.colors.GREY_50
+                    bgcolor=ft.Colors.GREY_50
                 )
             ]),
             visible=False,
@@ -125,10 +125,10 @@ class MediaCodecDetectorGUI:
         # Analysis button
         self.analyze_button = ft.ElevatedButton(
             self.detector_translations.get("start_analysis", "🕵️ Mulai Analisis"),
-            icon=ft.icons.SEARCH,
+            icon=ft.Icons.SEARCH,
             on_click=self.start_analysis,
-            bgcolor=ft.colors.GREEN,
-            color=ft.colors.WHITE,
+            bgcolor=ft.Colors.GREEN,
+            color=ft.Colors.WHITE,
             style=ft.ButtonStyle(
                 shape=ft.RoundedRectangleBorder(radius=8),
                 padding=ft.padding.all(15)
@@ -138,7 +138,7 @@ class MediaCodecDetectorGUI:
         
         # Progress
         self.progress_bar = ft.ProgressBar(visible=False)
-        self.status_text = ft.Text("", size=12, color=ft.colors.GREY_700)
+        self.status_text = ft.Text("", size=12, color=ft.Colors.GREY_700)
         
         action_section = ft.Column([
             self.progress_bar,
@@ -155,10 +155,10 @@ class MediaCodecDetectorGUI:
                 self.results_section_title,
                 ft.Container(
                     content=self.results_list,
-                    border=ft.border.all(1, ft.colors.GREY_300),
+                    border=ft.border.all(1, ft.Colors.GREY_300),
                     border_radius=5,
                     padding=10,
-                    bgcolor=ft.colors.GREY_50,
+                    bgcolor=ft.Colors.GREY_50,
                     height=200
                 )
             ]),
@@ -169,10 +169,10 @@ class MediaCodecDetectorGUI:
         # Create dummy files section
         self.dummy_button = ft.ElevatedButton(
             "🧪 Buat File Dummy untuk Testing",
-            icon=ft.icons.SCIENCE,
+            icon=ft.Icons.SCIENCE,
             on_click=self.create_dummy_files,
-            bgcolor=ft.colors.ORANGE,
-            color=ft.colors.WHITE,
+            bgcolor=ft.Colors.ORANGE,
+            color=ft.Colors.WHITE,
             style=ft.ButtonStyle(
                 shape=ft.RoundedRectangleBorder(radius=8),
                 padding=ft.padding.all(10)
@@ -183,10 +183,10 @@ class MediaCodecDetectorGUI:
             content=ft.Column([
                 ft.Text("🧪 Utilities", size=16, weight=ft.FontWeight.BOLD),
                 self.dummy_button,
-                ft.Text("Buat file test untuk demonstrasi analisis", size=12, color=ft.colors.GREY_600)
+                ft.Text("Buat file test untuk demonstrasi analisis", size=12, color=ft.Colors.GREY_600)
             ]),
             padding=15,
-            border=ft.border.all(1, ft.colors.ORANGE_200),
+            border=ft.border.all(1, ft.Colors.ORANGE_200),
             border_radius=8,
             margin=ft.margin.only(top=20)
         )
@@ -211,11 +211,11 @@ class MediaCodecDetectorGUI:
         
         if self.analysis_mode == "file":
             self.select_button.text = self.detector_translations.get("select_file", "Pilih File")
-            self.select_button.icon = ft.icons.FILE_OPEN
+            self.select_button.icon = ft.Icons.FILE_OPEN
             self.files_section.visible = False
         else:
             self.select_button.text = self.detector_translations.get("select_folder", "Pilih Folder")
-            self.select_button.icon = ft.icons.FOLDER_OPEN
+            self.select_button.icon = ft.Icons.FOLDER_OPEN
             self.files_section.visible = True
         
         # Reset selection
@@ -300,17 +300,17 @@ class MediaCodecDetectorGUI:
                 
                 # Choose icon based on file type
                 if file_ext in image_formats:
-                    icon = ft.icons.IMAGE
-                    color = ft.colors.BLUE
+                    icon = ft.Icons.IMAGE
+                    color = ft.Colors.BLUE
                 elif file_ext in video_formats:
-                    icon = ft.icons.VIDEO_FILE
-                    color = ft.colors.RED
+                    icon = ft.Icons.VIDEO_FILE
+                    color = ft.Colors.RED
                 elif file_ext in audio_formats:
-                    icon = ft.icons.AUDIO_FILE
-                    color = ft.colors.GREEN
+                    icon = ft.Icons.AUDIO_FILE
+                    color = ft.Colors.GREEN
                 else:
-                    icon = ft.icons.INSERT_DRIVE_FILE
-                    color = ft.colors.GREY
+                    icon = ft.Icons.INSERT_DRIVE_FILE
+                    color = ft.Colors.GREY
                 
                 self.files_list.controls.append(
                     ft.Row([
@@ -320,7 +320,7 @@ class MediaCodecDetectorGUI:
                 )
         else:
             self.files_list.controls.append(
-                ft.Text("❌ Tidak ada file media ditemukan", color=ft.colors.RED)
+                ft.Text("❌ Tidak ada file media ditemukan", color=ft.Colors.RED)
             )
         
         self.page.update()
@@ -328,7 +328,7 @@ class MediaCodecDetectorGUI:
     def start_analysis(self, e):
         """Start the media analysis process"""
         if not self.media_files:
-            self.show_snackbar("❌ Pilih file atau folder yang berisi media terlebih dahulu!", ft.colors.RED)
+            self.show_snackbar("❌ Pilih file atau folder yang berisi media terlebih dahulu!", ft.Colors.RED)
             return
         
         if self.is_processing:
@@ -363,12 +363,12 @@ class MediaCodecDetectorGUI:
                 self.add_result_to_ui(result)
             
             self.update_status(f"✅ Analisis selesai! {total_files} file dianalisis.")
-            self.show_snackbar_safe(f"🎉 Analisis selesai untuk {total_files} file!", ft.colors.GREEN)
+            self.show_snackbar_safe(f"🎉 Analisis selesai untuk {total_files} file!", ft.Colors.GREEN)
             
         except Exception as e:
             error_msg = f"❌ Error: {str(e)}"
             self.update_status(error_msg)
-            self.show_snackbar_safe(f"❌ Gagal menganalisis media: {str(e)}", ft.colors.RED)
+            self.show_snackbar_safe(f"❌ Gagal menganalisis media: {str(e)}", ft.Colors.RED)
         
         finally:
             # Reset UI state
@@ -478,19 +478,19 @@ class MediaCodecDetectorGUI:
             if result['error']:
                 header = ft.Container(
                     content=ft.Row([
-                        ft.Icon(ft.icons.ERROR, color=ft.colors.RED, size=20),
+                        ft.Icon(ft.Icons.ERROR, color=ft.Colors.RED, size=20),
                         ft.Text(filename, weight=ft.FontWeight.BOLD, expand=True),
-                        ft.Text("❌ Error", color=ft.colors.RED)
+                        ft.Text("❌ Error", color=ft.Colors.RED)
                     ]),
                     padding=10,
-                    bgcolor=ft.colors.RED_50,
+                    bgcolor=ft.Colors.RED_50,
                     border_radius=ft.border_radius.only(top_left=5, top_right=5)
                 )
                 
                 content = ft.Column([
                     header,
                     ft.Container(
-                        content=ft.Text(f"Error: {result['error']}", color=ft.colors.RED, size=12),
+                        content=ft.Text(f"Error: {result['error']}", color=ft.Colors.RED, size=12),
                         padding=10
                     )
                 ])
@@ -501,26 +501,26 @@ class MediaCodecDetectorGUI:
                 
                 # Choose icon and color based on type
                 if 'image' in mime_type:
-                    icon = ft.icons.IMAGE
-                    color = ft.colors.BLUE
+                    icon = ft.Icons.IMAGE
+                    color = ft.Colors.BLUE
                 elif 'video' in mime_type:
-                    icon = ft.icons.VIDEO_FILE
-                    color = ft.colors.RED
+                    icon = ft.Icons.VIDEO_FILE
+                    color = ft.Colors.RED
                 elif 'audio' in mime_type:
-                    icon = ft.icons.AUDIO_FILE
-                    color = ft.colors.GREEN
+                    icon = ft.Icons.AUDIO_FILE
+                    color = ft.Colors.GREEN
                 else:
-                    icon = ft.icons.INSERT_DRIVE_FILE
-                    color = ft.colors.GREY
+                    icon = ft.Icons.INSERT_DRIVE_FILE
+                    color = ft.Colors.GREY
                 
                 header = ft.Container(
                     content=ft.Row([
                         ft.Icon(icon, color=color, size=20),
                         ft.Text(filename, weight=ft.FontWeight.BOLD, expand=True),
-                        ft.Text("✅ OK", color=ft.colors.GREEN)
+                        ft.Text("✅ OK", color=ft.Colors.GREEN)
                     ]),
                     padding=10,
-                    bgcolor=ft.colors.GREEN_50,
+                    bgcolor=ft.Colors.GREEN_50,
                     border_radius=ft.border_radius.only(top_left=5, top_right=5)
                 )
                 
@@ -557,7 +557,7 @@ class MediaCodecDetectorGUI:
                             details_content.append(ft.Text(stream_text, size=11))
                 
                 elif details.get('error'):
-                    details_content.append(ft.Text(f"❌ {details['error']}", color=ft.colors.RED, size=12))
+                    details_content.append(ft.Text(f"❌ {details['error']}", color=ft.Colors.RED, size=12))
                 
                 content = ft.Column([
                     header,
@@ -570,7 +570,7 @@ class MediaCodecDetectorGUI:
             # Add result card
             result_card = ft.Container(
                 content=content,
-                border=ft.border.all(1, ft.colors.GREY_300),
+                border=ft.border.all(1, ft.Colors.GREY_300),
                 border_radius=5,
                 margin=ft.margin.only(bottom=10)
             )
@@ -641,7 +641,7 @@ class MediaCodecDetectorGUI:
             
             if dummy_files:
                 self.update_status(f"🎉 {len(dummy_files)} file dummy berhasil dibuat!")
-                self.show_snackbar_safe(f"✅ {len(dummy_files)} file dummy siap untuk dianalisis!", ft.colors.GREEN)
+                self.show_snackbar_safe(f"✅ {len(dummy_files)} file dummy siap untuk dianalisis!", ft.Colors.GREEN)
                 
                 # Auto-select current directory if no path selected
                 if not self.selected_path:
@@ -655,18 +655,18 @@ class MediaCodecDetectorGUI:
                         self.analysis_mode = "folder"
                         self.mode_radio.value = "folder"
                         self.select_button.text = "Pilih Folder"
-                        self.select_button.icon = ft.icons.FOLDER_OPEN
+                        self.select_button.icon = ft.Icons.FOLDER_OPEN
                         self.files_section.visible = True
                         self.scan_media_files()
                     
                     self.page.update()
             else:
                 self.update_status("❌ Tidak ada file dummy yang berhasil dibuat")
-                self.show_snackbar_safe("❌ Gagal membuat file dummy", ft.colors.RED)
+                self.show_snackbar_safe("❌ Gagal membuat file dummy", ft.Colors.RED)
         
         except Exception as e:
             self.update_status(f"❌ Error membuat dummy files: {e}")
-            self.show_snackbar_safe(f"❌ Error: {str(e)}", ft.colors.RED)
+            self.show_snackbar_safe(f"❌ Error: {str(e)}", ft.Colors.RED)
         
         finally:
             # Reset UI state

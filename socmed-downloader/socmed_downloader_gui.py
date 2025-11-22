@@ -48,13 +48,13 @@ class SocMedDownloaderGUI:
             get_text(self.current_lang, 'app_title'),
             size=32,
             weight=ft.FontWeight.BOLD,
-            color=ft.Colors.BLUE_700,
+            color=ft.colors.BLUE_700,
         )
         
         self.subtitle_text = ft.Text(
             get_text(self.current_lang, 'subtitle'),
             size=14,
-            color=ft.Colors.GREY_700,
+            color=ft.colors.GREY_700,
         )
         
         # Download Mode selector
@@ -70,7 +70,7 @@ class SocMedDownloaderGUI:
         # Batch file picker button
         self.batch_file_btn = ft.ElevatedButton(
             text=get_text(self.current_lang, 'batch_file_button'),
-            icon=ft.Icons.FILE_OPEN,
+            icon=ft.icons.FILE_OPEN,
             on_click=lambda _: self.file_picker.pick_files(
                 allowed_extensions=['txt', 'csv', 'json'],
                 dialog_title=get_text(self.current_lang, 'batch_file_label'),
@@ -82,7 +82,7 @@ class SocMedDownloaderGUI:
         self.batch_file_info = ft.Text(
             get_text(self.current_lang, 'batch_supported'),
             size=11,
-            color=ft.Colors.GREY_600,
+            color=ft.colors.GREY_600,
             italic=True,
             visible=False,
         )
@@ -91,7 +91,7 @@ class SocMedDownloaderGUI:
         self.selected_file_text = ft.Text(
             "",
             size=12,
-            color=ft.Colors.BLUE_700,
+            color=ft.colors.BLUE_700,
             weight=ft.FontWeight.W_500,
             visible=False,
         )
@@ -145,7 +145,7 @@ class SocMedDownloaderGUI:
         self.cookies_help = ft.Text(
             get_text(self.current_lang, 'help_cookies'),
             size=11,
-            color=ft.Colors.GREY_600,
+            color=ft.colors.GREY_600,
             italic=True,
         )
         
@@ -153,7 +153,7 @@ class SocMedDownloaderGUI:
         self.platform_info = ft.Text(
             get_text(self.current_lang, 'platform_support'),
             size=12,
-            color=ft.Colors.BLUE_600,
+            color=ft.colors.BLUE_600,
             weight=ft.FontWeight.W_500,
         )
         
@@ -164,13 +164,13 @@ class SocMedDownloaderGUI:
         self.status_text = ft.Text(
             get_text(self.current_lang, 'status_ready'),
             size=13,
-            color=ft.Colors.GREY_700,
+            color=ft.colors.GREY_700,
         )
         
         # Info container (for platform and title detection)
         self.info_container = ft.Container(
             content=ft.Column([]),
-            bgcolor=ft.Colors.BLUE_50,
+            bgcolor=ft.colors.BLUE_50,
             border_radius=10,
             padding=10,
             visible=False,
@@ -179,17 +179,17 @@ class SocMedDownloaderGUI:
         # Buttons
         self.download_btn = ft.ElevatedButton(
             text=get_text(self.current_lang, 'download_button'),
-            icon=ft.Icons.DOWNLOAD,
+            icon=ft.icons.DOWNLOAD,
             on_click=self.start_download,
             style=ft.ButtonStyle(
-                color=ft.Colors.WHITE,
-                bgcolor=ft.Colors.BLUE_700,
+                color=ft.colors.WHITE,
+                bgcolor=ft.colors.BLUE_700,
             ),
         )
         
         self.clear_btn = ft.OutlinedButton(
             text=get_text(self.current_lang, 'clear_button'),
-            icon=ft.Icons.CLEAR,
+            icon=ft.icons.CLEAR,
             on_click=self.clear_form,
         )
         
@@ -286,11 +286,11 @@ class SocMedDownloaderGUI:
         self.progress_bar.visible = False
         self.info_container.visible = False
         self.status_text.value = get_text(self.current_lang, 'status_ready')
-        self.status_text.color = ft.Colors.GREY_700
+        self.status_text.color = ft.colors.GREY_700
         self.download_btn.disabled = False
         self.page.update()
     
-    def update_status(self, message, color=ft.Colors.GREY_700):
+    def update_status(self, message, color=ft.colors.GREY_700):
         """Update status text"""
         self.status_text.value = message
         self.status_text.color = color
@@ -303,12 +303,12 @@ class SocMedDownloaderGUI:
                 get_text(self.current_lang, 'detected_platform', platform=platform),
                 size=12,
                 weight=ft.FontWeight.BOLD,
-                color=ft.Colors.BLUE_900,
+                color=ft.colors.BLUE_900,
             ),
             ft.Text(
                 get_text(self.current_lang, 'detected_title', title=title),
                 size=12,
-                color=ft.Colors.BLUE_800,
+                color=ft.colors.BLUE_800,
             ),
         ])
         self.info_container.visible = True
@@ -321,7 +321,7 @@ class SocMedDownloaderGUI:
             speed = d.get('_speed_str', 'N/A')
             self.update_status(
                 get_text(self.current_lang, 'progress_downloading', percent=percent, speed=speed),
-                ft.Colors.BLUE_700
+                ft.colors.BLUE_700
             )
             if not self.progress_bar.visible:
                 self.progress_bar.visible = True
@@ -329,7 +329,7 @@ class SocMedDownloaderGUI:
         elif d['status'] == 'finished':
             self.update_status(
                 get_text(self.current_lang, 'status_processing'),
-                ft.Colors.ORANGE_700
+                ft.colors.ORANGE_700
             )
     
     def download_video(self):
@@ -346,7 +346,7 @@ class SocMedDownloaderGUI:
             if not url:
                 self.update_status(
                     get_text(self.current_lang, 'error_empty_url'),
-                    ft.Colors.RED_700
+                    ft.colors.RED_700
                 )
                 self.download_btn.disabled = False
                 self.page.update()
@@ -397,7 +397,7 @@ class SocMedDownloaderGUI:
             # Extract info first
             self.update_status(
                 get_text(self.current_lang, 'status_validating'),
-                ft.Colors.BLUE_700
+                ft.colors.BLUE_700
             )
             
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -411,7 +411,7 @@ class SocMedDownloaderGUI:
                 # Start download
                 self.update_status(
                     get_text(self.current_lang, 'status_downloading'),
-                    ft.Colors.BLUE_700
+                    ft.colors.BLUE_700
                 )
                 ydl.download([url])
             
@@ -420,7 +420,7 @@ class SocMedDownloaderGUI:
             self.update_status(
                 get_text(self.current_lang, 'status_success') + "\n" + 
                 get_text(self.current_lang, 'output_folder', folder=self.download_folder),
-                ft.Colors.GREEN_700
+                ft.colors.GREEN_700
             )
             
         except Exception as e:
@@ -430,7 +430,7 @@ class SocMedDownloaderGUI:
                 error_msg = get_text(self.current_lang, 'error_invalid_url')
             self.update_status(
                 get_text(self.current_lang, 'status_error', error=error_msg),
-                ft.Colors.RED_700
+                ft.colors.RED_700
             )
         
         finally:
@@ -444,7 +444,7 @@ class SocMedDownloaderGUI:
             if not self.batch_file_path:
                 self.update_status(
                     get_text(self.current_lang, 'batch_no_file'),
-                    ft.Colors.RED_700
+                    ft.colors.RED_700
                 )
                 self.download_btn.disabled = False
                 self.page.update()
@@ -456,7 +456,7 @@ class SocMedDownloaderGUI:
             # Read links from file
             self.update_status(
                 get_text(self.current_lang, 'status_validating'),
-                ft.Colors.BLUE_700
+                ft.colors.BLUE_700
             )
             
             try:
@@ -464,7 +464,7 @@ class SocMedDownloaderGUI:
             except Exception as e:
                 self.update_status(
                     get_text(self.current_lang, 'batch_error_read', error=str(e)),
-                    ft.Colors.RED_700
+                    ft.colors.RED_700
                 )
                 self.download_btn.disabled = False
                 self.page.update()
@@ -473,7 +473,7 @@ class SocMedDownloaderGUI:
             if not links:
                 self.update_status(
                     get_text(self.current_lang, 'batch_no_links'),
-                    ft.Colors.RED_700
+                    ft.colors.RED_700
                 )
                 self.download_btn.disabled = False
                 self.page.update()
@@ -495,7 +495,7 @@ class SocMedDownloaderGUI:
                 # Update status
                 self.update_status(
                     get_text(self.current_lang, 'batch_processing', current=i, total=total),
-                    ft.Colors.BLUE_700
+                    ft.colors.BLUE_700
                 )
                 self.progress_bar.visible = True
                 self.page.update()
@@ -556,14 +556,14 @@ class SocMedDownloaderGUI:
                     success=success_count, 
                     failed=failed_count
                 ) + "\n" + get_text(self.current_lang, 'output_folder', folder=self.download_folder),
-                ft.Colors.GREEN_700 if failed_count == 0 else ft.Colors.ORANGE_700
+                ft.colors.GREEN_700 if failed_count == 0 else ft.colors.ORANGE_700
             )
             
         except Exception as e:
             self.progress_bar.visible = False
             self.update_status(
                 get_text(self.current_lang, 'status_error', error=str(e)),
-                ft.Colors.RED_700
+                ft.colors.RED_700
             )
         
         finally:
@@ -585,3 +585,4 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     ft.app(target=main)
+

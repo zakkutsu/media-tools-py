@@ -30,6 +30,13 @@ class SocMedDownloaderGUI:
     def build_ui(self):
         """Build the main user interface"""
         
+        # Create scrollable column for main content
+        main_content = ft.Column(
+            scroll=ft.ScrollMode.AUTO,
+            expand=True,
+            spacing=10
+        )
+        
         # Language selector
         self.lang_dropdown = ft.Dropdown(
             label=get_text(self.current_lang, 'language_label'),
@@ -43,67 +50,44 @@ class SocMedDownloaderGUI:
             on_change=self.change_language,
         )
         
-        # Title
-        self.title_text = ft.Text(
-            get_text(self.current_lang, 'app_title'),
-            size=32,
-            weight=ft.FontWeight.BOLD,
-            color=ft.Colors.BLUE_700,
+        # Language section (top right)
+        lang_section = ft.Container(
+            content=ft.Row([self.lang_dropdown], alignment=ft.MainAxisAlignment.END),
+            padding=ft.padding.only(bottom=10)
         )
+        main_content.controls.append(lang_section)
         
-        self.subtitle_text = ft.Text(
-            get_text(self.current_lang, 'subtitle'),
-            size=14,
-            color=ft.Colors.GREY_700,
-        )
-        
-        # Download Mode selector
-        self.mode_radio = ft.RadioGroup(
-            content=ft.Row([
-                ft.Radio(value="single", label=get_text(self.current_lang, 'mode_single')),
-                ft.Radio(value="batch", label=get_text(self.current_lang, 'mode_batch')),
+        # Title Section (centered like yt downloader)
+        title_section = ft.Container(
+            content=ft.Column([
+                ft.Text(
+                    get_text(self.current_lang, 'app_title'),
+                    size=24,
+                    weight=ft.FontWeight.BOLD,
+                    text_align=ft.TextAlign.CENTER,
+                    color=ft.Colors.BLUE_700,
+                ),
+                ft.Text(
+                    get_text(self.current_lang, 'subtitle'),
+                    size=14,
+                    color=ft.Colors.GREY_600,
+                    text_align=ft.TextAlign.CENTER
+                ),
+                ft.Text(
+                    get_text(self.current_lang, 'platform_support'),
+                    size=12,
+                    color=ft.Colors.BLUE_600,
+                    weight=ft.FontWeight.W_500,
+                    text_align=ft.TextAlign.CENTER
+                )
             ]),
-            value="single",
-            on_change=self.change_mode,
+            padding=ft.padding.only(bottom=20)
         )
+        main_content.controls.append(title_section)
         
-        # Batch file picker button
-        self.batch_file_btn = ft.ElevatedButton(
-            text=get_text(self.current_lang, 'batch_file_button'),
-            icon=ft.Icons.FILE_OPEN,
-            on_click=lambda _: self.file_picker.pick_files(
-                allowed_extensions=['txt', 'csv', 'json'],
-                dialog_title=get_text(self.current_lang, 'batch_file_label'),
-            ),
-            visible=False,
-        )
-        
-        # Batch file info
-        self.batch_file_info = ft.Text(
-            get_text(self.current_lang, 'batch_supported'),
-            size=11,
-            color=ft.Colors.GREY_600,
-            italic=True,
-            visible=False,
-        )
-        
-        # Selected file display
-        self.selected_file_text = ft.Text(
-            "",
-            size=12,
-            color=ft.Colors.BLUE_700,
-            weight=ft.FontWeight.W_500,
-            visible=False,
-        )
-        
-        # URL Input
-        self.url_input = ft.TextField(
-            label=get_text(self.current_lang, 'url_label'),
-            hint_text=get_text(self.current_lang, 'url_hint'),
-            width=700,
-            multiline=False,
-            autocorrect=False,
-        )
+        # Input Management Section (like yt downloader)
+        input_section = self.create_input_management_section()
+        main_content.controls.append(input_section)
         
         # Format selector
         self.format_radio = ft.RadioGroup(
@@ -193,54 +177,245 @@ class SocMedDownloaderGUI:
             on_click=self.clear_form,
         )
         
+        # Download Options Section
+        options_section = self.create_download_options_section()
+        main_content.controls.append(options_section)
+        
+        # Download Buttons Section
+        buttons_section = self.create_buttons_section()
+        main_content.controls.append(buttons_section)
+        
+        # Progress Section
+        progress_section = self.create_progress_section()
+        main_content.controls.append(progress_section)
+        
         # Add file picker to overlay
         self.page.overlay.append(self.file_picker)
         
-        # Layout
-        self.page.add(
-            ft.Container(height=10),
-            ft.Row([self.lang_dropdown], alignment=ft.MainAxisAlignment.END),
-            ft.Container(height=10),
-            self.title_text,
-            self.subtitle_text,
-            ft.Container(height=10),
-            self.platform_info,
-            ft.Divider(height=20),
-            ft.Text(get_text(self.current_lang, 'mode_label'), size=14, weight=ft.FontWeight.W_500),
-            self.mode_radio,
-            ft.Container(height=5),
-            self.batch_file_btn,
-            self.batch_file_info,
-            self.selected_file_text,
-            ft.Container(height=10),
-            self.url_input,
-            ft.Container(height=10),
-            ft.Text(get_text(self.current_lang, 'format_label'), size=14, weight=ft.FontWeight.W_500),
-            self.format_radio,
-            ft.Container(height=10),
-            ft.Row([
-                self.quality_dropdown,
-                ft.Container(width=20),
-                self.cookies_dropdown,
+        # Add main content to page
+        self.page.add(main_content)
+    
+    def create_input_management_section(self):
+        """Create input management section similar to yt downloader"""
+        # Download Mode selector
+        self.mode_radio = ft.RadioGroup(
+            content=ft.Row([
+                ft.Radio(value="single", label=get_text(self.current_lang, 'mode_single')),
+                ft.Radio(value="batch", label=get_text(self.current_lang, 'mode_batch')),
             ]),
-            self.cookies_help,
-            ft.Container(height=20),
-            self.info_container,
-            self.progress_bar,
-            self.status_text,
-            ft.Container(height=20),
-            ft.Row([
-                self.download_btn,
-                ft.Container(width=10),
-                self.clear_btn,
-            ]),
+            value="single",
+            on_change=self.change_mode,
         )
+        
+        # Batch file picker button
+        self.batch_file_btn = ft.ElevatedButton(
+            text=get_text(self.current_lang, 'batch_file_button'),
+            icon=ft.Icons.FILE_OPEN,
+            on_click=lambda _: self.file_picker.pick_files(
+                allowed_extensions=['txt', 'csv', 'json'],
+                dialog_title=get_text(self.current_lang, 'batch_file_label'),
+            ),
+            visible=False,
+        )
+        
+        # Batch file info
+        self.batch_file_info = ft.Text(
+            get_text(self.current_lang, 'batch_supported'),
+            size=11,
+            color=ft.Colors.GREY_600,
+            italic=True,
+            visible=False,
+        )
+        
+        # Selected file display
+        self.selected_file_text = ft.Text(
+            "",
+            size=12,
+            color=ft.Colors.BLUE_700,
+            weight=ft.FontWeight.W_500,
+            visible=False,
+        )
+        
+        # URL Input
+        self.url_input = ft.TextField(
+            label=get_text(self.current_lang, 'url_label'),
+            hint_text=get_text(self.current_lang, 'url_hint'),
+            expand=True,
+            multiline=False,
+            autocorrect=False,
+        )
+        
+        return ft.Container(
+            content=ft.Column([
+                ft.Text(
+                    get_text(self.current_lang, 'mode_label'), 
+                    size=16, 
+                    weight=ft.FontWeight.BOLD
+                ),
+                self.mode_radio,
+                ft.Container(height=10),
+                self.batch_file_btn,
+                self.batch_file_info,
+                self.selected_file_text,
+                ft.Container(height=10),
+                ft.Text(
+                    get_text(self.current_lang, 'url_label'),
+                    size=14,
+                    weight=ft.FontWeight.W_500
+                ),
+                self.url_input,
+            ]),
+            border=ft.border.all(1, ft.Colors.GREY_300),
+            border_radius=8,
+            padding=ft.padding.all(15),
+            margin=ft.margin.only(bottom=10)
+        )
+    
+    def create_download_options_section(self):
+        """Create download options section similar to yt downloader"""
+        # Format selector
+        self.format_radio = ft.RadioGroup(
+            content=ft.Row([
+                ft.Radio(value="video", label=get_text(self.current_lang, 'format_video')),
+                ft.Radio(value="audio", label=get_text(self.current_lang, 'format_audio')),
+            ]),
+            value="video",
+        )
+        
+        # Quality selector
+        self.quality_dropdown = ft.Dropdown(
+            label=get_text(self.current_lang, 'quality_label'),
+            width=300,
+            options=[
+                ft.dropdown.Option("best", get_text(self.current_lang, 'quality_best')),
+                ft.dropdown.Option("1080", get_text(self.current_lang, 'quality_1080p')),
+                ft.dropdown.Option("720", get_text(self.current_lang, 'quality_720p')),
+                ft.dropdown.Option("480", get_text(self.current_lang, 'quality_480p')),
+            ],
+            value="best",
+        )
+        
+        # Cookies selector
+        self.cookies_dropdown = ft.Dropdown(
+            label=get_text(self.current_lang, 'cookies_label'),
+            width=300,
+            options=[
+                ft.dropdown.Option("none", get_text(self.current_lang, 'cookies_none')),
+                ft.dropdown.Option("chrome", get_text(self.current_lang, 'cookies_chrome')),
+                ft.dropdown.Option("edge", get_text(self.current_lang, 'cookies_edge')),
+                ft.dropdown.Option("firefox", get_text(self.current_lang, 'cookies_firefox')),
+                ft.dropdown.Option("brave", get_text(self.current_lang, 'cookies_brave')),
+            ],
+            value="none",
+        )
+        
+        # Help text for cookies
+        self.cookies_help = ft.Text(
+            get_text(self.current_lang, 'help_cookies'),
+            size=11,
+            color=ft.Colors.GREY_600,
+            italic=True,
+        )
+        
+        return ft.Container(
+            content=ft.Column([
+                ft.Text(
+                    "⚙️ " + get_text(self.current_lang, 'format_label'), 
+                    size=16, 
+                    weight=ft.FontWeight.BOLD
+                ),
+                ft.Container(height=5),
+                self.format_radio,
+                ft.Container(height=10),
+                ft.Row([
+                    self.quality_dropdown,
+                    ft.Container(width=20),
+                    self.cookies_dropdown,
+                ]),
+                ft.Container(height=5),
+                self.cookies_help,
+            ]),
+            border=ft.border.all(1, ft.Colors.GREY_300),
+            border_radius=8,
+            padding=ft.padding.all(15),
+            margin=ft.margin.only(bottom=10)
+        )
+    
+    def create_buttons_section(self):
+        """Create buttons section similar to yt downloader"""
+        # Buttons
+        self.download_btn = ft.ElevatedButton(
+            text=get_text(self.current_lang, 'download_button'),
+            icon=ft.Icons.DOWNLOAD,
+            on_click=self.start_download,
+            width=200,
+            height=50,
+            style=ft.ButtonStyle(
+                color=ft.Colors.WHITE,
+                bgcolor=ft.Colors.BLUE_700,
+            ),
+        )
+        
+        self.clear_btn = ft.OutlinedButton(
+            text=get_text(self.current_lang, 'clear_button'),
+            icon=ft.Icons.CLEAR,
+            on_click=self.clear_form,
+            width=140,
+            height=50,
+        )
+        
+        return ft.Container(
+            content=ft.Row([
+                self.download_btn,
+                self.clear_btn,
+            ], alignment=ft.MainAxisAlignment.CENTER, spacing=15),
+            padding=ft.padding.symmetric(vertical=20)
+        )
+    
+    def create_progress_section(self):
+        """Create progress section similar to yt downloader"""
+        # Progress bar
+        self.progress_bar = ft.ProgressBar(expand=True, visible=False)
+        
+        # Status text
+        self.status_text = ft.Text(
+            get_text(self.current_lang, 'status_ready'),
+            size=13,
+            color=ft.Colors.GREY_700,
+        )
+        
+        # Info container (for platform and title detection)
+        self.info_container = ft.Container(
+            content=ft.Column([]),
+            bgcolor=ft.Colors.BLUE_50,
+            border_radius=10,
+            padding=10,
+            visible=False,
+        )
+        
+        return ft.Container(
+            content=ft.Column([
+                self.info_container,
+                ft.Container(height=10),
+                self.progress_bar,
+                ft.Container(height=5),
+                self.status_text,
+            ]),
+            border=ft.border.all(1, ft.Colors.GREY_300),
+            border_radius=8,
+            padding=ft.padding.all(15),
+            margin=ft.margin.only(top=10)
+        )
+        
+
     
     def change_language(self, e):
         """Change the interface language"""
         self.current_lang = e.control.value
         # Rebuild UI with new language
         self.page.controls.clear()
+        self.page.overlay.clear()
+        self.page.overlay.append(self.file_picker)
         self.build_ui()
         self.page.update()
     

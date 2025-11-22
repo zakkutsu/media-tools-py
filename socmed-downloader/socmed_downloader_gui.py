@@ -18,6 +18,11 @@ class SocMedDownloaderGUI:
         # State
         self.current_lang = 'id'
         self.download_folder = str(Path.home() / "Downloads")
+        self.download_mode = 'single'  # 'single' or 'batch'
+        self.batch_file_path = None
+        
+        # File picker
+        self.file_picker = ft.FilePicker(on_result=self.file_picker_result)
         
         # Build UI
         self.build_ui()
@@ -50,6 +55,45 @@ class SocMedDownloaderGUI:
             get_text(self.current_lang, 'subtitle'),
             size=14,
             color=ft.colors.GREY_700,
+        )
+        
+        # Download Mode selector
+        self.mode_radio = ft.RadioGroup(
+            content=ft.Row([
+                ft.Radio(value="single", label=get_text(self.current_lang, 'mode_single')),
+                ft.Radio(value="batch", label=get_text(self.current_lang, 'mode_batch')),
+            ]),
+            value="single",
+            on_change=self.change_mode,
+        )
+        
+        # Batch file picker button
+        self.batch_file_btn = ft.ElevatedButton(
+            text=get_text(self.current_lang, 'batch_file_button'),
+            icon=ft.icons.FILE_OPEN,
+            on_click=lambda _: self.file_picker.pick_files(
+                allowed_extensions=['txt', 'csv', 'json', 'xlsx', 'xls', 'docx', 'doc'],
+                dialog_title=get_text(self.current_lang, 'batch_file_label'),
+            ),
+            visible=False,
+        )
+        
+        # Batch file info
+        self.batch_file_info = ft.Text(
+            get_text(self.current_lang, 'batch_supported'),
+            size=11,
+            color=ft.colors.GREY_600,
+            italic=True,
+            visible=False,
+        )
+        
+        # Selected file display
+        self.selected_file_text = ft.Text(
+            "",
+            size=12,
+            color=ft.colors.BLUE_700,
+            weight=ft.FontWeight.W_500,
+            visible=False,
         )
         
         # URL Input
@@ -149,6 +193,9 @@ class SocMedDownloaderGUI:
             on_click=self.clear_form,
         )
         
+        # Add file picker to overlay
+        self.page.overlay.append(self.file_picker)
+        
         # Layout
         self.page.add(
             ft.Container(height=10),
@@ -159,6 +206,13 @@ class SocMedDownloaderGUI:
             ft.Container(height=10),
             self.platform_info,
             ft.Divider(height=20),
+            ft.Text(get_text(self.current_lang, 'mode_label'), size=14, weight=ft.FontWeight.W_500),
+            self.mode_radio,
+            ft.Container(height=5),
+            self.batch_file_btn,
+            self.batch_file_info,
+            self.selected_file_text,
+            ft.Container(height=10),
             self.url_input,
             ft.Container(height=10),
             ft.Text(get_text(self.current_lang, 'format_label'), size=14, weight=ft.FontWeight.W_500),
@@ -189,6 +243,39 @@ class SocMedDownloaderGUI:
         self.page.controls.clear()
         self.build_ui()
         self.page.update()
+    
+    def change_mode(self, e):
+        """Change download mode between single and batch"""
+        self.download_mode = e.control.value
+        
+        if self.download_mode == 'batch':
+            # Show batch file picker, hide URL input
+            self.url_input.visible = False
+            self.batch_file_btn.visible = True
+            self.batch_file_info.visible = True
+        else:
+            # Show URL input, hide batch file picker
+            self.url_input.visible = True
+            self.batch_file_btn.visible = False
+            self.batch_file_info.visible = False
+            self.selected_file_text.visible = False
+            self.batch_file_path = None
+        
+        self.page.update()
+    
+    def file_picker_result(self, e: ft.FilePickerResultEvent):
+        """Handle file picker result"""
+        if e.files:
+            file = e.files[0]
+            self.batch_file_path = file.path
+            filename = Path(file.path).name
+            self.selected_file_text.value = get_text(
+                self.current_lang, 
+                'batch_file_selected', 
+                filename=filename
+            )
+            self.selected_file_text.visible = True
+            self.page.update()
     
     def clear_form(self, e):
         """Clear the form"""
@@ -248,6 +335,12 @@ class SocMedDownloaderGUI:
     def download_video(self):
         """Download video/audio in background thread"""
         try:
+            # Check download mode
+            if self.download_mode == 'batch':
+                self.download_batch()
+                return
+            
+            # Single download mode
             url = self.url_input.value.strip()
             
             if not url:
@@ -337,6 +430,139 @@ class SocMedDownloaderGUI:
                 error_msg = get_text(self.current_lang, 'error_invalid_url')
             self.update_status(
                 get_text(self.current_lang, 'status_error', error=error_msg),
+                ft.colors.RED_700
+            )
+        
+        finally:
+            self.download_btn.disabled = False
+            self.page.update()
+    
+    def download_batch(self):
+        """Download multiple videos from batch file"""
+        try:
+            # Check if file is selected
+            if not self.batch_file_path:
+                self.update_status(
+                    get_text(self.current_lang, 'batch_no_file'),
+                    ft.colors.RED_700
+                )
+                self.download_btn.disabled = False
+                self.page.update()
+                return
+            
+            # Import batch reader
+            from batch_reader import read_batch_file
+            
+            # Read links from file
+            self.update_status(
+                get_text(self.current_lang, 'status_validating'),
+                ft.colors.BLUE_700
+            )
+            
+            try:
+                links = read_batch_file(self.batch_file_path)
+            except Exception as e:
+                self.update_status(
+                    get_text(self.current_lang, 'batch_error_read', error=str(e)),
+                    ft.colors.RED_700
+                )
+                self.download_btn.disabled = False
+                self.page.update()
+                return
+            
+            if not links:
+                self.update_status(
+                    get_text(self.current_lang, 'batch_no_links'),
+                    ft.colors.RED_700
+                )
+                self.download_btn.disabled = False
+                self.page.update()
+                return
+            
+            # Change to download folder
+            os.chdir(self.download_folder)
+            
+            # Process each link
+            total = len(links)
+            success_count = 0
+            failed_count = 0
+            
+            for i, link_data in enumerate(links, 1):
+                url = link_data['url']
+                quality = link_data.get('quality', self.quality_dropdown.value)
+                format_type = link_data.get('format', self.format_radio.value)
+                
+                # Update status
+                self.update_status(
+                    get_text(self.current_lang, 'batch_processing', current=i, total=total),
+                    ft.colors.BLUE_700
+                )
+                self.progress_bar.visible = True
+                self.page.update()
+                
+                try:
+                    # Base options
+                    ydl_opts = {
+                        'outtmpl': '%(title)s.%(ext)s',
+                        'progress_hooks': [self.progress_hook],
+                        'ignoreerrors': True,
+                        'quiet': True,
+                        'no_warnings': True,
+                    }
+                    
+                    # Format selection
+                    if format_type == 'audio':
+                        ydl_opts.update({
+                            'format': 'bestaudio/best',
+                            'postprocessors': [{
+                                'key': 'FFmpegExtractAudio',
+                                'preferredcodec': 'mp3',
+                                'preferredquality': '192',
+                            }],
+                        })
+                    else:
+                        # Video with quality selection
+                        if quality == 'best':
+                            ydl_opts['format'] = 'bestvideo+bestaudio/best'
+                        elif quality == '1080':
+                            ydl_opts['format'] = 'bestvideo[height<=1080]+bestaudio/best[height<=1080]'
+                        elif quality == '720':
+                            ydl_opts['format'] = 'bestvideo[height<=720]+bestaudio/best[height<=720]'
+                        elif quality == '480':
+                            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]'
+                    
+                    # Cookies if selected
+                    cookies_choice = self.cookies_dropdown.value
+                    if cookies_choice != 'none':
+                        ydl_opts['cookiesfrombrowser'] = (cookies_choice,)
+                    
+                    # Download
+                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                        ydl.download([url])
+                    
+                    success_count += 1
+                    
+                except Exception as e:
+                    failed_count += 1
+                    print(f"Error downloading {url}: {e}")
+            
+            # Show completion status
+            self.progress_bar.visible = False
+            self.update_status(
+                get_text(
+                    self.current_lang, 
+                    'batch_complete', 
+                    total=total, 
+                    success=success_count, 
+                    failed=failed_count
+                ) + "\n" + get_text(self.current_lang, 'output_folder', folder=self.download_folder),
+                ft.colors.GREEN_700 if failed_count == 0 else ft.colors.ORANGE_700
+            )
+            
+        except Exception as e:
+            self.progress_bar.visible = False
+            self.update_status(
+                get_text(self.current_lang, 'status_error', error=str(e)),
                 ft.colors.RED_700
             )
         

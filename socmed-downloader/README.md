@@ -15,6 +15,7 @@ Program Python untuk mendownload video dan audio dari berbagai platform social m
 - **Multi-Platform Support**: YouTube, TikTok, Instagram, Facebook, Twitter/X
 - **Dual Format**: Video (MP4) dan Audio (MP3 192kbps)
 - **Quality Selector**: Pilih kualitas 480p, 720p, 1080p, atau Terbaik (otomatis)
+- **Batch Download**: Download multiple links dari TXT/CSV/JSON/Excel/Word
 - **TikTok Watermark Removal**: Download TikTok tanpa watermark
 - **Cookie Support**: Browser cookies untuk bypass login Instagram/Facebook
 - **GUI Modern**: Interface grafis multi-bahasa (ID/EN/JP) dengan Flet
@@ -241,6 +242,129 @@ Program akan menampilkan menu dengan pilihan:
 - **Mobile/WhatsApp**: 480p atau 720p (hemat kuota)
 - **Archive/Collection**: Terbaik (kualitas maksimal)
 
+## Batch Download (Multiple Links)
+
+### Fitur Batch Download
+Download banyak video sekaligus dari **file yang berisi daftar link**! Sangat cocok untuk:
+- ✅ Download playlist atau koleksi video
+- ✅ Arsip channel/creator favorit
+- ✅ Backup konten penting sebelum dihapus
+- ✅ Download materi pembelajaran/tutorial
+
+### Format File yang Didukung
+
+#### 1. **TXT (Paling Simple)**
+File teks biasa, 1 link per baris:
+```text
+https://www.youtube.com/watch?v=dQw4w9WgXcQ
+https://www.tiktok.com/@username/video/123456
+https://www.instagram.com/reel/ABC123/
+# Komentar dimulai dengan #
+https://www.youtube.com/watch?v=jNQXAC9IVRw
+```
+
+#### 2. **CSV (Dengan Metadata)**
+Format CSV dengan header, bisa set quality per-link:
+```csv
+url,quality,format
+https://youtube.com/watch?v=abc,1080,video
+https://youtube.com/watch?v=def,best,video
+https://youtube.com/watch?v=ghi,720,audio
+```
+
+#### 3. **JSON (Structured)**
+Format JSON untuk data terstruktur:
+```json
+{
+  "links": [
+    {"url": "https://youtube.com/watch?v=abc", "quality": "1080", "format": "video"},
+    {"url": "https://youtube.com/watch?v=def", "quality": "best", "format": "video"},
+    {"url": "https://tiktok.com/@user/video/123", "quality": "720"}
+  ]
+}
+```
+
+#### 4. **Excel (.xlsx)**
+File Excel dengan kolom:
+- **Kolom A**: URL/Link
+- **Kolom B**: Quality (optional: best/1080/720/480)
+- **Kolom C**: Format (optional: video/audio)
+
+#### 5. **Word (.docx)**
+Dokumen Word yang berisi link di paragraf:
+```
+Kumpulan Video Tutorial:
+
+1. Tutorial Python: https://youtube.com/watch?v=abc
+2. Tutorial JavaScript: https://youtube.com/watch?v=def
+3. Tutorial Git: https://youtube.com/watch?v=ghi
+
+Link akan otomatis diekstrak dari dokumen.
+```
+
+### Cara Menggunakan (GUI)
+
+1. **Buka GUI** dengan double-click `launch_downloader.bat` atau:
+   ```bash
+   python socmed_downloader_gui.py
+   ```
+
+2. **Pilih Mode "Batch"** di radio button
+
+3. **Klik "Pilih File Batch"** untuk browse file (TXT/CSV/JSON/Excel/Word)
+
+4. **Set Quality** dan **Format** default (untuk link tanpa metadata)
+
+5. **Klik "Download"** - Program akan download semua link secara berurutan
+
+6. **Lihat Progress** - Status akan update untuk setiap link
+
+### Cara Menggunakan (CLI)
+
+1. **Jalankan CLI**:
+   ```bash
+   python socmed_downloader.py
+   ```
+
+2. **Pilih Option 2: Batch Download**
+
+3. **Masukkan path file** (bisa drag & drop file ke terminal):
+   ```
+   >> Masukkan path file batch: C:\Downloads\links.txt
+   ```
+
+4. **Pilih format default** (Video/Audio)
+
+5. **Pilih quality default** (untuk video)
+
+6. **Tunggu proses selesai** - Progress akan ditampilkan untuk setiap link
+
+### Contoh Hasil:
+```
+==================================================
+   BATCH DOWNLOAD SELESAI
+==================================================
+Total: 10 | Sukses: 9 | Gagal: 1
+```
+
+### Tips Batch Download:
+
+1. **Test dengan file kecil dulu** (3-5 link) sebelum download ratusan link
+2. **Gunakan TXT untuk simple list**, CSV/JSON untuk metadata per-link
+3. **Pisahkan file per platform** (YouTube, TikTok, dll) untuk troubleshooting
+4. **Check disk space** sebelum batch download besar
+5. **Gunakan quality 720p atau 480p** untuk batch besar (hemat storage & bandwidth)
+6. **Backup file link** - simpan file batch sebagai arsip
+
+### Template Files:
+
+Lihat folder `test_samples/` untuk contoh file:
+- `links.txt` - Simple text list
+- `links.csv` - CSV dengan metadata
+- `links.json` - JSON structured
+- `links.xlsx` - Excel template (coming soon)
+- `links.docx` - Word template (coming soon)
+
 ## Cookie Setup untuk Instagram & Facebook
 
 ### Kenapa Butuh Cookies?
@@ -391,6 +515,7 @@ Python program to download videos and audio from various social media platforms 
 - **Multi-Platform Support**: YouTube, TikTok, Instagram, Facebook, Twitter/X
 - **Dual Format**: Video (MP4) and Audio (MP3 192kbps)
 - **Quality Selector**: Choose 480p, 720p, 1080p, or Best (automatic)
+- **Batch Download**: Download multiple links from TXT/CSV/JSON/Excel/Word
 - **TikTok Watermark Removal**: Download TikTok without watermark
 - **Cookie Support**: Browser cookies to bypass Instagram/Facebook login
 - **Modern GUI**: Multi-language interface (ID/EN/JP) with Flet
@@ -442,6 +567,11 @@ python socmed_downloader.py
 
 **Download Instagram/Facebook (With Cookies):**
 - Preparation: Login to IG/FB in Chrome browser
+
+**Batch Download Multiple Videos:**
+- GUI: Select "Batch" mode → Choose file (TXT/CSV/JSON/Excel/Word) → Download
+- CLI: Select option 2 (Batch Download) → Enter file path → Download all
+- Supported formats: See [Indonesian section](#batch-download-multiple-links) for detailed documentation
 - GUI: Select "Google Chrome" in Cookies dropdown → Paste URL → Download
 - CLI: Edit `BROWSER_COOKIES = 'chrome'` in socmed_downloader.py → Run
 
@@ -459,6 +589,7 @@ yt-dlpとFFmpegを使用して、様々なソーシャルメディアプラッ�
 - **マルチプラットフォーム対応**: YouTube, TikTok, Instagram, Facebook, Twitter/X
 - **デュアルフォーマット**: ビデオ（MP4）とオーディオ（MP3 192kbps）
 - **品質セレクター**: 480p、720p、1080p、または最高（自動）を選択
+- **バッチダウンロード**: TXT/CSV/JSON/Excel/Wordから複数のリンクをダウンロード
 - **TikTok透かし除去**: TikTokを透かしなしでダウンロード
 - **Cookie対応**: Instagram/Facebookログインをバイパスするブラウザクッキー
 - **モダンGUI**: 多言語インターフェース（ID/EN/JP）とFlet
@@ -512,5 +643,10 @@ python socmed_downloader.py
 - 準備: ChromeブラウザでIG/FBにログイン
 - GUI: Cookie ドロップダウンで「Google Chrome」を選択 → URLを貼り付け → ダウンロード
 - CLI: socmed_downloader.pyで`BROWSER_COOKIES = 'chrome'`を編集 → 実行
+
+**複数のビデオを一括ダウンロード:**
+- GUI: 「Batch」モードを選択 → ファイルを選択（TXT/CSV/JSON/Excel/Word） → ダウンロード
+- CLI: オプション2（バッチダウンロード）を選択 → ファイルパスを入力 → すべてダウンロード
+- サポート形式: 詳細なドキュメントについては、[インドネシア語セクション](#batch-download-multiple-links)を参照してください
 
 詳細なドキュメントについては、上記のインドネシア語セクションを参照してください。

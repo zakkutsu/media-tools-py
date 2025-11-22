@@ -14,9 +14,10 @@ audio_merger_path = str(current_dir / "audio-merger")
 media_detector_path = str(current_dir / "media-codec-detector")
 batch_downloader_path = str(current_dir / "yt-batch-downloader")
 playlist_downloader_path = str(current_dir / "yt-playlist-downloader")
+socmed_downloader_path = str(current_dir / "socmed-downloader")
 
 # Add all tool paths to sys.path
-tool_paths = [audio_merger_path, media_detector_path, batch_downloader_path, playlist_downloader_path]
+tool_paths = [audio_merger_path, media_detector_path, batch_downloader_path, playlist_downloader_path, socmed_downloader_path]
 for path in tool_paths:
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -61,6 +62,7 @@ AudioMergerGUI = None
 MediaCodecDetectorGUI = None
 BatchDownloaderGUI = None
 PlaylistDownloaderGUI = None
+SocMedDownloaderGUI = None
 
 # Check dependencies first
 missing_deps = check_and_install_dependencies()
@@ -163,6 +165,20 @@ try:
 except Exception as e:
     print(f"Failed to import PlaylistDownloaderGUI (Tkinter fallback): {e}")
     PlaylistDownloaderGUI = None
+
+# Import SocMed Downloader (Flet-based)
+try:
+    socmed_spec = importlib.util.spec_from_file_location(
+        "socmed_downloader_gui",
+        current_dir / "socmed-downloader" / "socmed_downloader_gui.py"
+    )
+    if socmed_spec and socmed_spec.loader:
+        socmed_module = importlib.util.module_from_spec(socmed_spec)
+        socmed_spec.loader.exec_module(socmed_module)
+        SocMedDownloaderGUI = socmed_module.SocMedDownloaderGUI
+except Exception as e:
+    print(f"Failed to import SocMedDownloaderGUI: {e}")
+    SocMedDownloaderGUI = None
 
 class MediaToolsLauncher:
     def __init__(self, page: ft.Page):
@@ -300,6 +316,20 @@ class MediaToolsLauncher:
             on_click=self.launch_playlist_downloader
         )
         
+        socmed_downloader_card = self.create_tool_card(
+            title=self.translations.get("tool_socmed_downloader", "📥 SocMed Downloader"),
+            description=self.translations.get("socmed_downloader_desc",
+                "Download video/audio dari YouTube, TikTok, Instagram, Facebook, Twitter/X"),
+            features=[
+                "🌐 Multi-platform (YT, TikTok, IG, FB, X)",
+                "🎬 Video & Audio (MP3) support",
+                "📦 Batch download (TXT/CSV/JSON)",
+                "🎯 Quality selector (480p-1080p)"
+            ],
+            color=ft.colors.GREEN,
+            on_click=self.launch_socmed_downloader
+        )
+        
         # Tool selection section
         tools_section = ft.Container(
             content=ft.Column([
@@ -313,6 +343,10 @@ class MediaToolsLauncher:
                 ft.Row([
                     batch_downloader_card,
                     playlist_downloader_card,
+                ], alignment=ft.MainAxisAlignment.CENTER, spacing=20, wrap=True),
+                ft.Container(height=10),  # Spacing
+                ft.Row([
+                    socmed_downloader_card,
                 ], alignment=ft.MainAxisAlignment.CENTER, spacing=20, wrap=True),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=20),
             margin=ft.margin.only(bottom=30)
@@ -457,6 +491,15 @@ class MediaToolsLauncher:
             self.show_error(error_msg)
             return
     
+    def launch_socmed_downloader(self, e):
+        """Launch SocMed Downloader tool"""
+        if SocMedDownloaderGUI is None:
+            error_msg = "SocMed Downloader tidak tersedia.\n\nPastikan file socmed_downloader_gui.py ada di folder socmed-downloader/\n\nPeriksa juga bahwa yt-dlp sudah terinstall dengan:\npip install yt-dlp"
+            self.show_error(error_msg)
+            return
+        
+        self.switch_to_app("socmed_downloader")
+    
     def switch_to_app(self, app_name):
         """Switch to specific application"""
         self.page.controls.clear()
@@ -498,6 +541,9 @@ class MediaToolsLauncher:
         elif app_name == "playlist_downloader_flet":
             # Modern Flet-based Playlist Downloader
             self.current_app = PlaylistDownloaderFletGUI(self.create_app_page(app_container))
+        elif app_name == "socmed_downloader":
+            # SocMed Downloader (Flet-based)
+            self.current_app = SocMedDownloaderGUI(self.create_app_page(app_container))
         elif app_name == "batch_downloader_tkinter":
             # Fallback Tkinter-based Batch Downloader
             self.launch_tkinter_app("batch_downloader")

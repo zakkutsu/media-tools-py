@@ -1,3 +1,21 @@
+# ==========================================
+# CONTOH FILE CSV UNTUK BATCH DOWNLOAD
+# ==========================================
+# Format: CSV dengan header (url, quality, format)
+# Kolom:
+#   - url: Link video/audio (WAJIB)
+#   - quality: best/1080/720/480 (optional, default: best)
+#   - format: video/audio (optional, default: video)
+#
+# Keuntungan CSV: Bisa set quality & format berbeda per link!
+#
+# Cara pakai:
+# 1. Edit CSV ini dengan Excel/Google Sheets/Text Editor
+# 2. Isi url, quality, format sesuai kebutuhan
+# 3. Save as CSV
+# 4. Buka SocMed Downloader (GUI/CLI)
+# 5. Pilih mode "Batch" dan select file ini
+# ==========================================
 url,quality,format
 https://www.youtube.com/watch?v=dQw4w9WgXcQ,720,video
 https://www.youtube.com/watch?v=jNQXAC9IVRw,best,video

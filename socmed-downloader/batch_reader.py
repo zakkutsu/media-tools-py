@@ -46,33 +46,37 @@ def read_csv_file(file_path):
     """
     links = []
     try:
+        # Read file and filter out comment lines
         with open(file_path, 'r', encoding='utf-8') as f:
-            # Try to detect if file has header
-            sample = f.read(1024)
-            f.seek(0)
+            lines = [line for line in f if line.strip() and not line.strip().startswith('#')]
+        
+        # Check if has header
+        first_line = lines[0] if lines else ''
+        has_header = 'url' in first_line.lower() or 'link' in first_line.lower()
+        
+        if has_header:
+            reader = csv.DictReader(lines)
+        else:
+            reader = csv.reader(lines)
+        
+        for row in reader:
+            if isinstance(row, dict):
+                # CSV with headers
+                url = row.get('url') or row.get('link') or row.get('URL') or row.get('Link')
+                quality = row.get('quality', 'best')
+                format_type = row.get('format', 'video')
+            else:
+                # CSV without headers (just URLs)
+                url = row[0] if row else None
+                quality = row[1] if len(row) > 1 else 'best'
+                format_type = row[2] if len(row) > 2 else 'video'
             
-            has_header = 'url' in sample.lower() or 'link' in sample.lower()
-            
-            reader = csv.DictReader(f) if has_header else csv.reader(f)
-            
-            for row in reader:
-                if isinstance(row, dict):
-                    # CSV with headers
-                    url = row.get('url') or row.get('link') or row.get('URL') or row.get('Link')
-                    quality = row.get('quality', 'best')
-                    format_type = row.get('format', 'video')
-                else:
-                    # CSV without headers (just URLs)
-                    url = row[0] if row else None
-                    quality = row[1] if len(row) > 1 else 'best'
-                    format_type = row[2] if len(row) > 2 else 'video'
-                
-                if url and is_valid_url(url):
-                    links.append({
-                        'url': url.strip(),
-                        'quality': quality,
-                        'format': format_type
-                    })
+            if url and is_valid_url(url):
+                links.append({
+                    'url': url.strip(),
+                    'quality': quality,
+                    'format': format_type
+                })
     except Exception as e:
         raise Exception(f"Error reading CSV file: {str(e)}")
     
@@ -150,87 +154,7 @@ def read_json_links_from_array(link_array):
                 })
     return links
 
-def read_excel_file(file_path):
-    """
-    Read links from Excel file (.xlsx)
-    
-    Format:
-        Column A: URL/Link
-        Column B: Quality (optional)
-        Column C: Format (optional)
-    
-    First row can be header or data
-    """
-    links = []
-    try:
-        import openpyxl
-        
-        wb = openpyxl.load_workbook(file_path, read_only=True)
-        ws = wb.active
-        
-        # Check if first row is header
-        first_row = list(ws.iter_rows(min_row=1, max_row=1, values_only=True))[0]
-        has_header = any(str(cell).lower() in ['url', 'link', 'quality', 'format'] 
-                        for cell in first_row if cell)
-        
-        start_row = 2 if has_header else 1
-        
-        for row in ws.iter_rows(min_row=start_row, values_only=True):
-            if not row or not row[0]:
-                continue
-            
-            url = str(row[0]).strip()
-            quality = str(row[1]).strip() if len(row) > 1 and row[1] else 'best'
-            format_type = str(row[2]).strip() if len(row) > 2 and row[2] else 'video'
-            
-            if is_valid_url(url):
-                links.append({
-                    'url': url,
-                    'quality': quality,
-                    'format': format_type
-                })
-        
-        wb.close()
-    except ImportError:
-        raise Exception("openpyxl not installed. Install: pip install openpyxl")
-    except Exception as e:
-        raise Exception(f"Error reading Excel file: {str(e)}")
-    
-    return links
 
-def read_word_file(file_path):
-    """
-    Read links from Word file (.docx)
-    Extracts all URLs from paragraphs and hyperlinks
-    """
-    links = []
-    try:
-        from docx import Document
-        
-        doc = Document(file_path)
-        
-        # Extract from paragraphs
-        for para in doc.paragraphs:
-            text = para.text.strip()
-            # Find URLs in text
-            urls = extract_urls_from_text(text)
-            for url in urls:
-                if is_valid_url(url):
-                    links.append({'url': url, 'quality': 'best', 'format': 'video'})
-        
-        # Extract from hyperlinks
-        for rel in doc.part.rels.values():
-            if "hyperlink" in rel.target_ref:
-                url = rel.target_ref
-                if is_valid_url(url):
-                    links.append({'url': url, 'quality': 'best', 'format': 'video'})
-    
-    except ImportError:
-        raise Exception("python-docx not installed. Install: pip install python-docx")
-    except Exception as e:
-        raise Exception(f"Error reading Word file: {str(e)}")
-    
-    return links
 
 def extract_urls_from_text(text):
     """Extract URLs from text using regex"""
@@ -270,11 +194,9 @@ def read_batch_file(file_path):
     Auto-detect file format and read links
     
     Supported formats:
-    - .txt: Plain text, 1 link per line
+    - .txt: Plain text, 1 link per line (with # comments)
     - .csv: CSV with optional headers (url, quality, format)
-    - .json: JSON array or object
-    - .xlsx: Excel spreadsheet
-    - .docx: Word document
+    - .json: JSON array or object with links
     
     Returns:
         list: List of dicts with keys: url, quality, format
@@ -290,10 +212,6 @@ def read_batch_file(file_path):
         '.txt': read_txt_file,
         '.csv': read_csv_file,
         '.json': read_json_file,
-        '.xlsx': read_excel_file,
-        '.xls': read_excel_file,
-        '.docx': read_word_file,
-        '.doc': read_word_file,
     }
     
     reader_func = readers.get(extension)

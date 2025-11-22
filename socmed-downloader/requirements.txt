@@ -7,10 +7,6 @@ yt-dlp>=2024.11.0
 # GUI framework (Flet)
 flet>=0.25.0
 
-# Batch download file readers
-openpyxl>=3.1.0        # Excel (.xlsx) file support
-python-docx>=1.1.0     # Word (.docx) file support
-
 # Optional: Browser cookie support
 # brotli>=1.0.9
 # websockets>=10.0

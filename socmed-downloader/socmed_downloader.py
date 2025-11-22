@@ -28,11 +28,10 @@ def batch_download():
     print("   BATCH DOWNLOAD MODE   ")
     print("="*50)
     print("\nSupported file formats:")
-    print("  - TXT: 1 link per line")
-    print("  - CSV: url,quality,format")
+    print("  - TXT: 1 link per line (# for comments)")
+    print("  - CSV: url,quality,format (with or without headers)")
     print("  - JSON: Array of {url, quality, format}")
-    print("  - Excel (.xlsx): Columns A,B,C")
-    print("  - Word (.docx): Links in paragraphs")
+    print("\nSee test_samples/ folder for format examples!")
     
     file_path = input("\n>> Masukkan path file batch: ").strip().strip('"').strip("'")
     

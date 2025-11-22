@@ -1,4 +1,23 @@
 {
+  "_comment": "==========================================",
+  "_comment2": "CONTOH FILE JSON UNTUK BATCH DOWNLOAD",
+  "_comment3": "==========================================",
+  "_comment4": "Format 1: Object dengan array 'links'",
+  "_comment5": "Setiap item punya: url (wajib), quality (optional), format (optional)",
+  "_comment6": "",
+  "_comment7": "Quality options: best, 1080, 720, 480",
+  "_comment8": "Format options: video, audio",
+  "_comment9": "",
+  "_comment10": "Format 2 (simple): Langsung array of strings",
+  "_comment11": "[\"https://youtube.com/...\", \"https://tiktok.com/...\"]",
+  "_comment12": "",
+  "_comment13": "Cara pakai:",
+  "_comment14": "1. Edit file JSON ini",
+  "_comment15": "2. Tambah/edit links di array 'links'",
+  "_comment16": "3. Save file",
+  "_comment17": "4. Buka SocMed Downloader dan pilih Batch mode",
+  "_comment18": "==========================================",
+  
   "links": [
     {
       "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",

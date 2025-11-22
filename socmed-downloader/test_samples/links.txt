@@ -1,6 +1,30 @@
-# Sample TXT file for batch download
-# 1 link per line, comments start with #
+# ==========================================
+# CONTOH FILE TXT UNTUK BATCH DOWNLOAD
+# ==========================================
+# Format: 1 link per baris
+# Lines yang diawali # adalah komentar (diabaikan)
+# 
+# Cara pakai:
+# 1. Isi link di bawah (1 link per baris)
+# 2. Save file ini
+# 3. Buka SocMed Downloader GUI atau CLI
+# 4. Pilih mode "Batch"
+# 5. Select file ini
+# 6. Download!
+#
+# Platform support: YouTube, TikTok, Instagram, Facebook, Twitter/X
+# ==========================================
 
+# YouTube videos
 https://www.youtube.com/watch?v=dQw4w9WgXcQ
 https://www.youtube.com/watch?v=jNQXAC9IVRw
 https://www.youtube.com/watch?v=9bZkp7q19f0
+
+# TikTok videos (ganti dengan link TikTok asli)
+# https://www.tiktok.com/@username/video/1234567890
+
+# Instagram reels (butuh browser cookies!)
+# https://www.instagram.com/reel/ABC123/
+
+# Twitter/X videos
+# https://twitter.com/username/status/1234567890

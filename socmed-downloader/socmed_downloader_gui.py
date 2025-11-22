@@ -72,7 +72,7 @@ class SocMedDownloaderGUI:
             text=get_text(self.current_lang, 'batch_file_button'),
             icon=ft.icons.FILE_OPEN,
             on_click=lambda _: self.file_picker.pick_files(
-                allowed_extensions=['txt', 'csv', 'json', 'xlsx', 'xls', 'docx', 'doc'],
+                allowed_extensions=['txt', 'csv', 'json'],
                 dialog_title=get_text(self.current_lang, 'batch_file_label'),
             ),
             visible=False,

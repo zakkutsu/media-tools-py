@@ -1,0 +1,12 @@
+# SocMed Downloader - Requirements
+# Social Media Downloader for YouTube, TikTok, Instagram, Facebook, Twitter/X
+
+# Main library for downloading
+yt-dlp>=2024.11.0
+
+# GUI framework (Flet)
+flet>=0.25.0
+
+# Optional: Browser cookie support
+# brotli>=1.0.9
+# websockets>=10.0

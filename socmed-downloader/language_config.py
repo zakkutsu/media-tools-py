@@ -4,10 +4,10 @@
 LANGUAGES = {
     'id': {
         'app_title': 'SocMed Downloader',
-        'subtitle': 'Download video & audio dari berbagai platform',
+        'subtitle': 'Download video & audio dari platform social media',
         'language_label': 'Bahasa:',
         'url_label': 'Masukkan URL Video/Audio:',
-        'url_hint': 'https://youtube.com/... atau TikTok, Instagram, Facebook, Twitter/X',
+        'url_hint': 'TikTok, Instagram, Facebook, Twitter/X, atau platform lainnya',
         'format_label': 'Pilih Format:',
         'format_video': 'Video (MP4)',
         'format_audio': 'Audio (MP3)',
@@ -41,7 +41,7 @@ LANGUAGES = {
         'error_empty_url': 'URL tidak boleh kosong!',
         'error_invalid_url': 'URL tidak valid atau tidak didukung',
         'help_cookies': 'Gunakan cookies browser jika download Instagram/Facebook gagal (Error: Login required)',
-        'platform_support': 'Platform: YouTube, TikTok, Instagram, Facebook, Twitter/X',
+        'platform_support': 'TikTok, Instagram, Facebook, Twitter/X & Platform Lainnya',
         'download_folder_label': '📁 Folder Download',
         'output_folder': 'File tersimpan di: {folder}',
         # Batch download
@@ -67,10 +67,10 @@ LANGUAGES = {
     },
     'en': {
         'app_title': 'SocMed Downloader',
-        'subtitle': 'Download videos & audio from various platforms',
+        'subtitle': 'Download videos & audio from social media platforms',
         'language_label': 'Language:',
         'url_label': 'Enter Video/Audio URL:',
-        'url_hint': 'https://youtube.com/... or TikTok, Instagram, Facebook, Twitter/X',
+        'url_hint': 'TikTok, Instagram, Facebook, Twitter/X, or other platforms',
         'format_label': 'Select Format:',
         'format_video': 'Video (MP4)',
         'format_audio': 'Audio (MP3)',
@@ -104,7 +104,7 @@ LANGUAGES = {
         'error_empty_url': 'URL cannot be empty!',
         'error_invalid_url': 'Invalid or unsupported URL',
         'help_cookies': 'Use browser cookies if Instagram/Facebook download fails (Error: Login required)',
-        'platform_support': 'Platforms: YouTube, TikTok, Instagram, Facebook, Twitter/X',
+        'platform_support': 'TikTok, Instagram, Facebook, Twitter/X & More Platforms',
         'download_folder_label': '📁 Download Folder',
         'output_folder': 'File saved to: {folder}',
         # Batch download
@@ -130,10 +130,10 @@ LANGUAGES = {
     },
     'jp': {
         'app_title': 'SocMed Downloader',
-        'subtitle': '様々なプラットフォームから動画・音声をダウンロード',
+        'subtitle': 'ソーシャルメディアから動画・音声をダウンロード',
         'language_label': '言語:',
         'url_label': '動画/音声のURLを入力:',
-        'url_hint': 'https://youtube.com/... または TikTok, Instagram, Facebook, Twitter/X',
+        'url_hint': 'TikTok, Instagram, Facebook, Twitter/X、または他のプラットフォーム',
         'format_label': 'フォーマットを選択:',
         'format_video': 'ビデオ (MP4)',
         'format_audio': 'オーディオ (MP3)',
@@ -167,7 +167,7 @@ LANGUAGES = {
         'error_empty_url': 'URLを入力してください！',
         'error_invalid_url': '無効またはサポートされていないURL',
         'help_cookies': 'Instagram/Facebookのダウンロードが失敗する場合はブラウザCookieを使用（エラー: ログインが必要）',
-        'platform_support': 'プラットフォーム: YouTube, TikTok, Instagram, Facebook, Twitter/X',
+        'platform_support': 'TikTok, Instagram, Facebook, Twitter/X & その他',
         'download_folder_label': '📁 ダウンロードフォルダ',
         'output_folder': 'ファイル保存先: {folder}',
         # Batch download

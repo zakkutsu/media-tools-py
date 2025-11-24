@@ -231,8 +231,8 @@ class MediaToolsLauncher:
             options=language_options,
             width=250,
             on_change=self.change_language,
-            border_color=ft.Colors.DEEP_PURPLE,
-            focused_border_color=ft.Colors.DEEP_PURPLE_400,
+            border_color=ft.colors.DEEP_PURPLE,
+            focused_border_color=ft.colors.DEEP_PURPLE_400,
             label=self.common_translations.get("select_language", "Pilih Bahasa"),
         )
         
@@ -240,21 +240,21 @@ class MediaToolsLauncher:
         header = ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Icon(ft.Icons.BUILD_CIRCLE, size=50, color=ft.Colors.DEEP_PURPLE),
+                    ft.Icon(ft.icons.BUILD_CIRCLE, size=50, color=ft.colors.DEEP_PURPLE),
                     ft.Column([
                         ft.Text(self.translations.get("title", "Media Tools"), 
                                size=32, weight=ft.FontWeight.BOLD),
                         ft.Text(self.translations.get("subtitle", "Suite"), 
-                               size=24, weight=ft.FontWeight.W_300, color=ft.Colors.GREY_600),
+                               size=24, weight=ft.FontWeight.W_300, color=ft.colors.GREY_600),
                     ], spacing=0),
                     ft.Container(expand=True),  # Spacer
                     language_selector,
                 ], alignment=ft.MainAxisAlignment.CENTER, spacing=20),
                 ft.Text(self.translations.get("description", "Pilih tool yang ingin Anda gunakan"), 
-                       size=16, color=ft.Colors.GREY_700, text_align=ft.TextAlign.CENTER),
+                       size=16, color=ft.colors.GREY_700, text_align=ft.TextAlign.CENTER),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=15),
             padding=30,
-            bgcolor=ft.Colors.DEEP_PURPLE_50,
+            bgcolor=ft.colors.DEEP_PURPLE_50,
             border_radius=15,
             margin=ft.margin.only(bottom=30)
         )
@@ -270,7 +270,7 @@ class MediaToolsLauncher:
                 "📊 Real-time progress",
                 "🎨 Modern GUI interface"
             ],
-            color=ft.Colors.BLUE,
+            color=ft.colors.BLUE,
             on_click=self.launch_audio_merger
         )
         
@@ -284,7 +284,7 @@ class MediaToolsLauncher:
                 "🎥 Video & audio streams",
                 "🧪 Dummy file generator"
             ],
-            color=ft.Colors.PURPLE,
+            color=ft.colors.PURPLE,
             on_click=self.launch_media_detector
         )
         
@@ -298,7 +298,7 @@ class MediaToolsLauncher:
                 "� Quality selection options",
                 "📊 Real-time progress tracking"
             ],
-            color=ft.Colors.RED,
+            color=ft.colors.RED,
             on_click=self.launch_batch_downloader
         )
         
@@ -312,7 +312,7 @@ class MediaToolsLauncher:
                 "🎯 Flexible naming templates",
                 "📊 Progress tracking per video"
             ],
-            color=ft.Colors.ORANGE,
+            color=ft.colors.ORANGE,
             on_click=self.launch_playlist_downloader
         )
         
@@ -326,7 +326,7 @@ class MediaToolsLauncher:
                 "📦 Batch download (TXT/CSV/JSON)",
                 "🎯 Quality selector (480p-1080p)"
             ],
-            color=ft.Colors.GREEN,
+            color=ft.colors.GREEN,
             on_click=self.launch_socmed_downloader
         )
         
@@ -355,12 +355,12 @@ class MediaToolsLauncher:
         # Additional info section
         info_section = ft.Container(
             content=ft.Column([
-                ft.Divider(height=1, color=ft.Colors.GREY_300),
+                ft.Divider(height=1, color=ft.colors.GREY_300),
                 ft.Row([
-                    ft.Icon(ft.Icons.INFO_OUTLINE, size=20, color=ft.Colors.GREY_600),
+                    ft.Icon(ft.icons.INFO_OUTLINE, size=20, color=ft.colors.GREY_600),
                     ft.Text(self.translations.get("info_message", 
                            "Kedua tool memerlukan FFmpeg untuk berfungsi dengan optimal"), 
-                           size=14, color=ft.Colors.GREY_600),
+                           size=14, color=ft.colors.GREY_600),
                 ], alignment=ft.MainAxisAlignment.CENTER),
                 ft.Row([
                     ft.TextButton(self.translations.get("documentation", "📖 Dokumentasi"), 
@@ -394,7 +394,7 @@ class MediaToolsLauncher:
             feature_items.append(
                 ft.Row([
                     ft.Container(width=10),  # Indent
-                    ft.Text(feature, size=12, color=ft.Colors.GREY_700)
+                    ft.Text(feature, size=12, color=ft.colors.GREY_700)
                 ])
             )
         
@@ -403,27 +403,27 @@ class MediaToolsLauncher:
                 # Header
                 ft.Container(
                     content=ft.Row([
-                        ft.Icon(ft.Icons.PLAY_CIRCLE_FILL, color=color, size=30),
+                        ft.Icon(ft.icons.PLAY_CIRCLE_FILL, color=color, size=30),
                         ft.Text(title, size=18, weight=ft.FontWeight.BOLD, expand=True),
                     ]),
                     padding=15,
-                    bgcolor=ft.Colors.with_opacity(0.1, color),
+                    bgcolor=ft.colors.with_opacity(0.1, color),
                     border_radius=ft.border_radius.only(top_left=10, top_right=10)
                 ),
                 
                 # Content
                 ft.Container(
                     content=ft.Column([
-                        ft.Text(description, size=14, color=ft.Colors.GREY_800),
+                        ft.Text(description, size=14, color=ft.colors.GREY_800),
                         ft.Container(height=10),  # Spacing
-                        ft.Text("Features:", size=12, weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_700),
+                        ft.Text("Features:", size=12, weight=ft.FontWeight.BOLD, color=ft.colors.GREY_700),
                         ft.Column(feature_items, spacing=5),
                         ft.Container(height=15),  # Spacing
                         ft.ElevatedButton(
                             self.translations.get("launch_tool", "Launch Tool"),
-                            icon=ft.Icons.ROCKET_LAUNCH,
+                            icon=ft.icons.ROCKET_LAUNCH,
                             bgcolor=color,
-                            color=ft.Colors.WHITE,
+                            color=ft.colors.WHITE,
                             on_click=on_click,
                             style=ft.ButtonStyle(
                                 shape=ft.RoundedRectangleBorder(radius=8),
@@ -434,13 +434,13 @@ class MediaToolsLauncher:
                 )
             ]),
             width=350,
-            border=ft.border.all(2, ft.Colors.with_opacity(0.3, color)),
+            border=ft.border.all(2, ft.colors.with_opacity(0.3, color)),
             border_radius=10,
-            bgcolor=ft.Colors.WHITE,
+            bgcolor=ft.colors.WHITE,
             shadow=ft.BoxShadow(
                 spread_radius=1,
                 blur_radius=5,
-                color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK),
+                color=ft.colors.with_opacity(0.1, ft.colors.BLACK),
                 offset=ft.Offset(0, 2)
             )
         )
@@ -508,10 +508,10 @@ class MediaToolsLauncher:
         back_button = ft.Container(
             content=ft.ElevatedButton(
                 self.common_translations.get("back_to_home", "🏠 Back to Home"),
-                icon=ft.Icons.HOME,
+                icon=ft.icons.HOME,
                 on_click=self.back_to_home,
-                bgcolor=ft.Colors.GREY_600,
-                color=ft.Colors.WHITE
+                bgcolor=ft.colors.GREY_600,
+                color=ft.colors.WHITE
             ),
             alignment=ft.alignment.top_left,
             padding=10
@@ -722,8 +722,8 @@ class MediaToolsLauncher:
         """Show error dialog"""
         dialog = ft.AlertDialog(
             title=ft.Row([
-                ft.Icon(ft.Icons.ERROR, color=ft.Colors.RED),
-                ft.Text("Error", color=ft.Colors.RED)
+                ft.Icon(ft.icons.ERROR, color=ft.colors.RED),
+                ft.Text("Error", color=ft.colors.RED)
             ]),
             content=ft.Container(
                 content=ft.Text(message, size=14),
@@ -780,10 +780,10 @@ Python Path:
         debug_dialog.open = True
         self.page.update()
     
-    def show_snackbar(self, message, color=ft.Colors.BLUE):
+    def show_snackbar(self, message, color=ft.colors.BLUE):
         """Show snackbar message"""
         snack_bar = ft.SnackBar(
-            content=ft.Text(message, color=ft.Colors.WHITE),
+            content=ft.Text(message, color=ft.colors.WHITE),
             bgcolor=color,
             duration=3000
         )

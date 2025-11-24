@@ -806,8 +806,9 @@ Python Path:
     def exit_app(self, e):
         """Exit the application"""
         import sys
-        self.page.window_destroy()
-        sys.exit(0)
+        import os
+        self.page.window.close()
+        os._exit(0)
 
 def main(page: ft.Page):
     """Main function for Flet app"""

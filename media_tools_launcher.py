@@ -654,6 +654,16 @@ class MediaToolsLauncher:
     def show_docs(self, e):
         """Show documentation dialog"""
         try:
+            print("📖 Opening documentation dialog...")
+            
+            def close_docs_dialog(e):
+                try:
+                    if self.page.dialog:
+                        self.page.dialog.open = False
+                        self.page.update()
+                except Exception as ex:
+                    print(f"Error closing docs dialog: {ex}")
+            
             docs_content = ft.Column([
                 ft.Text("📖 Dokumentasi Media Tools", size=20, weight=ft.FontWeight.BOLD),
                 ft.Divider(),
@@ -673,9 +683,6 @@ class MediaToolsLauncher:
                 ft.Text("• Pastikan FFmpeg sudah terinstall\n• YouTube tools memerlukan yt-dlp\n• Gunakan virtual environment untuk dependencies", size=12),
             ], spacing=5, scroll=ft.ScrollMode.AUTO, height=300)
             
-            def close_docs_dialog(e):
-                self.close_dialog()
-            
             dialog = ft.AlertDialog(
                 title=ft.Text("Dokumentasi"),
                 content=docs_content,
@@ -686,12 +693,25 @@ class MediaToolsLauncher:
             self.page.dialog = dialog
             dialog.open = True
             self.page.update()
+            print("✅ Documentation dialog opened successfully")
         except Exception as ex:
-            print(f"Error showing docs: {ex}")
+            print(f"❌ Error showing docs: {ex}")
+            import traceback
+            traceback.print_exc()
     
     def show_requirements(self, e):
         """Show system requirements dialog"""
         try:
+            print("⚙️ Opening system requirements dialog...")
+            
+            def close_req_dialog(e):
+                try:
+                    if self.page.dialog:
+                        self.page.dialog.open = False
+                        self.page.update()
+                except Exception as ex:
+                    print(f"Error closing requirements dialog: {ex}")
+            
             req_content = ft.Column([
                 ft.Text("⚙️ System Requirements", size=20, weight=ft.FontWeight.BOLD),
                 ft.Divider(),
@@ -708,9 +728,6 @@ class MediaToolsLauncher:
                 ft.Text("• ~200MB untuk dependencies\n• Space tambahan untuk file output", size=12),
             ], spacing=5, scroll=ft.ScrollMode.AUTO, height=350)
             
-            def close_req_dialog(e):
-                self.close_dialog()
-            
             dialog = ft.AlertDialog(
                 title=ft.Text("System Requirements"),
                 content=req_content,
@@ -721,8 +738,11 @@ class MediaToolsLauncher:
             self.page.dialog = dialog
             dialog.open = True
             self.page.update()
+            print("✅ System requirements dialog opened successfully")
         except Exception as ex:
-            print(f"Error showing requirements: {ex}")
+            print(f"❌ Error showing requirements: {ex}")
+            import traceback
+            traceback.print_exc()
     
     def close_dialog(self):
         """Close current dialog"""

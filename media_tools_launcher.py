@@ -653,64 +653,76 @@ class MediaToolsLauncher:
     
     def show_docs(self, e):
         """Show documentation dialog"""
-        docs_content = ft.Column([
-            ft.Text("📖 Dokumentasi Media Tools", size=20, weight=ft.FontWeight.BOLD),
-            ft.Divider(),
-            ft.Text("🎵 Audio Merger:", weight=ft.FontWeight.BOLD),
-            ft.Text("• Gabungkan multiple file audio dengan efek transisi\n• Format: MP3, WAV, FLAC, M4A, OGG, AAC, WMA\n• Efek: Crossfade, Gap/Jeda, Gabungan langsung", size=12),
-            ft.Container(height=10),
-            ft.Text("🎬 Media Codec Detector:", weight=ft.FontWeight.BOLD),
-            ft.Text("• Deteksi codec dan format file media\n• Support: Gambar, Video, Audio\n• Analisis stream dan container format", size=12),
-            ft.Container(height=10),
-            ft.Text("� YouTube Batch Downloader:", weight=ft.FontWeight.BOLD),
-            ft.Text("• Download multiple individual YouTube videos\n• Quality selection & auto-numbering\n• URL management dari file atau manual input", size=12),
-            ft.Container(height=10),
-            ft.Text("🎵 YouTube Playlist Downloader:", weight=ft.FontWeight.BOLD),
-            ft.Text("• Download entire YouTube playlists\n• Progress tracking per video\n• Flexible naming templates\n• Modern Flet interface", size=12),
-            ft.Container(height=10),
-            ft.Text("�💡 Tips:", weight=ft.FontWeight.BOLD),
-            ft.Text("• Pastikan FFmpeg sudah terinstall\n• YouTube tools memerlukan yt-dlp\n• Gunakan virtual environment untuk dependencies", size=12),
-        ], spacing=5, scroll=ft.ScrollMode.AUTO, height=300)
-        
-        dialog = ft.AlertDialog(
-            title=ft.Text("Dokumentasi"),
-            content=docs_content,
-            actions=[ft.TextButton("Tutup", on_click=lambda e: self.close_dialog())],
-            modal=True
-        )
-        
-        self.page.dialog = dialog
-        dialog.open = True
-        self.page.update()
+        try:
+            docs_content = ft.Column([
+                ft.Text("📖 Dokumentasi Media Tools", size=20, weight=ft.FontWeight.BOLD),
+                ft.Divider(),
+                ft.Text("🎵 Audio Merger:", weight=ft.FontWeight.BOLD),
+                ft.Text("• Gabungkan multiple file audio dengan efek transisi\n• Format: MP3, WAV, FLAC, M4A, OGG, AAC, WMA\n• Efek: Crossfade, Gap/Jeda, Gabungan langsung", size=12),
+                ft.Container(height=10),
+                ft.Text("🎬 Media Codec Detector:", weight=ft.FontWeight.BOLD),
+                ft.Text("• Deteksi codec dan format file media\n• Support: Gambar, Video, Audio\n• Analisis stream dan container format", size=12),
+                ft.Container(height=10),
+                ft.Text("📥 YouTube Batch Downloader:", weight=ft.FontWeight.BOLD),
+                ft.Text("• Download multiple individual YouTube videos\n• Quality selection & auto-numbering\n• URL management dari file atau manual input", size=12),
+                ft.Container(height=10),
+                ft.Text("🎵 YouTube Playlist Downloader:", weight=ft.FontWeight.BOLD),
+                ft.Text("• Download entire YouTube playlists\n• Progress tracking per video\n• Flexible naming templates\n• Modern Flet interface", size=12),
+                ft.Container(height=10),
+                ft.Text("💡 Tips:", weight=ft.FontWeight.BOLD),
+                ft.Text("• Pastikan FFmpeg sudah terinstall\n• YouTube tools memerlukan yt-dlp\n• Gunakan virtual environment untuk dependencies", size=12),
+            ], spacing=5, scroll=ft.ScrollMode.AUTO, height=300)
+            
+            def close_docs_dialog(e):
+                self.close_dialog()
+            
+            dialog = ft.AlertDialog(
+                title=ft.Text("Dokumentasi"),
+                content=docs_content,
+                actions=[ft.TextButton("Tutup", on_click=close_docs_dialog)],
+                modal=True
+            )
+            
+            self.page.dialog = dialog
+            dialog.open = True
+            self.page.update()
+        except Exception as ex:
+            print(f"Error showing docs: {ex}")
     
     def show_requirements(self, e):
         """Show system requirements dialog"""
-        req_content = ft.Column([
-            ft.Text("⚙️ System Requirements", size=20, weight=ft.FontWeight.BOLD),
-            ft.Divider(),
-            ft.Text("🐍 Python:", weight=ft.FontWeight.BOLD),
-            ft.Text("• Python 3.8 atau lebih baru\n• Virtual environment (recommended)", size=12),
-            ft.Container(height=10),
-            ft.Text("📦 FFmpeg (Wajib):", weight=ft.FontWeight.BOLD),
-            ft.Text("Windows: choco install ffmpeg\nmacOS: brew install ffmpeg\nLinux: sudo apt install ffmpeg", size=12),
-            ft.Container(height=10),
-            ft.Text("📚 Python Dependencies:", weight=ft.FontWeight.BOLD),
-            ft.Text("• pydub (audio processing)\n• flet (GUI framework)\n• ffmpeg-python (FFmpeg wrapper)\n• Pillow (image processing)\n• filetype (file type detection)\n• yt-dlp (YouTube downloader)", size=12),
-            ft.Container(height=10),
-            ft.Text("💾 Disk Space:", weight=ft.FontWeight.BOLD),
-            ft.Text("• ~200MB untuk dependencies\n• Space tambahan untuk file output", size=12),
-        ], spacing=5, scroll=ft.ScrollMode.AUTO, height=350)
-        
-        dialog = ft.AlertDialog(
-            title=ft.Text("System Requirements"),
-            content=req_content,
-            actions=[ft.TextButton("Tutup", on_click=lambda e: self.close_dialog())],
-            modal=True
-        )
-        
-        self.page.dialog = dialog
-        dialog.open = True
-        self.page.update()
+        try:
+            req_content = ft.Column([
+                ft.Text("⚙️ System Requirements", size=20, weight=ft.FontWeight.BOLD),
+                ft.Divider(),
+                ft.Text("🐍 Python:", weight=ft.FontWeight.BOLD),
+                ft.Text("• Python 3.8 atau lebih baru\n• Virtual environment (recommended)", size=12),
+                ft.Container(height=10),
+                ft.Text("📦 FFmpeg (Wajib):", weight=ft.FontWeight.BOLD),
+                ft.Text("Windows: choco install ffmpeg\nmacOS: brew install ffmpeg\nLinux: sudo apt install ffmpeg", size=12),
+                ft.Container(height=10),
+                ft.Text("📚 Python Dependencies:", weight=ft.FontWeight.BOLD),
+                ft.Text("• pydub (audio processing)\n• flet (GUI framework)\n• ffmpeg-python (FFmpeg wrapper)\n• Pillow (image processing)\n• filetype (file type detection)\n• yt-dlp (YouTube downloader)", size=12),
+                ft.Container(height=10),
+                ft.Text("💾 Disk Space:", weight=ft.FontWeight.BOLD),
+                ft.Text("• ~200MB untuk dependencies\n• Space tambahan untuk file output", size=12),
+            ], spacing=5, scroll=ft.ScrollMode.AUTO, height=350)
+            
+            def close_req_dialog(e):
+                self.close_dialog()
+            
+            dialog = ft.AlertDialog(
+                title=ft.Text("System Requirements"),
+                content=req_content,
+                actions=[ft.TextButton("Tutup", on_click=close_req_dialog)],
+                modal=True
+            )
+            
+            self.page.dialog = dialog
+            dialog.open = True
+            self.page.update()
+        except Exception as ex:
+            print(f"Error showing requirements: {ex}")
     
     def close_dialog(self):
         """Close current dialog"""
@@ -793,7 +805,9 @@ Python Path:
     
     def exit_app(self, e):
         """Exit the application"""
-        self.page.window_close()
+        import sys
+        self.page.window_destroy()
+        sys.exit(0)
 
 def main(page: ft.Page):
     """Main function for Flet app"""

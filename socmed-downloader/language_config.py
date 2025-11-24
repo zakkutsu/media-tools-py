@@ -57,6 +57,13 @@ LANGUAGES = {
         'batch_no_file': 'Silakan pilih file batch terlebih dahulu!',
         'batch_no_links': 'Tidak ada link valid ditemukan di file!',
         'batch_error_read': 'Error membaca file: {error}',
+        # UI Labels
+        'format_section_title': 'Format Download',
+        'progress_section_title': 'Progress Download',
+        'log_section_title': 'Log Download',
+        'speed_label': 'Kecepatan',
+        'eta_label': 'Estimasi Waktu',
+        'ready_status': 'Siap',
     },
     'en': {
         'app_title': 'SocMed Downloader',
@@ -113,6 +120,13 @@ LANGUAGES = {
         'batch_no_file': 'Please select a batch file first!',
         'batch_no_links': 'No valid links found in file!',
         'batch_error_read': 'Error reading file: {error}',
+        # UI Labels
+        'format_section_title': 'Download Format',
+        'progress_section_title': 'Download Progress',
+        'log_section_title': 'Download Log',
+        'speed_label': 'Speed',
+        'eta_label': 'ETA',
+        'ready_status': 'Ready',
     },
     'jp': {
         'app_title': 'SocMed Downloader',
@@ -169,6 +183,13 @@ LANGUAGES = {
         'batch_no_file': 'バッチファイルを選択してください！',
         'batch_no_links': 'ファイルに有効なリンクが見つかりません！',
         'batch_error_read': 'ファイル読み込みエラー: {error}',
+        # UI Labels
+        'format_section_title': 'ダウンロード形式',
+        'progress_section_title': 'ダウンロード進行状況',
+        'log_section_title': 'ダウンロードログ',
+        'speed_label': '速度',
+        'eta_label': '予想時間',
+        'ready_status': '準備完了',
     }
 }
 

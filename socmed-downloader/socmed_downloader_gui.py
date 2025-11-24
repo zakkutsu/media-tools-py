@@ -348,7 +348,6 @@ class SocMedDownloaderGUI:
                     size=16, 
                     weight=ft.FontWeight.BOLD
                 ),
-                ft.Text("Download Format:", size=12, weight=ft.FontWeight.BOLD),
                 self.format_radio,
                 ft.Container(height=10),
                 ft.Row([
@@ -424,8 +423,8 @@ class SocMedDownloaderGUI:
         self.progress_bar = ft.ProgressBar(value=0, expand=True)
         
         # Enhanced progress info
-        self.speed_label = ft.Text("Speed: -- MB/s", size=11, color=ft.Colors.BLUE_600)
-        self.eta_label = ft.Text("ETA: --:--", size=11, color=ft.Colors.GREEN_600)
+        self.speed_label = ft.Text(get_text(self.current_lang, 'speed_label') + ": -- MB/s", size=11, color=ft.Colors.BLUE_600)
+        self.eta_label = ft.Text(get_text(self.current_lang, 'eta_label') + ": --:--", size=11, color=ft.Colors.GREEN_600)
         self.stats_text = ft.Text("", size=11, color=ft.Colors.GREY_700)
         
         # Info container (for platform and title detection)
@@ -439,7 +438,7 @@ class SocMedDownloaderGUI:
         
         return ft.Container(
             content=ft.Column([
-                ft.Text("📊 Download Progress", size=16, weight=ft.FontWeight.BOLD),
+                ft.Text("📊 " + get_text(self.current_lang, 'progress_section_title'), size=16, weight=ft.FontWeight.BOLD),
                 self.info_container,
                 ft.Container(height=5),
                 self.progress_label,
@@ -471,7 +470,7 @@ class SocMedDownloaderGUI:
         
         return ft.Container(
             content=ft.Column([
-                ft.Text("📋 Download Log", size=16, weight=ft.FontWeight.BOLD),
+                ft.Text("📋 " + get_text(self.current_lang, 'log_section_title'), size=16, weight=ft.FontWeight.BOLD),
                 ft.Container(
                     content=self.output_log,
                     border=ft.border.all(1, ft.Colors.GREY_300),
@@ -524,7 +523,7 @@ class SocMedDownloaderGUI:
         # Add to UI list
         url_item = ft.ListTile(
             title=ft.Text(url, size=12),
-            subtitle=ft.Text("Ready", color=ft.Colors.BLUE_600),
+            subtitle=ft.Text(get_text(self.current_lang, 'ready_status'), color=ft.Colors.BLUE_600),
             trailing=ft.IconButton(
                 icon=ft.Icons.DELETE,
                 icon_color=ft.Colors.RED_400,
@@ -713,9 +712,9 @@ class SocMedDownloaderGUI:
             
             # Update speed and ETA
             if speed:
-                self.speed_label.value = f"Speed: {speed}"
+                self.speed_label.value = f"{get_text(self.current_lang, 'speed_label')}: {speed}"
             if eta:
-                self.eta_label.value = f"ETA: {eta}"
+                self.eta_label.value = f"{get_text(self.current_lang, 'eta_label')}: {eta}"
             
             # Update statistics
             if self.start_time:
@@ -733,8 +732,8 @@ class SocMedDownloaderGUI:
         """Reset progress display"""
         self.progress_label.value = get_text(self.current_lang, 'status_ready')
         self.progress_bar.value = 0
-        self.speed_label.value = "Speed: -- MB/s"
-        self.eta_label.value = "ETA: --:--"
+        self.speed_label.value = get_text(self.current_lang, 'speed_label') + ": -- MB/s"
+        self.eta_label.value = get_text(self.current_lang, 'eta_label') + ": --:--"
         self.stats_text.value = ""
         self.start_time = None
         self.page.update()
@@ -757,7 +756,7 @@ class SocMedDownloaderGUI:
             
             # Update speed display
             if speed_str != 'N/A':
-                self.speed_label.value = f"Speed: {speed_str}"
+                self.speed_label.value = f"{get_text(self.current_lang, 'speed_label')}: {speed_str}"
             
             self.page.update()
             

@@ -21,7 +21,22 @@ Koleksi tools untuk pemrosesan dan analisis file media (audio, video, gambar) de
 
 ### 🚀 Quick Start (Recommended)
 
-#### ⚡ EASIEST WAY - One-Click Auto Setup!
+#### 💿 DOWNLOAD EXECUTABLE (No Python Required!)
+
+**Download versi siap pakai tanpa perlu install Python:**
+
+📥 **[Download dari GitHub Releases](https://github.com/zakkutsu/media-tools-py/releases/latest)**
+
+- ✅ Single file executable (.exe)
+- ✅ Tidak perlu install Python
+- ✅ Tidak perlu install dependencies
+- ✅ Double-click dan langsung jalan!
+
+**Catatan:** Executable sudah include semua dependencies Python, tapi **FFmpeg masih harus diinstall secara terpisah** (lihat [System Requirements](#system-requirements)).
+
+---
+
+#### ⚡ ALTERNATIVE - One-Click Auto Setup (For Developers)
 
 **Untuk pengguna Windows**, cukup double-click file ini:
 ```
@@ -197,7 +212,22 @@ A collection of tools for media file processing and analysis (audio, video, imag
 
 ### 🚀 Quick Start (Recommended)
 
-#### ⚡ EASIEST WAY - One-Click Auto Setup!
+#### 💿 DOWNLOAD EXECUTABLE (No Python Required!)
+
+**Download ready-to-use version without Python installation:**
+
+📥 **[Download from GitHub Releases](https://github.com/zakkutsu/media-tools-py/releases/latest)**
+
+- ✅ Single file executable (.exe)
+- ✅ No Python installation needed
+- ✅ No dependency installation needed
+- ✅ Double-click and run!
+
+**Note:** The executable includes all Python dependencies, but **FFmpeg must still be installed separately** (see [System Requirements](#system-requirements)).
+
+---
+
+#### ⚡ ALTERNATIVE - One-Click Auto Setup (For Developers)
 
 **For Windows users**, just double-click this file:
 ```
@@ -373,7 +403,22 @@ pip install -r requirements.txt
 
 ### 🚀 クイックスタート（推奨）
 
-#### ⚡ 最も簡単な方法 - ワンクリック自動セットアップ！
+#### 💿 実行可能ファイルをダウンロード（Pythonは不要！）
+
+**Pythonのインストール不要ですぐに使える版をダウンロード：**
+
+📥 **[GitHub Releasesからダウンロード](https://github.com/zakkutsu/media-tools-py/releases/latest)**
+
+- ✅ 単一の実行可能ファイル（.exe）
+- ✅ Pythonのインストール不要
+- ✅ 依存関係のインストール不要
+- ✅ ダブルクリックで即起動！
+
+**注意：** 実行可能ファイルにはすべてのPython依存関係が含まれていますが、**FFmpegは別途インストールが必要です**（[システム要件](#system-requirements)を参照）。
+
+---
+
+#### ⚡ 代替方法 - ワンクリック自動セットアップ（開発者向け）
 
 **Windowsユーザーの場合**、このファイルをダブルクリックするだけ：
 ```

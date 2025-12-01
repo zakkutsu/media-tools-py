@@ -5,9 +5,12 @@ __pycache__/
 *.so
 .Python
 *.egg-info/
+
+# PyInstaller build artifacts (but keep .spec files)
 dist/
 build/
-*.spec
+*.manifest
+*.spec.backup
 
 # Executable files (uploaded to GitHub Releases)
 *.exe

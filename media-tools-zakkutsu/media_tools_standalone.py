@@ -1697,19 +1697,20 @@ if __name__ == "__main__":
     
     # Check FFmpeg
     if check_ffmpeg():
-        print("✅ FFmpeg: OK")
+        print("[OK] FFmpeg: OK")
     else:
-        print("❌ FFmpeg: Not Found")
-        print("   Install: winget install FFmpeg")
+        print("[!] FFmpeg: Not Found")
+        print("    Install: winget install FFmpeg")
+        print("    Or use auto-download feature in the app")
     
     # Check yt-dlp
     if check_ytdlp():
-        print("✅ yt-dlp: OK")
+        print("[OK] yt-dlp: OK")
     else:
-        print("⚠️  yt-dlp: Not Found (will auto-install)")
+        print("[INFO] yt-dlp: Not Found (will auto-install)")
     
     print()
-    print("🚀 Launching GUI...")
+    print("[LAUNCH] Starting GUI...")
     print("="*70)
     print()
     

@@ -37,7 +37,8 @@ def get_media_duration(file_path):
     try:
         cmd = ['ffprobe', '-v', 'quiet', '-show_entries', 'format=duration',
                '-of', 'default=noprint_wrappers=1:nokey=1', file_path]
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', 
+                              errors='replace', check=True)
         return float(result.stdout.strip())
     except:
         return None
@@ -92,12 +93,15 @@ def process_single_loop(input_file, loop_count):
     
     print(f"\n⚙️  Processing...")
     try:
-        subprocess.run(cmd, check=True, capture_output=True)
+        subprocess.run(cmd, check=True, capture_output=True, text=True, 
+                      encoding='utf-8', errors='replace')
         size = os.path.getsize(output_file) / (1024 * 1024)
         print(f"✅ Success! {output_file} ({size:.2f} MB)")
         return output_file
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
         print("❌ FFmpeg error")
+        if e.stderr:
+            print(f"Error details: {e.stderr}")
         return None
 
 
@@ -135,7 +139,7 @@ def process_alternating_loop(file_a, file_b, loop_count):
     path_b = get_ffmpeg_path_format(file_b)
     
     try:
-        with open(list_file, 'w', encoding='utf-8') as f:
+        with open(list_file, 'w', encoding='utf-8', newline='') as f:
             for _ in range(int(loop_count)):
                 f.write(f"file '{path_a}'\n")
                 f.write(f"file '{path_b}'\n")
@@ -147,13 +151,16 @@ def process_alternating_loop(file_a, file_b, loop_count):
                '-c', 'copy', output_file, '-y']
         
         print(f"⚙️  Processing...")
-        subprocess.run(cmd, check=True, capture_output=True)
+        subprocess.run(cmd, check=True, capture_output=True, text=True, 
+                      encoding='utf-8', errors='replace')
         
         size = os.path.getsize(output_file) / (1024 * 1024)
         print(f"✅ Success! {output_file} ({size:.2f} MB)")
         return output_file
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
         print("❌ FFmpeg error. Cek codec compatibility!")
+        if e.stderr:
+            print(f"Error details: {e.stderr}")
         return None
     except Exception as e:
         print(f"❌ Error: {e}")

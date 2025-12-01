@@ -192,6 +192,8 @@ class MediaLooperGUI:
         
         # Status
         self.single_status = ft.Text("Ready", size=12, color=colors.GREY_600)
+        self.single_progress = ft.ProgressBar(width=400, value=0, visible=False)
+        self.single_progress_text = ft.Text("", size=11, color=colors.BLUE_700, visible=False)
         self.single_log = ft.Column([], scroll=ft.ScrollMode.AUTO, expand=True, spacing=5)
         
         return ft.Container(
@@ -227,6 +229,8 @@ class MediaLooperGUI:
                 ft.Divider(),
                 ft.Text("Status", size=14, weight=ft.FontWeight.BOLD),
                 self.single_status,
+                self.single_progress,
+                self.single_progress_text,
                 ft.Container(
                     content=self.single_log,
                     bgcolor=colors.GREY_100,
@@ -377,6 +381,8 @@ class MediaLooperGUI:
         
         # Status
         self.alt_status = ft.Text("Ready", size=12, color=colors.GREY_600)
+        self.alt_progress = ft.ProgressBar(width=400, value=0, visible=False)
+        self.alt_progress_text = ft.Text("", size=11, color=colors.BLUE_700, visible=False)
         self.alt_log = ft.Column([], scroll=ft.ScrollMode.AUTO, expand=True, spacing=5)
         
         return ft.Container(
@@ -417,6 +423,8 @@ class MediaLooperGUI:
                 ft.Divider(),
                 ft.Text("Status", size=14, weight=ft.FontWeight.BOLD),
                 self.alt_status,
+                self.alt_progress,
+                self.alt_progress_text,
                 ft.Container(
                     content=self.alt_log,
                     bgcolor=colors.GREY_100,
@@ -579,12 +587,66 @@ class MediaLooperGUI:
         )
         self.page.update()
     
+    def update_progress(self, progress_bar, progress_text, percentage, step_text):
+        """Update progress bar and text"""
+        progress_bar.value = percentage / 100
+        progress_bar.visible = True
+        progress_text.value = f"{step_text} - {percentage}%"
+        progress_text.visible = True
+        self.page.update()
+    
+    def hide_progress(self, progress_bar, progress_text):
+        """Hide progress bar"""
+        progress_bar.visible = False
+        progress_text.visible = False
+        self.page.update()
+    
+    def run_ffmpeg_with_progress(self, cmd, total_duration, progress_bar, progress_text, step_text):
+        """Run FFmpeg with progress tracking"""
+        import re
+        
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding='utf-8',
+            errors='replace',  # Replace invalid characters instead of failing
+            creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+        )
+        
+        stderr_output = []
+        for line in process.stderr:
+            stderr_output.append(line)
+            # Parse FFmpeg progress from stderr
+            # Example: time=00:01:23.45
+            time_match = re.search(r'time=(\d+):(\d+):(\d+\.\d+)', line)
+            if time_match and total_duration and total_duration > 0:
+                hours = int(time_match.group(1))
+                minutes = int(time_match.group(2))
+                seconds = float(time_match.group(3))
+                current_time = hours * 3600 + minutes * 60 + seconds
+                
+                percentage = min(int((current_time / total_duration) * 100), 99)
+                self.update_progress(progress_bar, progress_text, percentage, step_text)
+        
+        process.wait()
+        
+        if process.returncode != 0:
+            error_msg = ''.join(stderr_output[-20:])  # Last 20 lines
+            raise subprocess.CalledProcessError(process.returncode, cmd, stderr=error_msg)
+        
+        # Set to 100% when done
+        self.update_progress(progress_bar, progress_text, 100, step_text)
+        return process
+    
     def get_duration(self, file_path):
         """Get media duration"""
         try:
             cmd = ['ffprobe', '-v', 'quiet', '-show_entries', 'format=duration',
                    '-of', 'default=noprint_wrappers=1:nokey=1', file_path]
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=10)
+            result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', 
+                                  errors='replace', check=True, timeout=10)
             return float(result.stdout.strip())
         except:
             return None
@@ -622,7 +684,8 @@ class MediaLooperGUI:
                     '-c:a', 'aac', silence_file, '-y'
                 ]
             
-            subprocess.run(cmd, check=True, capture_output=True, timeout=30)
+            subprocess.run(cmd, check=True, capture_output=True, text=True, 
+                          encoding='utf-8', errors='replace', timeout=30)
             return silence_file
         except Exception as e:
             print(f"Error generating silence: {e}")
@@ -708,9 +771,12 @@ class MediaLooperGUI:
             
             loop_count = count - 1
             cmd = ['ffmpeg', '-stream_loop', str(loop_count), '-i', file_path,
-                   '-c', 'copy', temp_looped, '-y']
+                   '-c', 'copy', '-progress', 'pipe:2', temp_looped, '-y']
             
-            subprocess.run(cmd, check=True, capture_output=True, timeout=300)
+            # Use progress tracking for looping (stream copy is instant, so this is mostly for show)
+            total_dur = duration * count if duration else None
+            self.run_ffmpeg_with_progress(cmd, total_dur, self.single_progress, 
+                                         self.single_progress_text, "Looping")
             self.log_message(self.single_log, "✓ Looping complete", colors.GREEN)
             
             # Step 2: Convert if needed
@@ -731,19 +797,25 @@ class MediaLooperGUI:
                     cmd = ['ffmpeg', '-loop', '1', '-i', bg_image, '-i', temp_looped,
                            '-c:v', 'libx264', '-tune', 'stillimage', '-c:a', 'aac',
                            '-b:a', '192k', '-pix_fmt', 'yuv420p', '-shortest',
-                           output_file, '-y']
+                           '-progress', 'pipe:2', output_file, '-y']
                 else:
                     # Video to Audio
                     cmd = ['ffmpeg', '-i', temp_looped, '-vn', '-c:a', 'libmp3lame',
-                           '-b:a', '192k', output_file, '-y']
+                           '-b:a', '192k', '-progress', 'pipe:2', output_file, '-y']
                 
-                subprocess.run(cmd, check=True, capture_output=True, timeout=300)
+                # Use progress tracking for conversion
+                total_dur = duration * count if duration else None
+                self.run_ffmpeg_with_progress(cmd, total_dur, self.single_progress,
+                                             self.single_progress_text, "Converting")
                 self.log_message(self.single_log, "✓ Conversion complete", colors.GREEN)
             else:
                 # No conversion needed, just move
                 import shutil
                 shutil.move(temp_looped, output_file)
                 temp_files.remove(temp_looped)
+            
+            # Hide progress bar
+            self.hide_progress(self.single_progress, self.single_progress_text)
             
             size = os.path.getsize(output_file) / (1024 * 1024)
             self.log_message(self.single_log, f"\n✅ SUCCESS!", colors.GREEN)
@@ -755,12 +827,19 @@ class MediaLooperGUI:
             self.show_snackbar("Processing completed!", colors.GREEN)
             
         except subprocess.CalledProcessError as e:
+            self.hide_progress(self.single_progress, self.single_progress_text)
             self.log_message(self.single_log, "\n❌ FFmpeg error!", colors.RED)
-            self.log_message(self.single_log, str(e.stderr) if e.stderr else "Unknown error", colors.RED)
+            error_msg = "Unknown error"
+            if hasattr(e, 'stderr') and e.stderr:
+                error_msg = str(e.stderr)
+            elif hasattr(e, 'output') and e.output:
+                error_msg = str(e.output)
+            self.log_message(self.single_log, error_msg, colors.RED)
             self.single_status.value = "Error"
             self.single_status.color = colors.RED
-            self.show_snackbar("Processing failed!", colors.RED)
+            self.show_snackbar("Processing failed! Check FFmpeg installation.", colors.RED)
         except Exception as e:
+            self.hide_progress(self.single_progress, self.single_progress_text)
             self.log_message(self.single_log, f"\n❌ Error: {e}", colors.RED)
             self.single_status.value = "Error"
             self.single_status.color = colors.RED
@@ -772,6 +851,7 @@ class MediaLooperGUI:
                         os.remove(temp_file)
                     except:
                         pass
+            self.hide_progress(self.single_progress, self.single_progress_text)
             self.processing = False
             self.page.update()
     
@@ -861,7 +941,7 @@ class MediaLooperGUI:
             self.log_message(self.alt_log, f"Pattern: {pattern} × {count} sets")
             
             # Create concat list with optional silence
-            with open(list_file, 'w', encoding='utf-8') as f:
+            with open(list_file, 'w', encoding='utf-8', newline='') as f:
                 for _ in range(count):
                     f.write(f"file '{abs_a}'\n")
                     if silence_file:
@@ -875,11 +955,17 @@ class MediaLooperGUI:
             
             self.log_message(self.alt_log, f"\n⚙️ FFmpeg processing...", colors.BLUE)
             
-            # FFmpeg command
+            # FFmpeg command with progress
             cmd = ['ffmpeg', '-f', 'concat', '-safe', '0', '-i', list_file,
-                   '-c', 'copy', output_file, '-y']
+                   '-c', 'copy', '-progress', 'pipe:2', output_file, '-y']
             
-            subprocess.run(cmd, check=True, capture_output=True)
+            # Calculate total duration for progress tracking
+            total_dur = (dur_a + dur_b + delay) * count if dur_a and dur_b else None
+            self.run_ffmpeg_with_progress(cmd, total_dur, self.alt_progress,
+                                         self.alt_progress_text, "Merging")
+            
+            # Hide progress bar
+            self.hide_progress(self.alt_progress, self.alt_progress_text)
             
             size = os.path.getsize(output_file) / (1024 * 1024)
             self.log_message(self.alt_log, f"\n✅ SUCCESS!", colors.GREEN)
@@ -890,12 +976,20 @@ class MediaLooperGUI:
             self.alt_status.color = colors.GREEN
             self.show_snackbar("Processing completed!", colors.GREEN)
             
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as e:
+            self.hide_progress(self.alt_progress, self.alt_progress_text)
             self.log_message(self.alt_log, "\n❌ FFmpeg error! Check codec compatibility.", colors.RED)
+            error_msg = "Unknown error"
+            if hasattr(e, 'stderr') and e.stderr:
+                error_msg = str(e.stderr)
+            elif hasattr(e, 'output') and e.output:
+                error_msg = str(e.output)
+            self.log_message(self.alt_log, f"Error details: {error_msg}", colors.RED)
             self.alt_status.value = "Error"
             self.alt_status.color = colors.RED
-            self.show_snackbar("Processing failed!", colors.RED)
+            self.show_snackbar("Processing failed! Check codec compatibility.", colors.RED)
         except Exception as e:
+            self.hide_progress(self.alt_progress, self.alt_progress_text)
             self.log_message(self.alt_log, f"\n❌ Error: {e}", colors.RED)
             self.alt_status.value = "Error"
             self.alt_status.color = colors.RED
@@ -905,6 +999,7 @@ class MediaLooperGUI:
                 os.remove(list_file)
             if silence_file and os.path.exists(silence_file):
                 os.remove(silence_file)
+            self.hide_progress(self.alt_progress, self.alt_progress_text)
             self.processing = False
             self.page.update()
     

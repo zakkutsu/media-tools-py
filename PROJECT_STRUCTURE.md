@@ -61,8 +61,8 @@ media-tools-py/
 │
 └── 📁 media-looper/                 # 🔁 Media Looper Tool ⭐ NEW!
     ├── 📄 README.md                 # Tool-specific documentation
-    ├── 🐍 loop_media.py             # CLI version
-    ├── 🐍 media_looper_gui.py       # GUI version (Tkinter)
+    ├── 🐍 media_looper_cli.py       # CLI version (unified)
+    ├── 🐍 media_looper_gui_flet.py  # GUI version (Flet)
     └── 📁 __pycache__/              # Python cache
 ```
 

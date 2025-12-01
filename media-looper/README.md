@@ -36,30 +36,37 @@ Input → Binary Concatenation → Output
 
 ## 📝 Penggunaan
 
-### Via GUI (Basic Mode)
+### Via GUI (Flet - Modern Interface) 🎨
 ```bash
-python media_looper_gui.py
+python media_looper_gui_flet.py
 ```
-1. Pilih file (atau drag & drop)
-2. Masukkan jumlah loop (contoh: 60)
-3. Klik "Process"
-4. File output: `filename_looped_60x.ext`
+**Features:**
+- 🎯 **Tab-based UI**: Single Loop & Alternating Loop
+- 📊 **Duration Calculator**: Preview output duration
+- 🚀 **Quick Presets**: 10x, 20x, 30x, 60x, 120x buttons
+- 📝 **Real-time Log**: Monitor processing status
+- 🎨 **Modern Design**: Clean Flet interface
 
-### Via CLI (Basic Mode)
-```bash
-python loop_media.py
-```
-- Interaktif: masukkan path dan jumlah loop
-- Output otomatis di folder yang sama
+**Tab 1: Single Loop**
+1. Select file
+2. Enter loop count (or use quick presets)
+3. Click Process
+4. Output: `filename_looped_60x.ext`
 
-### Via CLI (Advanced Mode) ⭐ NEW!
+**Tab 2: Alternating Loop** 🔥
+1. Select File A and File B
+2. Enter loop count (sets)
+3. Click Process
+4. Output: `filenameA_merged_10x.ext`
+
+### Via CLI (Interactive Menu)
 ```bash
-python advanced_looper.py
+python media_looper_cli.py
 ```
 
 **Mode 1: Single Loop**
 - Loop 1 file berkali-kali (A-A-A...)
-- Sama seperti basic mode tapi dengan menu interaktif
+- Instant processing dengan stream copy
 
 **Mode 2: Alternating Loop** 🔥
 - Loop 2 file bergantian (A-B-A-B-A-B...)

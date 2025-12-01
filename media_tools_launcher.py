@@ -182,11 +182,11 @@ except Exception as e:
     print(f"Failed to import SocMedDownloaderGUI: {e}")
     SocMedDownloaderGUI = None
 
-# Import Media Looper (Tkinter-based)
+# Import Media Looper (Flet-based)
 try:
     media_looper_spec = importlib.util.spec_from_file_location(
-        "media_looper_gui",
-        current_dir / "media-looper" / "media_looper_gui.py"
+        "media_looper_gui_flet",
+        current_dir / "media-looper" / "media_looper_gui_flet.py"
     )
     if media_looper_spec and media_looper_spec.loader:
         media_looper_module = importlib.util.module_from_spec(media_looper_spec)
@@ -534,11 +534,32 @@ class MediaToolsLauncher:
     def launch_media_looper(self, e):
         """Launch Media Looper tool"""
         if MediaLooperGUI is None:
-            error_msg = "Media Looper tidak tersedia.\n\nPastikan file media_looper_gui.py ada di folder media-looper/\n\nPeriksa juga bahwa FFmpeg sudah terinstall dan ada di system PATH."
+            error_msg = "Media Looper tidak tersedia.\n\nPastikan file media_looper_gui_flet.py ada di folder media-looper/\n\nPeriksa juga bahwa FFmpeg sudah terinstall dan ada di system PATH."
             self.show_error(error_msg)
             return
         
-        self.switch_to_app("media_looper")
+        # Media Looper uses Flet, launch in new window
+        import subprocess
+        import sys
+        
+        script_path = current_dir / "media-looper" / "media_looper_gui_flet.py"
+        if not script_path.exists():
+            self.show_error("File media_looper_gui_flet.py tidak ditemukan!")
+            return
+        
+        # Use virtual environment python if available
+        venv_python = current_dir / "venv" / "Scripts" / "python.exe"
+        if venv_python.exists():
+            python_exe = str(venv_python)
+        else:
+            python_exe = sys.executable
+        
+        try:
+            subprocess.Popen([python_exe, str(script_path)],
+                           creationflags=subprocess.CREATE_NEW_CONSOLE if os.name == 'nt' else 0)
+            self.show_snackbar("✅ Media Looper launched!", ft.Colors.GREEN)
+        except Exception as e:
+            self.show_error(f"Failed to launch Media Looper:\n{e}")
     
     def switch_to_app(self, app_name):
         """Switch to specific application"""
@@ -643,8 +664,6 @@ class MediaToolsLauncher:
                     script_path = current_dir / "yt-batch-downloader" / "batch_downloader_gui.py"
                 elif app_name == "playlist_downloader":
                     script_path = current_dir / "yt-playlist-downloader" / "playlist_downloader_gui.py"
-                elif app_name == "media_looper":
-                    script_path = current_dir / "media-looper" / "media_looper_gui.py"
                 else:
                     raise ValueError(f"Unknown app: {app_name}")
                 

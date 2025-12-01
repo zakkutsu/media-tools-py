@@ -94,7 +94,7 @@ class BatchDownloaderGUI:
                 ft.Text(
                     self.translations.get("desc_batch", "Download multiple individual YouTube videos"),
                     size=14,
-                    color=ft.Colors.GREY_600,
+                    color=ft.colors.GREY_600,
                     text_align=ft.TextAlign.CENTER
                 )
             ]),
@@ -107,7 +107,7 @@ class BatchDownloaderGUI:
         self.install_btn = ft.ElevatedButton(
             text=self.translations.get("install_ytdlp", "📦 Install/Update yt-dlp"),
             on_click=self.install_update_ytdlp,
-            icon=ft.Icons.DOWNLOAD
+            icon=ft.icons.DOWNLOAD
         )
         
         ytdlp_status_section = ft.Container(
@@ -115,7 +115,7 @@ class BatchDownloaderGUI:
                 self.ytdlp_status_text,
                 self.install_btn
             ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-            border=ft.border.all(1, ft.Colors.GREY_300),
+            border=ft.border.all(1, ft.colors.GREY_300),
             border_radius=8,
             padding=ft.padding.all(10),
             margin=ft.margin.only(bottom=10)
@@ -132,7 +132,7 @@ class BatchDownloaderGUI:
         
         browse_btn = ft.ElevatedButton(
             text=self.common_translations.get("browse", "Browse"),
-            icon=ft.Icons.FOLDER_OPEN,
+            icon=ft.icons.FOLDER_OPEN,
             on_click=self.browse_folder
         )
         
@@ -153,38 +153,38 @@ class BatchDownloaderGUI:
         # Download Buttons
         self.download_btn = ft.ElevatedButton(
             text=self.translations.get("start_download", "🚀 Start Batch Download"),
-            icon=ft.Icons.PLAY_ARROW,
+            icon=ft.icons.PLAY_ARROW,
             on_click=self.start_download,
             width=200,
             height=50,
             style=ft.ButtonStyle(
-                color=ft.Colors.WHITE,
-                bgcolor=ft.Colors.BLUE_600
+                color=ft.colors.WHITE,
+                bgcolor=ft.colors.BLUE_600
             )
         )
         
         self.retry_failed_btn = ft.ElevatedButton(
             text="🔄 " + self.translations.get("retry", "Retry Failed"),
-            icon=ft.Icons.REFRESH,
+            icon=ft.icons.REFRESH,
             on_click=self.retry_failed_downloads,
             width=150,
             height=50,
             disabled=True,
             style=ft.ButtonStyle(
-                color=ft.Colors.WHITE,
-                bgcolor=ft.Colors.ORANGE_600
+                color=ft.colors.WHITE,
+                bgcolor=ft.colors.ORANGE_600
             )
         )
         
         self.clear_failed_btn = ft.OutlinedButton(
             text="🗑️ Clear Failed",
-            icon=ft.Icons.DELETE_OUTLINE,
+            icon=ft.icons.DELETE_OUTLINE,
             on_click=self.clear_failed_urls,
             width=140,
             height=50,
             disabled=True,
             style=ft.ButtonStyle(
-                color=ft.Colors.RED_600,
+                color=ft.colors.RED_600,
             )
         )
         
@@ -221,7 +221,7 @@ class BatchDownloaderGUI:
         
         add_btn = ft.ElevatedButton(
             text=self.translations.get("add_url", "Add URL"),
-            icon=ft.Icons.ADD,
+            icon=ft.icons.ADD,
             on_click=self.add_url
         )
         
@@ -230,23 +230,23 @@ class BatchDownloaderGUI:
         # URL Management Buttons
         load_btn = ft.ElevatedButton(
             text=self.translations.get("load_from_file", "📄 Load from File"),
-            icon=ft.Icons.FILE_OPEN,
+            icon=ft.icons.FILE_OPEN,
             on_click=self.load_urls_from_file,
-            style=ft.ButtonStyle(bgcolor=ft.Colors.GREEN_100)
+            style=ft.ButtonStyle(bgcolor=ft.colors.GREEN_100)
         )
         
         save_btn = ft.ElevatedButton(
             text=self.translations.get("save_to_file", "💾 Save to File"),
-            icon=ft.Icons.SAVE,
+            icon=ft.icons.SAVE,
             on_click=self.save_urls_to_file,
-            style=ft.ButtonStyle(bgcolor=ft.Colors.BLUE_100)
+            style=ft.ButtonStyle(bgcolor=ft.colors.BLUE_100)
         )
         
         clear_btn = ft.ElevatedButton(
             text=self.translations.get("clear_all", "🗑️ Clear All"),
-            icon=ft.Icons.CLEAR,
+            icon=ft.icons.CLEAR,
             on_click=self.clear_all_urls,
-            style=ft.ButtonStyle(bgcolor=ft.Colors.RED_100)
+            style=ft.ButtonStyle(bgcolor=ft.colors.RED_100)
         )
         
         self.url_count_text = ft.Text(self.translations.get("url_list", "URLs") + ": 0", weight=ft.FontWeight.BOLD, size=14)
@@ -266,9 +266,9 @@ class BatchDownloaderGUI:
         
         url_list_container = ft.Container(
             content=self.url_list,
-            border=ft.border.all(1, ft.Colors.GREY_300),
+            border=ft.border.all(1, ft.colors.GREY_300),
             border_radius=8,
-            bgcolor=ft.Colors.GREY_50
+            bgcolor=ft.colors.GREY_50
         )
         
         return ft.Container(
@@ -280,7 +280,7 @@ class BatchDownloaderGUI:
                 url_list_container
             ]),
             padding=ft.padding.all(10),
-            border=ft.border.all(1, ft.Colors.GREY_300),
+            border=ft.border.all(1, ft.colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=10)
         )
@@ -309,7 +309,7 @@ class BatchDownloaderGUI:
         
         reset_template_btn = ft.ElevatedButton(
             text="Reset",
-            icon=ft.Icons.REFRESH,
+            icon=ft.icons.REFRESH,
             on_click=self.reset_template
         )
         
@@ -332,7 +332,7 @@ class BatchDownloaderGUI:
         help_text = ft.Text(
             "Template variables: %(title)s (title), %(ext)s (extension), %(uploader)s (channel)",
             size=10,
-            color=ft.Colors.GREY_600
+            color=ft.colors.GREY_600
         )
         
         return ft.Container(
@@ -347,7 +347,7 @@ class BatchDownloaderGUI:
                 help_text
             ]),
             padding=ft.padding.all(10),
-            border=ft.border.all(1, ft.Colors.GREY_300),
+            border=ft.border.all(1, ft.colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=10)
         )
@@ -358,9 +358,9 @@ class BatchDownloaderGUI:
         self.progress_bar = ft.ProgressBar(value=0, expand=True)
         
         # Enhanced progress info
-        self.speed_label = ft.Text("Speed: -- MB/s", size=11, color=ft.Colors.BLUE_600)
-        self.eta_label = ft.Text("ETA: --:--", size=11, color=ft.Colors.GREEN_600)
-        self.stats_text = ft.Text("", size=11, color=ft.Colors.GREY_700)
+        self.speed_label = ft.Text("Speed: -- MB/s", size=11, color=ft.colors.BLUE_600)
+        self.eta_label = ft.Text("ETA: --:--", size=11, color=ft.colors.GREEN_600)
+        self.stats_text = ft.Text("", size=11, color=ft.colors.GREY_700)
         
         return ft.Container(
             content=ft.Column([
@@ -372,13 +372,13 @@ class BatchDownloaderGUI:
                 ),
                 ft.Row([
                     self.speed_label,
-                    ft.Text("│", color=ft.Colors.GREY_400),
+                    ft.Text("│", color=ft.colors.GREY_400),
                     self.eta_label,
                 ], spacing=10),
                 self.stats_text,
             ]),
             padding=ft.padding.all(10),
-            border=ft.border.all(1, ft.Colors.GREY_300),
+            border=ft.border.all(1, ft.colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=10)
         )
@@ -397,13 +397,13 @@ class BatchDownloaderGUI:
                 ft.Text("📋 Download Log", size=16, weight=ft.FontWeight.BOLD),
                 ft.Container(
                     content=self.output_log,
-                    border=ft.border.all(1, ft.Colors.GREY_300),
+                    border=ft.border.all(1, ft.colors.GREY_300),
                     border_radius=8,
-                    bgcolor=ft.Colors.GREY_50
+                    bgcolor=ft.colors.GREY_50
                 )
             ]),
             padding=ft.padding.all(10),
-            border=ft.border.all(1, ft.Colors.GREY_300),
+            border=ft.border.all(1, ft.colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=10)
         )
@@ -412,11 +412,11 @@ class BatchDownloaderGUI:
         """Update yt-dlp status display"""
         if self.downloader.yt_dlp_available:
             self.ytdlp_status_text.value = "✅ yt-dlp is available"
-            self.ytdlp_status_text.color = ft.Colors.GREEN_600
+            self.ytdlp_status_text.color = ft.colors.GREEN_600
             self.install_btn.text = "Update yt-dlp"
         else:
             self.ytdlp_status_text.value = "❌ yt-dlp not found"
-            self.ytdlp_status_text.color = ft.Colors.RED_600
+            self.ytdlp_status_text.color = ft.colors.RED_600
             self.install_btn.text = "Install yt-dlp"
         self.page.update()
     
@@ -473,10 +473,10 @@ class BatchDownloaderGUI:
             # Add to UI list
             url_item = ft.ListTile(
                 title=ft.Text(url, size=12),
-                subtitle=ft.Text("Ready", color=ft.Colors.BLUE_600),
+                subtitle=ft.Text("Ready", color=ft.colors.BLUE_600),
                 trailing=ft.IconButton(
-                    icon=ft.Icons.DELETE,
-                    icon_color=ft.Colors.RED_400,
+                    icon=ft.icons.DELETE,
+                    icon_color=ft.colors.RED_400,
                     tooltip="Remove URL",
                     on_click=lambda e, url=url: self.remove_url(url)
                 )
@@ -580,21 +580,21 @@ class BatchDownloaderGUI:
         
         for i, url in enumerate(self.downloader.url_list, 1):
             status = 'Ready'
-            status_color = ft.Colors.BLUE_600
+            status_color = ft.colors.BLUE_600
             
             if url in self.downloader.successful_downloads:
                 status = 'Success'
-                status_color = ft.Colors.GREEN_600
+                status_color = ft.colors.GREEN_600
             elif url in self.downloader.failed_downloads:
                 status = 'Failed'
-                status_color = ft.Colors.RED_600
+                status_color = ft.colors.RED_600
             
             url_item = ft.ListTile(
                 title=ft.Text(f"{i}. {url}", size=12),
                 subtitle=ft.Text(status, color=status_color),
                 trailing=ft.IconButton(
-                    icon=ft.Icons.DELETE,
-                    icon_color=ft.Colors.RED_400,
+                    icon=ft.icons.DELETE,
+                    icon_color=ft.colors.RED_400,
                     tooltip="Remove URL",
                     on_click=lambda e, url=url: self.remove_url(url)
                 )
@@ -939,4 +939,6 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     ft.app(target=main)
+
+
 

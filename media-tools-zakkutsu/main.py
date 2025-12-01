@@ -173,25 +173,27 @@ class MediaToolsZakkutsu:
             )
             return
         
-        # Clear page and launch tool
-        self.page.controls.clear()
-        
-        # Add back button
-        back_btn = ft.ElevatedButton(
-            "← Back to Home",
-            icon=ft.icons.HOME,
-            on_click=lambda e: self.setup_ui()
-        )
-        
         try:
-            # Create tool instance
-            tool_instance = tool_info["gui_class"](self.page)
+            # Store original page settings
+            original_title = self.page.title
             
-            # Add controls
-            self.page.add(
-                ft.Container(padding=10, content=back_btn),
-                ft.Divider(),
+            # Clear page
+            self.page.controls.clear()
+            
+            # Add back button at top
+            back_btn = ft.ElevatedButton(
+                "← Back to Home",
+                icon=ft.icons.HOME,
+                on_click=lambda e: self.return_home(original_title)
             )
+            
+            self.page.add(
+                ft.Container(padding=10, content=back_btn)
+            )
+            
+            # Create and initialize tool
+            # Note: The tool's __init__ will add its own controls to the page
+            tool_instance = tool_info["gui_class"](self.page)
             
             self.page.update()
             
@@ -203,6 +205,11 @@ class MediaToolsZakkutsu:
                 )
             )
             self.setup_ui()
+    
+    def return_home(self, original_title):
+        """Return to home screen"""
+        self.page.title = original_title
+        self.setup_ui()
     
     def setup_ui(self):
         """Setup main UI"""

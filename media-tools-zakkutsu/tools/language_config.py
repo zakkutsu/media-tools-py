@@ -200,3 +200,5 @@ def get_text(lang_code, key, **kwargs):
     if kwargs:
         return text.format(**kwargs)
     return text
+
+

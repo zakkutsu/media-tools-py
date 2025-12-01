@@ -205,3 +205,4 @@ if __name__ == "__main__":
         print("\n\nProgram dihentikan oleh pengguna. Sampai jumpa! 👋")
     except Exception as e:
         print(f"\n❌ Terjadi error tidak terduga: {e}")
+

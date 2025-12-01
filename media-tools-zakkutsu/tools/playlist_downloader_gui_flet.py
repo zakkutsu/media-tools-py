@@ -85,7 +85,7 @@ class PlaylistDownloaderGUI:
                 ft.Text(
                     self.translations.get("desc_playlist", "Download complete YouTube playlists with ease"),
                     size=14,
-                    color=ft.colors.GREY_600,
+                    color=ft.Colors.GREY_600,
                     text_align=ft.TextAlign.CENTER
                 )
             ]),
@@ -98,7 +98,7 @@ class PlaylistDownloaderGUI:
         self.install_btn = ft.ElevatedButton(
             text=self.translations.get("install_ytdlp", "📦 Install/Update yt-dlp"),
             on_click=self.install_update_ytdlp,
-            icon=ft.icons.DOWNLOAD
+            icon=ft.Icons.DOWNLOAD
         )
         
         ytdlp_status_section = ft.Container(
@@ -107,7 +107,7 @@ class PlaylistDownloaderGUI:
                 self.install_btn
             ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
             padding=ft.padding.all(10),
-            border=ft.border.all(1, ft.colors.GREY_300),
+            border=ft.border.all(1, ft.Colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=10)
         )
@@ -123,7 +123,7 @@ class PlaylistDownloaderGUI:
         
         browse_btn = ft.ElevatedButton(
             text=self.common_translations.get("browse", "Browse"),
-            icon=ft.icons.FOLDER_OPEN,
+            icon=ft.Icons.FOLDER_OPEN,
             on_click=self.browse_folder
         )
         
@@ -144,9 +144,9 @@ class PlaylistDownloaderGUI:
         
         self.get_info_btn = ft.ElevatedButton(
             text="Get Info",
-            icon=ft.icons.INFO,
+            icon=ft.Icons.INFO,
             on_click=self.get_playlist_info,
-            style=ft.ButtonStyle(bgcolor=ft.colors.BLUE_100)
+            style=ft.ButtonStyle(bgcolor=ft.Colors.BLUE_100)
         )
         
         url_section = ft.Container(
@@ -156,7 +156,7 @@ class PlaylistDownloaderGUI:
         main_content.controls.append(url_section)
         
         # Playlist Info Display
-        self.info_text = ft.Text("", color=ft.colors.BLUE_600, size=12, weight=ft.FontWeight.BOLD)
+        self.info_text = ft.Text("", color=ft.Colors.BLUE_600, size=12, weight=ft.FontWeight.BOLD)
         info_section = ft.Container(
             content=self.info_text,
             padding=ft.padding.only(bottom=10)
@@ -170,13 +170,13 @@ class PlaylistDownloaderGUI:
         # Download Button
         self.download_btn = ft.ElevatedButton(
             text=self.translations.get("start_download", "🚀 Start Download"),
-            icon=ft.icons.PLAY_ARROW,
+            icon=ft.Icons.PLAY_ARROW,
             on_click=self.start_download,
             width=200,
             height=50,
             style=ft.ButtonStyle(
-                color=ft.colors.WHITE,
-                bgcolor=ft.colors.BLUE_600
+                color=ft.Colors.WHITE,
+                bgcolor=ft.Colors.BLUE_600
             )
         )
         
@@ -221,7 +221,7 @@ class PlaylistDownloaderGUI:
         
         reset_template_btn = ft.ElevatedButton(
             text="Reset",
-            icon=ft.icons.REFRESH,
+            icon=ft.Icons.REFRESH,
             on_click=self.reset_template
         )
         
@@ -238,7 +238,7 @@ class PlaylistDownloaderGUI:
         help_text = ft.Text(
             "Template variables: %(playlist_index)s (number), %(title)s (title), %(ext)s (extension)",
             size=10,
-            color=ft.colors.GREY_600
+            color=ft.Colors.GREY_600
         )
         
         return ft.Container(
@@ -252,7 +252,7 @@ class PlaylistDownloaderGUI:
                 help_text
             ]),
             padding=ft.padding.all(10),
-            border=ft.border.all(1, ft.colors.GREY_300),
+            border=ft.border.all(1, ft.Colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=10)
         )
@@ -287,7 +287,7 @@ class PlaylistDownloaderGUI:
                 )
             ]),
             padding=ft.padding.all(10),
-            border=ft.border.all(1, ft.colors.GREY_300),
+            border=ft.border.all(1, ft.Colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=10)
         )
@@ -306,13 +306,13 @@ class PlaylistDownloaderGUI:
                 ft.Text("📋 Output Log", size=16, weight=ft.FontWeight.BOLD),
                 ft.Container(
                     content=self.output_log,
-                    border=ft.border.all(1, ft.colors.GREY_300),
+                    border=ft.border.all(1, ft.Colors.GREY_300),
                     border_radius=8,
-                    bgcolor=ft.colors.GREY_50
+                    bgcolor=ft.Colors.GREY_50
                 )
             ]),
             padding=ft.padding.all(10),
-            border=ft.border.all(1, ft.colors.GREY_300),
+            border=ft.border.all(1, ft.Colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=10)
         )
@@ -321,11 +321,11 @@ class PlaylistDownloaderGUI:
         """Update yt-dlp status display"""
         if self.downloader.yt_dlp_available:
             self.ytdlp_status_text.value = "✅ yt-dlp is available"
-            self.ytdlp_status_text.color = ft.colors.GREEN_600
+            self.ytdlp_status_text.color = ft.Colors.GREEN_600
             self.install_btn.text = "Update yt-dlp"
         else:
             self.ytdlp_status_text.value = "❌ yt-dlp not found"
-            self.ytdlp_status_text.color = ft.colors.RED_600
+            self.ytdlp_status_text.color = ft.Colors.RED_600
             self.install_btn.text = "Install yt-dlp"
         self.page.update()
     
@@ -401,12 +401,12 @@ class PlaylistDownloaderGUI:
                 self.playlist_info = info
                 info_text = f"📊 Found {info['total_videos']} videos in playlist"
                 self.info_text.value = info_text
-                self.info_text.color = ft.colors.GREEN_600
+                self.info_text.color = ft.Colors.GREEN_600
                 self.log_output(f"✅ {info_text}")
             else:
                 self.playlist_info = None
                 self.info_text.value = "❌ Failed to get playlist info"
-                self.info_text.color = ft.colors.RED_600
+                self.info_text.color = ft.Colors.RED_600
                 self.log_output("❌ Failed to get playlist info. Check URL and internet connection.")
             
             self.page.update()
@@ -615,6 +615,7 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     ft.app(target=main)
+
 
 
 

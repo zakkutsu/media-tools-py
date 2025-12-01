@@ -382,7 +382,9 @@ class PlaylistDownloaderGUI:
         self.template_field = None
         self.info_text = None
         self.overall_progress_bar = None
+        self.overall_progress_text = None
         self.current_progress_bar = None
+        self.current_progress_text = None
         self.progress_label = None
         self.output_log = None
         self.download_btn = None
@@ -596,10 +598,12 @@ class PlaylistDownloaderGUI:
         # Playlist Progress (Overall)
         playlist_progress_label = ft.Text("Playlist Progress:", size=10, weight=ft.FontWeight.BOLD)
         self.overall_progress_bar = ft.ProgressBar(value=0, expand=True)
+        self.overall_progress_text = ft.Text("0%", size=11, weight=ft.FontWeight.BOLD, width=50, text_align=ft.TextAlign.RIGHT)
         
         # Current Item Progress
         current_progress_label = ft.Text("Current Item Progress:", size=10, weight=ft.FontWeight.BOLD)
         self.current_progress_bar = ft.ProgressBar(value=0, expand=True)
+        self.current_progress_text = ft.Text("0%", size=11, weight=ft.FontWeight.BOLD, width=50, text_align=ft.TextAlign.RIGHT)
         
         return ft.Container(
             content=ft.Column([
@@ -607,16 +611,24 @@ class PlaylistDownloaderGUI:
                 self.progress_label,
                 ft.Container(height=10),
                 playlist_progress_label,
-                ft.Container(
-                    content=self.overall_progress_bar,
-                    padding=ft.padding.symmetric(vertical=3)
-                ),
+                ft.Row([
+                    ft.Container(
+                        content=self.overall_progress_bar,
+                        padding=ft.padding.symmetric(vertical=3),
+                        expand=True
+                    ),
+                    self.overall_progress_text
+                ], spacing=10),
                 ft.Container(height=5),
                 current_progress_label,
-                ft.Container(
-                    content=self.current_progress_bar,
-                    padding=ft.padding.symmetric(vertical=3)
-                )
+                ft.Row([
+                    ft.Container(
+                        content=self.current_progress_bar,
+                        padding=ft.padding.symmetric(vertical=3),
+                        expand=True
+                    ),
+                    self.current_progress_text
+                ], spacing=10)
             ]),
             padding=ft.padding.all(10),
             border=ft.border.all(1, colors.GREY_300),
@@ -877,13 +889,16 @@ class PlaylistDownloaderGUI:
             self.progress_label.value = f"🎵 [{current}/{total}] ({percentage:.1f}%)"
         
         self.overall_progress_bar.value = percentage / 100.0
+        self.overall_progress_text.value = f"{percentage:.1f}%"
         self.page.update()
     
     def reset_progress(self):
         """Reset progress display"""
         self.progress_label.value = "Ready to download"
         self.overall_progress_bar.value = 0
+        self.overall_progress_text.value = "0%"
         self.current_progress_bar.value = 0
+        self.current_progress_text.value = "0%"
         self.page.update()
     
     def log_output(self, message):

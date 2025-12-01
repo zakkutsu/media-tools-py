@@ -269,17 +269,35 @@ class PlaylistDownloader:
                 format_selector = quality
             
             # Progress hook
+            current_item = [0]  # Track current item
+            
             def progress_hook(d):
-                if progress_callback and d['status'] == 'downloading':
-                    try:
-                        playlist_index = d.get('playlist_index', 0)
-                        playlist_count = d.get('playlist_count', 0)
-                        if playlist_index > 0 and playlist_count > 0:
+                if not progress_callback:
+                    return
+                
+                try:
+                    status = d.get('status', '')
+                    playlist_index = d.get('playlist_index', 0)
+                    playlist_count = d.get('playlist_count', 0)
+                    
+                    if playlist_index > 0 and playlist_count > 0:
+                        # Update tracker when starting new item
+                        if status == 'downloading' and playlist_index != current_item[0]:
+                            current_item[0] = playlist_index
+                            info_dict = d.get('info_dict', {})
+                            title = info_dict.get('title', '')
                             percentage = (playlist_index / playlist_count) * 100
-                            title = d.get('info_dict', {}).get('title', '')
                             progress_callback(playlist_index, playlist_count, percentage, title)
-                    except:
-                        pass
+                        
+                        # Update on completion
+                        elif status == 'finished':
+                            info_dict = d.get('info_dict', {})
+                            title = info_dict.get('title', '')
+                            percentage = (playlist_index / playlist_count) * 100
+                            progress_callback(playlist_index, playlist_count, percentage, f"✓ {title}")
+                
+                except Exception as e:
+                    pass
             
             ydl_opts = {
                 'format': format_selector,
@@ -317,17 +335,35 @@ class PlaylistDownloader:
                     output_template = "%(title)s.%(ext)s"
             
             # Progress hook
+            current_item = [0]  # Track current item
+            
             def progress_hook(d):
-                if progress_callback and d['status'] == 'downloading':
-                    try:
-                        playlist_index = d.get('playlist_index', 0)
-                        playlist_count = d.get('playlist_count', 0)
-                        if playlist_index > 0 and playlist_count > 0:
+                if not progress_callback:
+                    return
+                
+                try:
+                    status = d.get('status', '')
+                    playlist_index = d.get('playlist_index', 0)
+                    playlist_count = d.get('playlist_count', 0)
+                    
+                    if playlist_index > 0 and playlist_count > 0:
+                        # Update tracker when starting new item
+                        if status == 'downloading' and playlist_index != current_item[0]:
+                            current_item[0] = playlist_index
+                            info_dict = d.get('info_dict', {})
+                            title = info_dict.get('title', '')
                             percentage = (playlist_index / playlist_count) * 100
-                            title = d.get('info_dict', {}).get('title', '')
                             progress_callback(playlist_index, playlist_count, percentage, title)
-                    except:
-                        pass
+                        
+                        # Update on completion
+                        elif status == 'finished':
+                            info_dict = d.get('info_dict', {})
+                            title = info_dict.get('title', '')
+                            percentage = (playlist_index / playlist_count) * 100
+                            progress_callback(playlist_index, playlist_count, percentage, f"✓ {title}")
+                
+                except Exception as e:
+                    pass
             
             ydl_opts = {
                 'format': 'bestaudio/best',

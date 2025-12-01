@@ -1,8 +1,0 @@
-# Media Tools Zakkutsu - Requirements
-flet>=0.25.0
-pydub==0.25.1
-audioop-lts==0.2.2
-ffmpeg-python==0.2.0
-Pillow>=10.0.0
-filetype==1.2.0
-yt-dlp>=2024.11.0

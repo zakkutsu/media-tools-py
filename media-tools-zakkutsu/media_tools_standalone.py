@@ -150,8 +150,10 @@ def check_ytdlp():
     """Check if yt-dlp is installed"""
     try:
         import yt_dlp
+        # Try to verify it's working by checking version
+        version = yt_dlp.version.__version__
         return True
-    except ImportError:
+    except (ImportError, AttributeError):
         return False
 
 def install_dependencies():
@@ -190,33 +192,13 @@ class PlaylistDownloader:
     def __init__(self):
         self.download_folder = None
         self.yt_dlp_available = self._check_yt_dlp()
-        self.yt_dlp_cmd = self._get_yt_dlp_command()
     
     def _check_yt_dlp(self) -> bool:
         try:
-            result = subprocess.run(['yt-dlp', '--version'], 
-                                  capture_output=True, text=True, timeout=10)
-            if result.returncode == 0:
-                return True
-        except:
-            pass
-        
-        try:
-            result = subprocess.run([sys.executable, '-m', 'yt_dlp', '--version'], 
-                                  capture_output=True, text=True, timeout=10)
-            return result.returncode == 0
-        except:
+            import yt_dlp
+            return True
+        except ImportError:
             return False
-    
-    def _get_yt_dlp_command(self) -> List[str]:
-        try:
-            result = subprocess.run(['yt-dlp', '--version'], 
-                                  capture_output=True, text=True, timeout=5)
-            if result.returncode == 0:
-                return ['yt-dlp']
-        except:
-            pass
-        return [sys.executable, '-m', 'yt_dlp']
     
     def install_or_update_yt_dlp(self) -> bool:
         try:
@@ -242,20 +224,24 @@ class PlaylistDownloader:
             return None
         
         try:
-            cmd = self.yt_dlp_cmd + ['--dump-json', '--flat-playlist', playlist_url]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            import yt_dlp
             
-            if result.returncode == 0:
-                entries = []
-                for line in result.stdout.strip().split('\n'):
-                    if line.strip():
-                        try:
-                            entries.append(json.loads(line))
-                        except:
-                            continue
-                return {'total_videos': len(entries), 'entries': entries}
-            return None
-        except:
+            ydl_opts = {
+                'quiet': True,
+                'extract_flat': True,
+                'force_generic_extractor': False,
+            }
+            
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(playlist_url, download=False)
+                if 'entries' in info:
+                    return {
+                        'total_videos': len(info['entries']),
+                        'entries': info['entries']
+                    }
+                return None
+        except Exception as e:
+            print(f"Error getting playlist info: {e}")
             return None
     
     def download_video_playlist(self, playlist_url: str, quality: str = "best", 
@@ -265,8 +251,7 @@ class PlaylistDownloader:
             return False
         
         try:
-            original_cwd = os.getcwd()
-            os.chdir(self.download_folder)
+            import yt_dlp
             
             if not auto_numbering:
                 output_template = output_template.replace("%(playlist_index)s - ", "").replace("%(playlist_index)s", "")
@@ -283,53 +268,37 @@ class PlaylistDownloader:
             else:
                 format_selector = quality
             
-            cmd = self.yt_dlp_cmd + ['-f', format_selector, '-o', output_template, 
-                                    '--embed-thumbnail', '--add-metadata', playlist_url]
-            cmd = [arg for arg in cmd if arg]
-            
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, 
-                                     text=True, universal_newlines=True)
-            
-            current_item = 0
-            total_items = 0
-            
-            for line in process.stdout:
-                line_stripped = line.strip()
-                
-                if "Downloading" in line and "items of" in line:
+            # Progress hook
+            def progress_hook(d):
+                if progress_callback and d['status'] == 'downloading':
                     try:
-                        parts = line_stripped.split()
-                        for i, part in enumerate(parts):
-                            if part == "items" and i > 0:
-                                total_items = int(parts[i-1])
-                                break
+                        playlist_index = d.get('playlist_index', 0)
+                        playlist_count = d.get('playlist_count', 0)
+                        if playlist_index > 0 and playlist_count > 0:
+                            percentage = (playlist_index / playlist_count) * 100
+                            title = d.get('info_dict', {}).get('title', '')
+                            progress_callback(playlist_index, playlist_count, percentage, title)
                     except:
                         pass
-                
-                elif "Downloading item" in line and "of" in line:
-                    try:
-                        parts = line_stripped.split()
-                        for i, part in enumerate(parts):
-                            if part == "item" and i < len(parts) - 2:
-                                current_item = int(parts[i+1])
-                                break
-                    except:
-                        pass
-                
-                if current_item > 0 and total_items > 0 and progress_callback:
-                    percentage = (current_item / total_items) * 100
-                    if "Downloading item" in line:
-                        progress_callback(current_item, total_items, percentage, "")
             
-            process.wait()
-            return process.returncode == 0
-        except:
+            ydl_opts = {
+                'format': format_selector,
+                'outtmpl': str(self.download_folder / output_template),
+                'writethumbnail': True,
+                'embedthumbnail': True,
+                'addmetadata': True,
+                'progress_hooks': [progress_hook],
+                'quiet': False,
+                'no_warnings': False,
+            }
+            
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([playlist_url])
+            
+            return True
+        except Exception as e:
+            print(f"Download error: {e}")
             return False
-        finally:
-            try:
-                os.chdir(original_cwd)
-            except:
-                pass
     
     def download_audio_playlist(self, playlist_url: str, audio_format: str = "mp3",
                               audio_quality: str = "0",
@@ -339,8 +308,7 @@ class PlaylistDownloader:
             return False
         
         try:
-            original_cwd = os.getcwd()
-            os.chdir(self.download_folder)
+            import yt_dlp
             
             if not auto_numbering:
                 output_template = output_template.replace("%(playlist_index)s - ", "").replace("%(playlist_index)s", "")
@@ -348,52 +316,42 @@ class PlaylistDownloader:
                 if "%(title)s" not in output_template:
                     output_template = "%(title)s.%(ext)s"
             
-            cmd = self.yt_dlp_cmd + ['-x', '--audio-format', audio_format, '--audio-quality', audio_quality,
-                                    '-o', output_template, '--embed-thumbnail', '--add-metadata', playlist_url]
-            
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, 
-                                     text=True, universal_newlines=True)
-            
-            current_item = 0
-            total_items = 0
-            
-            for line in process.stdout:
-                line_stripped = line.strip()
-                
-                if "Downloading" in line and "items of" in line:
+            # Progress hook
+            def progress_hook(d):
+                if progress_callback and d['status'] == 'downloading':
                     try:
-                        parts = line_stripped.split()
-                        for i, part in enumerate(parts):
-                            if part == "items" and i > 0:
-                                total_items = int(parts[i-1])
-                                break
+                        playlist_index = d.get('playlist_index', 0)
+                        playlist_count = d.get('playlist_count', 0)
+                        if playlist_index > 0 and playlist_count > 0:
+                            percentage = (playlist_index / playlist_count) * 100
+                            title = d.get('info_dict', {}).get('title', '')
+                            progress_callback(playlist_index, playlist_count, percentage, title)
                     except:
                         pass
-                
-                elif "Downloading item" in line and "of" in line:
-                    try:
-                        parts = line_stripped.split()
-                        for i, part in enumerate(parts):
-                            if part == "item" and i < len(parts) - 2:
-                                current_item = int(parts[i+1])
-                                break
-                    except:
-                        pass
-                
-                if current_item > 0 and total_items > 0 and progress_callback:
-                    percentage = (current_item / total_items) * 100
-                    if "Downloading item" in line:
-                        progress_callback(current_item, total_items, percentage, "")
             
-            process.wait()
-            return process.returncode == 0
-        except:
+            ydl_opts = {
+                'format': 'bestaudio/best',
+                'outtmpl': str(self.download_folder / output_template),
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': audio_format,
+                    'preferredquality': audio_quality,
+                }],
+                'writethumbnail': True,
+                'embedthumbnail': True,
+                'addmetadata': True,
+                'progress_hooks': [progress_hook],
+                'quiet': False,
+                'no_warnings': False,
+            }
+            
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([playlist_url])
+            
+            return True
+        except Exception as e:
+            print(f"Download error: {e}")
             return False
-        finally:
-            try:
-                os.chdir(original_cwd)
-            except:
-                pass
 
 
 # ============================================================================

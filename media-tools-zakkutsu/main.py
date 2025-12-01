@@ -8,6 +8,7 @@ import flet as ft
 import os
 import sys
 from pathlib import Path
+import shutil
 
 # Detect if running as PyInstaller executable
 if getattr(sys, 'frozen', False):
@@ -23,6 +24,9 @@ else:
 for path_dir in [str(BASE_DIR), str(TOOLS_DIR)]:
     if path_dir not in sys.path:
         sys.path.insert(0, path_dir)
+
+# Check FFmpeg availability (used in launcher warning)
+FFMPEG_AVAILABLE = shutil.which('ffmpeg') is not None
 
 # Import language config
 try:
@@ -87,6 +91,10 @@ class MediaToolsZakkutsu:
         # Language setup
         self.current_language = get_language()
         self.translations = get_all_texts("launcher", self.current_language)
+        
+        # Check FFmpeg on startup
+        if not FFMPEG_AVAILABLE:
+            self.show_ffmpeg_warning()
         
         # Tool definitions
         self.tools = {
@@ -210,6 +218,24 @@ class MediaToolsZakkutsu:
         """Return to home screen"""
         self.page.title = original_title
         self.setup_ui()
+    
+    def show_ffmpeg_warning(self):
+        """Show FFmpeg warning banner"""
+        banner = ft.Banner(
+            bgcolor=ft.colors.AMBER_100,
+            leading=ft.Icon(ft.icons.WARNING_AMBER, color=ft.colors.ORANGE, size=40),
+            content=ft.Text(
+                "⚠️ FFmpeg tidak ditemukan! Beberapa tools memerlukan FFmpeg.\n"
+                "Install FFmpeg terlebih dahulu: winget install ffmpeg",
+                size=13
+            ),
+            actions=[
+                ft.TextButton("OK", on_click=lambda e: setattr(self.page.banner, 'open', False) or self.page.update()),
+            ],
+        )
+        self.page.banner = banner
+        banner.open = True
+        self.page.update()
     
     def setup_ui(self):
         """Setup main UI"""

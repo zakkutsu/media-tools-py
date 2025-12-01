@@ -15,16 +15,16 @@ from pathlib import Path
 
 # Compatibility layer for different Flet versions
 # Flet 0.21.x uses ft.Icons/ft.Colors (uppercase)
-# Flet 0.25.x uses ft.Icons/ft.Colors (lowercase)
+# Flet 0.25.x uses ft.icons/ft.colors (lowercase attributes)
 try:
-    # Try new style (0.25.x)
+    # Try old style (0.21.x) first
     _ = ft.Icons.LOOP
     icons = ft.Icons
     colors = ft.Colors
 except AttributeError:
-    # Fallback to old style (0.21.x)
-    icons = ft.Icons
-    colors = ft.Colors
+    # Use new style (0.25.x)
+    icons = ft.icons
+    colors = ft.colors
 
 
 class MediaLooperGUI:

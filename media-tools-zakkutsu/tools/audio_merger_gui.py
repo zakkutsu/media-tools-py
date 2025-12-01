@@ -2,6 +2,7 @@ import flet as ft
 import os
 import glob
 import threading
+import shutil
 from pathlib import Path
 import sys
 
@@ -9,13 +10,19 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from language_config import get_language, get_all_texts
 
-# Konfigurasi FFmpeg path sebelum import pydub
-FFMPEG_PATH = r"C:\Users\nonion\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0-essentials_build\bin\ffmpeg.exe"
-FFPROBE_PATH = r"C:\Users\nonion\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0-essentials_build\bin\ffprobe.exe"
-
-# Set environment untuk pydub agar menemukan ffmpeg
-if os.path.exists(FFMPEG_PATH):
-    os.environ["PATH"] = os.path.dirname(FFMPEG_PATH) + os.pathsep + os.environ.get("PATH", "")
+# Import FFmpeg helper
+try:
+    from ffmpeg_helper import FFMPEG_PATH, FFPROBE_PATH, FFMPEG_AVAILABLE, FFMPEG_ERROR, setup_ffmpeg_environment
+    # Setup environment for pydub
+    setup_ffmpeg_environment()
+except ImportError:
+    # Fallback jika ffmpeg_helper tidak ada
+    FFMPEG_PATH = shutil.which('ffmpeg')
+    FFPROBE_PATH = shutil.which('ffprobe')
+    FFMPEG_AVAILABLE = FFMPEG_PATH is not None
+    FFMPEG_ERROR = "FFmpeg tidak ditemukan di system PATH"
+    if FFMPEG_PATH:
+        os.environ["PATH"] = os.path.dirname(FFMPEG_PATH) + os.pathsep + os.environ.get("PATH", "")
 
 from pydub import AudioSegment
 
@@ -37,9 +44,15 @@ class AudioMergerGUI:
         self.translations = get_all_texts("audio_merger", self.current_language)
         self.common_translations = get_all_texts("common", self.current_language)
         
+        # Check FFmpeg availability
+        if not FFMPEG_AVAILABLE:
+            self.show_ffmpeg_error()
+        
         # State variables
         self.selected_folder = ""
-        self.output_folder = r"C:\Users\nonion\Music"  # Default folder tujuan penyimpanan
+        # Default output folder: User's Music folder (portable)
+        music_folder = Path.home() / "Music"
+        self.output_folder = str(music_folder) if music_folder.exists() else str(Path.home() / "Downloads")
         self.audio_files = []
         self.output_filename = "merger_output"
         self.crossfade_duration = 0
@@ -48,6 +61,23 @@ class AudioMergerGUI:
         
         # Initialize UI
         self.setup_ui()
+    
+    def show_ffmpeg_error(self):
+        """Show FFmpeg error dialog"""
+        def close_dialog(e):
+            dialog.open = False
+            self.page.update()
+        
+        dialog = ft.AlertDialog(
+            title=ft.Text("⚠️ FFmpeg Required", weight=ft.FontWeight.BOLD),
+            content=ft.Text(FFMPEG_ERROR if FFMPEG_ERROR else "FFmpeg tidak ditemukan"),
+            actions=[
+                ft.TextButton("OK", on_click=close_dialog),
+            ],
+        )
+        self.page.dialog = dialog
+        dialog.open = True
+        self.page.update()
         
     def setup_ui(self):
         """Setup user interface"""
@@ -56,16 +86,16 @@ class AudioMergerGUI:
         header = ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Icon(ft.Icons.AUDIOTRACK, size=40, color=ft.Colors.BLUE),
+                    ft.Icon(ft.icons.AUDIOTRACK, size=40, color=ft.colors.BLUE),
                     ft.Text(self.translations.get("title", "🎵 Audio Merger"), 
                            size=28, weight=ft.FontWeight.BOLD),
                 ], alignment=ft.MainAxisAlignment.CENTER),
                 ft.Text(self.translations.get("description", 
                        "Gabungkan file audio menjadi satu dengan efek transisi"), 
-                       size=14, color=ft.Colors.GREY_700, text_align=ft.TextAlign.CENTER),
+                       size=14, color=ft.colors.GREY_700, text_align=ft.TextAlign.CENTER),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER),
             padding=15,
-            bgcolor=ft.Colors.BLUE_50,
+            bgcolor=ft.colors.BLUE_50,
             border_radius=10,
             margin=ft.margin.only(bottom=10)
         )
@@ -74,10 +104,10 @@ class AudioMergerGUI:
         self.folder_text = ft.Text(self.translations.get("folder_not_selected", "📁 Belum ada folder dipilih"), size=14)
         folder_button = ft.ElevatedButton(
             self.translations.get("select_audio_folder", "Pilih Folder Audio"),
-            icon=ft.Icons.FOLDER_OPEN,
+            icon=ft.icons.FOLDER_OPEN,
             on_click=self.pick_folder_dialog,
-            bgcolor=ft.Colors.BLUE,
-            color=ft.Colors.WHITE
+            bgcolor=ft.colors.BLUE,
+            color=ft.colors.WHITE
         )
         
         folder_section = ft.Container(
@@ -86,7 +116,7 @@ class AudioMergerGUI:
                 ft.Row([folder_button, self.folder_text], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
             ]),
             padding=10,
-            border=ft.border.all(1, ft.Colors.GREY_300),
+            border=ft.border.all(1, ft.colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=8)
         )
@@ -99,33 +129,33 @@ class AudioMergerGUI:
                 self.files_section_title,
                 ft.Container(
                     content=self.files_list,
-                    border=ft.border.all(1, ft.Colors.GREY_300),
+                    border=ft.border.all(1, ft.colors.GREY_300),
                     border_radius=5,
                     padding=10,
-                    bgcolor=ft.Colors.GREY_50
+                    bgcolor=ft.colors.GREY_50
                 )
             ]),
             margin=ft.margin.only(bottom=8)
         )
         
         # Output folder selection
-        self.output_folder_text = ft.Text("📂 C:\\Users\\nonion\\Music", size=12, expand=True)
+        self.output_folder_text = ft.Text(f"📂 {self.output_folder}", size=12, expand=True)
         output_folder_button = ft.ElevatedButton(
             self.translations.get("select_output_folder", "Pilih Folder Tujuan"),
-            icon=ft.Icons.SAVE,
+            icon=ft.icons.SAVE,
             on_click=self.pick_output_folder_dialog,
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
+            bgcolor=ft.colors.GREEN,
+            color=ft.colors.WHITE,
             width=150
         )
         
         # Reset output folder button
         reset_output_button = ft.ElevatedButton(
             self.common_translations.get("reset", "Reset"),
-            icon=ft.Icons.REFRESH,
+            icon=ft.icons.REFRESH,
             on_click=self.reset_output_folder,
-            bgcolor=ft.Colors.GREY,
-            color=ft.Colors.WHITE,
+            bgcolor=ft.colors.GREY,
+            color=ft.colors.WHITE,
             width=80
         )
         
@@ -174,7 +204,7 @@ class AudioMergerGUI:
                 ], alignment=ft.MainAxisAlignment.START, spacing=10),
             ]),
             padding=10,
-            border=ft.border.all(1, ft.Colors.GREY_300),
+            border=ft.border.all(1, ft.colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=8)
         )
@@ -196,22 +226,22 @@ class AudioMergerGUI:
                 ft.Row([self.crossfade_slider, self.gap_slider], alignment=ft.MainAxisAlignment.CENTER),
             ], spacing=8),
             padding=10,
-            border=ft.border.all(1, ft.Colors.GREY_300),
+            border=ft.border.all(1, ft.colors.GREY_300),
             border_radius=8,
             margin=ft.margin.only(bottom=10)
         )
         
         # Progress and merge button
         self.progress_bar = ft.ProgressBar(value=0, visible=False, width=400, height=10)
-        self.progress_text = ft.Text("", size=12, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE)
-        self.status_text = ft.Text("", size=12, color=ft.Colors.GREY_700)
+        self.progress_text = ft.Text("", size=12, weight=ft.FontWeight.BOLD, color=ft.colors.BLUE)
+        self.status_text = ft.Text("", size=12, color=ft.colors.GREY_700)
         
         self.merge_button = ft.ElevatedButton(
             self.translations.get("start_merge_btn", "🎵 Mulai Gabungkan Audio"),
-            icon=ft.Icons.PLAY_ARROW,
+            icon=ft.icons.PLAY_ARROW,
             on_click=self.start_merge,
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
+            bgcolor=ft.colors.GREEN,
+            color=ft.colors.WHITE,
             style=ft.ButtonStyle(
                 shape=ft.RoundedRectangleBorder(radius=8),
                 padding=ft.padding.all(15)
@@ -232,9 +262,9 @@ class AudioMergerGUI:
                 self.status_text,
             ]),
             padding=15,
-            bgcolor=ft.Colors.BLUE_50,
+            bgcolor=ft.colors.BLUE_50,
             border_radius=8,
-            border=ft.border.all(1, ft.Colors.BLUE_200),
+            border=ft.border.all(1, ft.colors.BLUE_200),
             visible=False
         )
         
@@ -281,7 +311,7 @@ class AudioMergerGUI:
                 self.output_folder = e.path
                 folder_name = os.path.basename(e.path)
                 self.output_folder_text.value = f"📂 {folder_name}"
-                self.output_folder_text.color = ft.Colors.GREEN_700
+                self.output_folder_text.color = ft.colors.GREEN_700
                 self.page.update()
         
         get_output_dialog = ft.FilePicker(on_result=get_output_directory_result)
@@ -293,7 +323,7 @@ class AudioMergerGUI:
         """Reset output folder to default Music folder"""
         self.output_folder = r"C:\Users\nonion\Music"
         self.output_folder_text.value = "📂 C:\\Users\\nonion\\Music"
-        self.output_folder_text.color = ft.Colors.GREY_700
+        self.output_folder_text.color = ft.colors.GREY_700
         self.page.update()
     
     def scan_audio_files(self):
@@ -328,15 +358,15 @@ class AudioMergerGUI:
                 self.files_list.controls.append(
                     ft.Container(
                         content=ft.Row([
-                            ft.Icon(ft.Icons.MUSIC_NOTE, size=16, color=ft.Colors.BLUE),
+                            ft.Icon(ft.icons.MUSIC_NOTE, size=16, color=ft.colors.BLUE),
                             ft.Column([
                                 ft.Text(f"{i}. {filename}", size=12, weight=ft.FontWeight.BOLD),
-                                ft.Text(size_text, size=10, color=ft.Colors.GREY_600),
+                                ft.Text(size_text, size=10, color=ft.colors.GREY_600),
                             ], spacing=2, expand=True),
                         ]),
                         padding=5,
                         border_radius=5,
-                        bgcolor=ft.Colors.WHITE if i % 2 == 0 else ft.Colors.GREY_100,
+                        bgcolor=ft.colors.WHITE if i % 2 == 0 else ft.colors.GREY_100,
                     )
                 )
             
@@ -344,12 +374,12 @@ class AudioMergerGUI:
             self.files_list.controls.append(
                 ft.Container(
                     content=ft.Row([
-                        ft.Icon(ft.Icons.INFO, size=16, color=ft.Colors.GREEN),
+                        ft.Icon(ft.icons.INFO, size=16, color=ft.colors.GREEN),
                         ft.Text(f"Total: {len(self.audio_files)} file • {total_size:.1f} MB", 
-                               size=12, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN),
+                               size=12, weight=ft.FontWeight.BOLD, color=ft.colors.GREEN),
                     ]),
                     padding=8,
-                    bgcolor=ft.Colors.GREEN_50,
+                    bgcolor=ft.colors.GREEN_50,
                     border_radius=5,
                     margin=ft.margin.only(top=5)
                 )
@@ -358,13 +388,13 @@ class AudioMergerGUI:
             self.files_list.controls.append(
                 ft.Container(
                     content=ft.Row([
-                        ft.Icon(ft.Icons.ERROR, color=ft.Colors.RED),
-                        ft.Text("❌ Tidak ada file audio ditemukan", color=ft.Colors.RED),
+                        ft.Icon(ft.icons.ERROR, color=ft.colors.RED),
+                        ft.Text("❌ Tidak ada file audio ditemukan", color=ft.colors.RED),
                     ]),
                     padding=10,
-                    bgcolor=ft.Colors.RED_50,
+                    bgcolor=ft.colors.RED_50,
                     border_radius=5,
-                    border=ft.border.all(1, ft.Colors.RED_200)
+                    border=ft.border.all(1, ft.colors.RED_200)
                 )
             )
         
@@ -404,7 +434,7 @@ class AudioMergerGUI:
     def start_merge(self, e):
         """Start the audio merging process"""
         if not self.audio_files:
-            self.show_snackbar("❌ Pilih folder yang berisi file audio terlebih dahulu!", ft.Colors.RED)
+            self.show_snackbar("❌ Pilih folder yang berisi file audio terlebih dahulu!", ft.colors.RED)
             return
         
         if self.is_processing:
@@ -413,8 +443,8 @@ class AudioMergerGUI:
         # Start merging in background thread
         self.is_processing = True
         self.merge_button.text = "⏳ Sedang Memproses..."
-        self.merge_button.icon = ft.Icons.HOURGLASS_EMPTY
-        self.merge_button.bgcolor = ft.Colors.ORANGE
+        self.merge_button.icon = ft.icons.HOURGLASS_EMPTY
+        self.merge_button.bgcolor = ft.colors.ORANGE
         self.merge_button.disabled = True
         self.progress_container.visible = True
         self.progress_bar.value = 0
@@ -435,8 +465,8 @@ class AudioMergerGUI:
             try:
                 self.is_processing = False
                 self.merge_button.text = "🎵 Mulai Gabungkan Audio"
-                self.merge_button.icon = ft.Icons.PLAY_ARROW
-                self.merge_button.bgcolor = ft.Colors.GREEN
+                self.merge_button.icon = ft.icons.PLAY_ARROW
+                self.merge_button.bgcolor = ft.colors.GREEN
                 self.merge_button.disabled = False
                 self.progress_container.visible = False
                 self.status_text.value = f"❌ Error: {str(e)}"
@@ -514,12 +544,12 @@ class AudioMergerGUI:
             
             # Update status with full path info
             self.update_status(f"✅ File tersimpan: {output_path}")
-            self.show_snackbar_safe("🎉 Audio berhasil digabungkan!", ft.Colors.GREEN)
+            self.show_snackbar_safe("🎉 Audio berhasil digabungkan!", ft.colors.GREEN)
             
         except Exception as e:
             error_msg = f"❌ Error: {str(e)}"
             self.update_status(error_msg)
-            self.show_snackbar_safe(f"❌ Gagal menggabungkan audio: {str(e)}", ft.Colors.RED)
+            self.show_snackbar_safe(f"❌ Gagal menggabungkan audio: {str(e)}", ft.colors.RED)
         
         finally:
             # Reset UI state after 3 seconds to show final result
@@ -529,8 +559,8 @@ class AudioMergerGUI:
             try:
                 self.is_processing = False
                 self.merge_button.text = "🎵 Mulai Gabungkan Audio"
-                self.merge_button.icon = ft.Icons.PLAY_ARROW
-                self.merge_button.bgcolor = ft.Colors.GREEN
+                self.merge_button.icon = ft.icons.PLAY_ARROW
+                self.merge_button.bgcolor = ft.colors.GREEN
                 self.merge_button.disabled = False
                 self.progress_container.visible = False
                 self.page.update()

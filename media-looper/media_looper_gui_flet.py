@@ -117,6 +117,13 @@ class MediaLooperGUI:
             on_click=lambda _: self.browse_folder(self.single_output_folder),
         )
         
+        # Output filename
+        self.single_output_name = ft.TextField(
+            label="Output Filename (without extension)",
+            hint_text="Auto: input_looped_NNx",
+            expand=True,
+        )
+        
         # Output format
         self.single_output_format = ft.Dropdown(
             label="Output Format",
@@ -217,13 +224,14 @@ class MediaLooperGUI:
                 ft.Row([self.single_file, browse_btn], spacing=10),
                 self.single_duration_display,
                 ft.Divider(),
-                ft.Text("Output Settings", size=14, weight=ft.FontWeight.BOLD),
-                ft.Row([self.single_output_folder, browse_output_btn], spacing=10),
-                ft.Row([self.single_output_format], spacing=10),
-                ft.Row([self.single_bg_image, browse_bg_btn, use_default_bg_btn], spacing=10),
-                ft.Divider(),
                 ft.Text("Loop Settings", size=14, weight=ft.FontWeight.BOLD),
                 ft.Row([self.single_loop_count, presets], spacing=20),
+                ft.Divider(),
+                ft.Text("Output Settings", size=14, weight=ft.FontWeight.BOLD),
+                ft.Row([self.single_output_folder, browse_output_btn], spacing=10),
+                self.single_output_name,
+                ft.Row([self.single_output_format], spacing=10),
+                ft.Row([self.single_bg_image, browse_bg_btn, use_default_bg_btn], spacing=10),
                 ft.Divider(),
                 process_btn,
                 ft.Divider(),
@@ -284,6 +292,13 @@ class MediaLooperGUI:
             "Browse",
             icon=icons.FOLDER_OPEN,
             on_click=lambda _: self.browse_folder(self.alt_output_folder),
+        )
+        
+        # Output filename
+        self.alt_output_name = ft.TextField(
+            label="Output Filename (without extension)",
+            hint_text="Auto: fileA_fileB_alt_NNx",
+            expand=True,
         )
         
         # Output format
@@ -408,16 +423,17 @@ class MediaLooperGUI:
                 ft.Row([self.alt_file_b, browse_b_btn], spacing=10),
                 self.alt_duration_display,
                 ft.Divider(),
-                ft.Text("Output Settings", size=14, weight=ft.FontWeight.BOLD),
-                ft.Row([self.alt_output_folder, browse_alt_output_btn], spacing=10),
-                ft.Row([self.alt_output_format], spacing=10),
-                ft.Row([self.alt_bg_image, browse_alt_bg_btn, use_default_alt_bg_btn], spacing=10),
-                ft.Divider(),
                 ft.Text("Loop Settings", size=14, weight=ft.FontWeight.BOLD),
                 ft.Row([self.alt_loop_count, presets], spacing=20),
                 ft.Row([self.alt_delay, delay_presets], spacing=20),
                 ft.Text("💡 Use delay for Q&A drill: Question → [pause] → Answer", 
                        size=11, color=colors.GREY_600, italic=True),
+                ft.Divider(),
+                ft.Text("Output Settings", size=14, weight=ft.FontWeight.BOLD),
+                ft.Row([self.alt_output_folder, browse_alt_output_btn], spacing=10),
+                self.alt_output_name,
+                ft.Row([self.alt_output_format], spacing=10),
+                ft.Row([self.alt_bg_image, browse_alt_bg_btn, use_default_alt_bg_btn], spacing=10),
                 ft.Divider(),
                 process_btn,
                 ft.Divider(),
@@ -758,8 +774,14 @@ class MediaLooperGUI:
             else:
                 output_folder = os.path.dirname(file_path)
             
-            filename = os.path.splitext(os.path.basename(file_path))[0]
-            output_file = os.path.join(output_folder, f"{filename}_looped_{count}x{output_ext}")
+            # Determine output filename
+            if self.single_output_name.value and self.single_output_name.value.strip():
+                filename = self.single_output_name.value.strip()
+            else:
+                filename = os.path.splitext(os.path.basename(file_path))[0]
+                filename = f"{filename}_looped_{count}x"
+            
+            output_file = os.path.join(output_folder, f"{filename}{output_ext}")
             
             self.log_message(self.single_log, f"\nInput: {os.path.basename(file_path)}")
             self.log_message(self.single_log, f"Output: {os.path.basename(output_file)}")
@@ -950,9 +972,25 @@ class MediaLooperGUI:
                     f.write(f"file '{abs_b}'\n")
             
             # Prepare output
-            filename, ext = os.path.splitext(file_a)
-            output_file = f"{filename}_merged_{count}x{ext}"
+            ext = os.path.splitext(file_a)[1]
             
+            # Determine output folder
+            if self.alt_output_folder.value:
+                output_folder = self.alt_output_folder.value
+            else:
+                output_folder = os.path.dirname(file_a)
+            
+            # Determine output filename
+            if self.alt_output_name.value and self.alt_output_name.value.strip():
+                filename = self.alt_output_name.value.strip()
+            else:
+                name_a = os.path.splitext(os.path.basename(file_a))[0]
+                name_b = os.path.splitext(os.path.basename(file_b))[0]
+                filename = f"{name_a}_{name_b}_alt_{count}x"
+            
+            output_file = os.path.join(output_folder, f"{filename}{ext}")
+            
+            self.log_message(self.alt_log, f"Output: {os.path.basename(output_file)}")
             self.log_message(self.alt_log, f"\n⚙️ FFmpeg processing...", colors.BLUE)
             
             # FFmpeg command with progress

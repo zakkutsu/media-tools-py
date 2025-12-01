@@ -7,6 +7,10 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+*.spec
+
+# Executable files (uploaded to GitHub Releases)
+*.exe
 
 # Virtual Environment (DO NOT COMMIT!)
 venv/

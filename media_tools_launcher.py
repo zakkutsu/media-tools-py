@@ -256,7 +256,7 @@ class MediaToolsLauncher:
         header = ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Icon(ft.Icons.BUILD_CIRCLE, size=50, color=ft.colors.DEEP_PURPLE),
+                    ft.Icon(ft.icons.BUILD_CIRCLE, size=50, color=ft.colors.DEEP_PURPLE),
                     ft.Column([
                         ft.Text(self.translations.get("title", "Media Tools"), 
                                size=32, weight=ft.FontWeight.BOLD),
@@ -388,7 +388,7 @@ class MediaToolsLauncher:
             content=ft.Column([
                 ft.Divider(height=1, color=ft.colors.GREY_300),
                 ft.Row([
-                    ft.Icon(ft.Icons.INFO_OUTLINE, size=20, color=ft.colors.GREY_600),
+                    ft.Icon(ft.icons.INFO_OUTLINE, size=20, color=ft.colors.GREY_600),
                     ft.Text(self.translations.get("info_message", 
                            "Kedua tool memerlukan FFmpeg untuk berfungsi dengan optimal"), 
                            size=14, color=ft.colors.GREY_600),
@@ -434,7 +434,7 @@ class MediaToolsLauncher:
                 # Header
                 ft.Container(
                     content=ft.Row([
-                        ft.Icon(ft.Icons.PLAY_CIRCLE_FILL, color=color, size=30),
+                        ft.Icon(ft.icons.PLAY_CIRCLE_FILL, color=color, size=30),
                         ft.Text(title, size=18, weight=ft.FontWeight.BOLD, expand=True),
                     ]),
                     padding=15,
@@ -452,7 +452,7 @@ class MediaToolsLauncher:
                         ft.Container(height=15),  # Spacing
                         ft.ElevatedButton(
                             self.translations.get("launch_tool", "Launch Tool"),
-                            icon=ft.Icons.ROCKET_LAUNCH,
+                            icon=ft.icons.ROCKET_LAUNCH,
                             bgcolor=color,
                             color=ft.colors.WHITE,
                             on_click=on_click,
@@ -548,7 +548,7 @@ class MediaToolsLauncher:
         back_button = ft.Container(
             content=ft.ElevatedButton(
                 self.common_translations.get("back_to_home", "🏠 Back to Home"),
-                icon=ft.Icons.HOME,
+                icon=ft.icons.HOME,
                 on_click=self.back_to_home,
                 bgcolor=ft.colors.GREY_600,
                 color=ft.colors.WHITE
@@ -806,7 +806,7 @@ class MediaToolsLauncher:
         """Show error dialog"""
         dialog = ft.AlertDialog(
             title=ft.Row([
-                ft.Icon(ft.Icons.ERROR, color=ft.colors.RED),
+                ft.Icon(ft.icons.ERROR, color=ft.colors.RED),
                 ft.Text("Error", color=ft.colors.RED)
             ]),
             content=ft.Container(
@@ -1016,6 +1016,7 @@ if __name__ == "__main__":
     else:
         # Launch main launcher GUI
         ft.app(target=main, view=ft.AppView.FLET_APP)
+
 
 
 

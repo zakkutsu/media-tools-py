@@ -15,9 +15,10 @@ media_detector_path = str(current_dir / "media-codec-detector")
 batch_downloader_path = str(current_dir / "yt-batch-downloader")
 playlist_downloader_path = str(current_dir / "yt-playlist-downloader")
 socmed_downloader_path = str(current_dir / "socmed-downloader")
+media_looper_path = str(current_dir / "media-looper")
 
 # Add all tool paths to sys.path
-tool_paths = [audio_merger_path, media_detector_path, batch_downloader_path, playlist_downloader_path, socmed_downloader_path]
+tool_paths = [audio_merger_path, media_detector_path, batch_downloader_path, playlist_downloader_path, socmed_downloader_path, media_looper_path]
 for path in tool_paths:
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -63,6 +64,7 @@ MediaCodecDetectorGUI = None
 BatchDownloaderGUI = None
 PlaylistDownloaderGUI = None
 SocMedDownloaderGUI = None
+MediaLooperGUI = None
 
 # Check dependencies first
 missing_deps = check_and_install_dependencies()
@@ -179,6 +181,20 @@ try:
 except Exception as e:
     print(f"Failed to import SocMedDownloaderGUI: {e}")
     SocMedDownloaderGUI = None
+
+# Import Media Looper (Tkinter-based)
+try:
+    media_looper_spec = importlib.util.spec_from_file_location(
+        "media_looper_gui",
+        current_dir / "media-looper" / "media_looper_gui.py"
+    )
+    if media_looper_spec and media_looper_spec.loader:
+        media_looper_module = importlib.util.module_from_spec(media_looper_spec)
+        media_looper_spec.loader.exec_module(media_looper_module)
+        MediaLooperGUI = media_looper_module.MediaLooperGUI
+except Exception as e:
+    print(f"Failed to import MediaLooperGUI: {e}")
+    MediaLooperGUI = None
 
 class MediaToolsLauncher:
     def __init__(self, page: ft.Page):
@@ -330,6 +346,20 @@ class MediaToolsLauncher:
             on_click=self.launch_socmed_downloader
         )
         
+        media_looper_card = self.create_tool_card(
+            title=self.translations.get("tool_media_looper", "🔁 Media Looper"),
+            description=self.translations.get("media_looper_desc",
+                "Loop video/audio N kali tanpa re-encoding menggunakan FFmpeg stream copy"),
+            features=[
+                "⚡ Super cepat (stream copy, no re-encode)",
+                "🎵 Audio & Video support",
+                "📊 Duration calculator",
+                "🎯 Zero quality loss"
+            ],
+            color=ft.Colors.TEAL,
+            on_click=self.launch_media_looper
+        )
+        
         # Tool selection section
         tools_section = ft.Container(
             content=ft.Column([
@@ -347,6 +377,7 @@ class MediaToolsLauncher:
                 ft.Container(height=10),  # Spacing
                 ft.Row([
                     socmed_downloader_card,
+                    media_looper_card,
                 ], alignment=ft.MainAxisAlignment.CENTER, spacing=20, wrap=True),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=20),
             margin=ft.margin.only(bottom=30)
@@ -500,6 +531,15 @@ class MediaToolsLauncher:
         
         self.switch_to_app("socmed_downloader")
     
+    def launch_media_looper(self, e):
+        """Launch Media Looper tool"""
+        if MediaLooperGUI is None:
+            error_msg = "Media Looper tidak tersedia.\n\nPastikan file media_looper_gui.py ada di folder media-looper/\n\nPeriksa juga bahwa FFmpeg sudah terinstall dan ada di system PATH."
+            self.show_error(error_msg)
+            return
+        
+        self.switch_to_app("media_looper")
+    
     def switch_to_app(self, app_name):
         """Switch to specific application"""
         self.page.controls.clear()
@@ -544,6 +584,10 @@ class MediaToolsLauncher:
         elif app_name == "socmed_downloader":
             # SocMed Downloader (Flet-based)
             self.current_app = SocMedDownloaderGUI(self.create_app_page(app_container))
+        elif app_name == "media_looper":
+            # Media Looper (Tkinter-based)
+            self.launch_tkinter_app("media_looper")
+            return
         elif app_name == "batch_downloader_tkinter":
             # Fallback Tkinter-based Batch Downloader
             self.launch_tkinter_app("batch_downloader")
@@ -599,6 +643,8 @@ class MediaToolsLauncher:
                     script_path = current_dir / "yt-batch-downloader" / "batch_downloader_gui.py"
                 elif app_name == "playlist_downloader":
                     script_path = current_dir / "yt-playlist-downloader" / "playlist_downloader_gui.py"
+                elif app_name == "media_looper":
+                    script_path = current_dir / "media-looper" / "media_looper_gui.py"
                 else:
                     raise ValueError(f"Unknown app: {app_name}")
                 

@@ -45,18 +45,24 @@ media-tools-py/
 │   ├── 🐍 playlist_downloader_gui_flet.py # GUI version (Flet - modern)
 │   └── 📁 __pycache__/              # Python cache
 │
-└── 📁 socmed-downloader/            # 📥 SocMed Downloader Tool ⭐ NEW!
-    ├── 📄 README.md                 # Tool-specific documentation (ID/EN/JP)
-    ├── 🐍 socmed_downloader.py      # CLI version with batch support
-    ├── 🐍 socmed_downloader_gui.py  # GUI version (Flet) with batch support
-    ├── 🐍 batch_reader.py           # Batch file reader (TXT/CSV/JSON)
-    ├── 🐍 language_config.py        # Multi-language support
-    ├── 🚀 launch_downloader.bat     # Direct launcher for Windows
-    ├── 📁 test_samples/             # Sample batch files
-    │   ├── 📄 README_BATCH.md       # Comprehensive batch guide
-    │   ├── 📄 links.txt             # TXT format example
-    │   ├── 📄 links.csv             # CSV format example
-    │   └── 📄 links.json            # JSON format example
+├── 📁 socmed-downloader/            # 📥 SocMed Downloader Tool
+│   ├── 📄 README.md                 # Tool-specific documentation (ID/EN/JP)
+│   ├── 🐍 socmed_downloader.py      # CLI version with batch support
+│   ├── 🐍 socmed_downloader_gui.py  # GUI version (Flet) with batch support
+│   ├── 🐍 batch_reader.py           # Batch file reader (TXT/CSV/JSON)
+│   ├── 🐍 language_config.py        # Multi-language support
+│   ├── 🚀 launch_downloader.bat     # Direct launcher for Windows
+│   ├── 📁 test_samples/             # Sample batch files
+│   │   ├── 📄 README_BATCH.md       # Comprehensive batch guide
+│   │   ├── 📄 links.txt             # TXT format example
+│   │   ├── 📄 links.csv             # CSV format example
+│   │   └── 📄 links.json            # JSON format example
+│   └── 📁 __pycache__/              # Python cache
+│
+└── 📁 media-looper/                 # 🔁 Media Looper Tool ⭐ NEW!
+    ├── 📄 README.md                 # Tool-specific documentation
+    ├── 🐍 loop_media.py             # CLI version
+    ├── 🐍 media_looper_gui.py       # GUI version (Tkinter)
     └── 📁 __pycache__/              # Python cache
 ```
 
@@ -131,6 +137,7 @@ python audio_merger.py
 | **📥 YT Batch** | Download videos | YouTube only | ✅ (URL list) |
 | **🎵 YT Playlist** | Download playlists | YouTube only | ✅ (Playlist) |
 | **📥 SocMed** | Multi-platform DL | YT, TikTok, IG, FB, X | ✅ (TXT/CSV/JSON) |
+| **🔁 Media Looper** | Loop media files | Audio & Video | ❌ |
 
 ---
 
@@ -156,7 +163,7 @@ python audio_merger.py
 - ✅ Flexible naming
 - ✅ Per-video progress
 
-### SocMed Downloader ⭐
+### SocMed Downloader
 - ✅ 5 platforms (YT, TikTok, IG, FB, X)
 - ✅ Single & Batch mode
 - ✅ TXT/CSV/JSON batch files
@@ -165,6 +172,13 @@ python audio_merger.py
 - ✅ Multi-language (ID/EN/JP)
 - ✅ Browser cookies for IG/FB
 
+### Media Looper ⭐
+- ✅ Stream copy (no re-encoding)
+- ✅ Super fast processing
+- ✅ Audio & Video support
+- ✅ Zero quality loss
+- ✅ Duration calculator
+
 ---
 
 ## 📚 Documentation Structure
@@ -172,6 +186,11 @@ python audio_merger.py
 ```
 📄 README.md (root)          → Main overview (this file)
 ├─ 📄 audio-merger/README.md
+├─ 📄 media-codec-detector/README.md
+├─ 📄 yt-batch-downloader/README.md
+├─ 📄 yt-playlist-downloader/README.md
+├─ 📄 socmed-downloader/README.md
+└─ 📄 media-looper/README.md
 ├─ 📄 media-codec-detector/README.md
 ├─ 📄 yt-batch-downloader/README.md
 ├─ 📄 yt-playlist-downloader/README.md

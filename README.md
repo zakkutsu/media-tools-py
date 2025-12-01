@@ -17,6 +17,7 @@ Koleksi tools untuk pemrosesan dan analisis file media (audio, video, gambar) de
 3. **📥 YouTube Batch Downloader** - Download multiple video YouTube individual
 4. **🎵 YouTube Playlist Downloader** - Download playlist YouTube lengkap
 5. **📥 SocMed Downloader** - Download video/audio dari YouTube, TikTok, Instagram, Facebook, Twitter/X (dengan batch download TXT/CSV/JSON)
+6. **🔁 Media Looper** - Loop video/audio tanpa re-encoding (stream copy untuk kecepatan maksimal)
 
 ### 🚀 Quick Start (Recommended)
 
@@ -156,7 +157,8 @@ python playlist_downloader_gui_flet.py
 - [Media Codec Detector](media-codec-detector/README.md)
 - [YouTube Batch Downloader](yt-batch-downloader/README.md)
 - [YouTube Playlist Downloader](yt-playlist-downloader/README.md)
-- [SocMed Downloader](socmed-downloader/README.md) ⭐ **NEW!**
+- [SocMed Downloader](socmed-downloader/README.md)
+- [Media Looper](media-looper/README.md) ⭐ **NEW!**
 
 ### 🔧 Troubleshooting
 
@@ -191,6 +193,7 @@ A collection of tools for media file processing and analysis (audio, video, imag
 3. **📥 YouTube Batch Downloader** - Download multiple individual YouTube videos
 4. **🎵 YouTube Playlist Downloader** - Download complete YouTube playlists
 5. **📥 SocMed Downloader** - Download video/audio from YouTube, TikTok, Instagram, Facebook, Twitter/X (with batch download TXT/CSV/JSON)
+6. **🔁 Media Looper** - Loop video/audio without re-encoding (stream copy for maximum speed)
 
 ### 🚀 Quick Start (Recommended)
 
@@ -330,6 +333,8 @@ python playlist_downloader_gui_flet.py
 - [Media Codec Detector](media-codec-detector/README.md)
 - [YouTube Batch Downloader](yt-batch-downloader/README.md)
 - [YouTube Playlist Downloader](yt-playlist-downloader/README.md)
+- [SocMed Downloader](socmed-downloader/README.md)
+- [Media Looper](media-looper/README.md) ⭐ **NEW!**
 
 ### 🔧 Troubleshooting
 
@@ -364,6 +369,7 @@ pip install -r requirements.txt
 3. **📥 YouTube Batch Downloader** - 複数のYouTube動画を個別にダウンロード
 4. **🎵 YouTube Playlist Downloader** - YouTubeプレイリスト全体をダウンロード
 5. **📥 SocMed Downloader** - YouTube、TikTok、Instagram、Facebook、Twitter/Xから動画/音声をダウンロード（TXT/CSV/JSONバッチダウンロード対応）
+6. **🔁 Media Looper** - 再エンコードなしで動画/音声をループ（最高速度のストリームコピー）
 
 ### 🚀 クイックスタート（推奨）
 
@@ -479,6 +485,10 @@ python batch_downloader_gui_flet.py
 # YouTube Playlist Downloader
 cd yt-playlist-downloader
 python playlist_downloader_gui_flet.py
+
+# Media Looper
+cd media-looper
+python media_looper_gui.py
 ```
 
 ### 📦 依存関係
@@ -503,6 +513,8 @@ python playlist_downloader_gui_flet.py
 - [Media Codec Detector](media-codec-detector/README.md)
 - [YouTube Batch Downloader](yt-batch-downloader/README.md)
 - [YouTube Playlist Downloader](yt-playlist-downloader/README.md)
+- [SocMed Downloader](socmed-downloader/README.md)
+- [Media Looper](media-looper/README.md) ⭐ **NEW!**
 
 ### 🔧 トラブルシューティング
 

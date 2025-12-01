@@ -1,0 +1,89 @@
+# ==========================================
+# MEDIA TOOLS ZAKKUTSU - Requirements
+# ==========================================
+# Dependencies for Zakkutsu's Media Tools Collection
+# Install with: pip install -r requirements.txt
+#
+# Tools included:
+# - YT Playlist Downloader
+# - Media Looper
+# - Audio Merger
+# - SocMed Downloader
+# ==========================================
+
+# ===== Core GUI Framework =====
+flet>=0.25.0              # Modern GUI framework (used by all GUI tools)
+
+# ===== Audio Processing =====
+pydub==0.25.1             # Audio manipulation library (Audio Merger)
+audioop-lts==0.2.2        # Audio operations support (Audio Merger)
+
+# ===== Media Processing =====
+ffmpeg-python==0.2.0      # FFmpeg wrapper for Python (Media Looper)
+
+# ===== Video/Social Media Downloaders =====
+yt-dlp>=2024.11.0         # YouTube and social media downloader
+                          # Used by: YT Playlist Downloader, SocMed Downloader
+                          # Supports: YouTube, TikTok, Instagram, Facebook, Twitter/X
+
+# ==========================================
+# SYSTEM REQUIREMENTS
+# ==========================================
+# FFmpeg Binary (REQUIRED for all tools!):
+# FFmpeg must be installed separately and available in system PATH
+# 
+# Installation Instructions:
+# 
+# Windows:
+#   Option 1: winget install FFmpeg
+#   Option 2: choco install ffmpeg
+#   Option 3: Manual download from https://ffmpeg.org/download.html
+#            Then add to PATH environment variable
+# 
+# macOS:
+#   brew install ffmpeg
+# 
+# Linux (Ubuntu/Debian):
+#   sudo apt update
+#   sudo apt install ffmpeg
+# 
+# Verify Installation:
+#   ffmpeg -version
+#   ffprobe -version
+# 
+# All commands should work in terminal/command prompt
+# ==========================================
+
+# ===== Tool-Specific Notes =====
+# 
+# 1. YT Playlist Downloader:
+#    - Requires: yt-dlp, flet
+#    - Optional: Browser cookies for private playlists
+# 
+# 2. Media Looper:
+#    - Requires: FFmpeg (system), flet
+#    - Uses stream copy for instant processing
+# 
+# 3. Audio Merger:
+#    - Requires: pydub, audioop-lts, FFmpeg (system), flet
+#    - Supports: MP3, WAV, FLAC, M4A, OGG, AAC, WMA
+# 
+# 4. SocMed Downloader:
+#    - Requires: yt-dlp, flet
+#    - Supports batch download from TXT/CSV/JSON files
+#    - Optional: Browser cookies for Facebook/Instagram
+# ==========================================
+
+# ===== Optional Dependencies =====
+# Uncomment if needed:
+# brotli>=1.0.9           # Compression support (for browser cookies)
+# websockets>=10.0        # WebSocket support (advanced features)
+
+# ==========================================
+# Quick Installation Guide:
+# ==========================================
+# 1. Install Python 3.8 or higher
+# 2. Install FFmpeg (see instructions above)
+# 3. Run: pip install -r requirements.txt
+# 4. Run any tool's GUI or CLI version
+# ==========================================

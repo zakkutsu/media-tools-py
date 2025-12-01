@@ -14,17 +14,17 @@ import threading
 from pathlib import Path
 
 # Compatibility layer for different Flet versions
-# Flet 0.21.x uses ft.Icons/ft.Colors (uppercase)
+# Flet 0.21.x uses ft.icons/ft.colors (uppercase)
 # Flet 0.25.x uses ft.icons/ft.colors (lowercase)
 try:
     # Try new style (0.25.x)
-    _ = ft.Icons.LOOP
+    _ = ft.icons.LOOP
     icons = ft.icons
     colors = ft.colors
 except AttributeError:
     # Fallback to old style (0.21.x)
-    icons = ft.Icons
-    colors = ft.Colors
+    icons = ft.icons
+    colors = ft.colors
 
 
 class MediaLooperGUI:
@@ -1084,4 +1084,6 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     ft.app(target=main)
+
+
 

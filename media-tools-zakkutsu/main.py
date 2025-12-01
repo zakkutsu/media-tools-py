@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Media Tools Zakkutsu - All-in-One Media Processing Suite
-Unified executable version with all tools integrated
+Media Tools Zakkutsu - All-in-One Executable Version
+Unified version for building single .exe file
 """
 
 import flet as ft
@@ -24,7 +24,6 @@ if str(TOOLS_DIR) not in sys.path:
 try:
     from language_config import get_language, set_language, get_available_languages, get_all_texts
 except ImportError:
-    # Fallback if language_config not available
     def get_language(): return "id"
     def set_language(lang): return True
     def get_available_languages(): return {"id": {"name": "Bahasa Indonesia", "flag": "🇮🇩"}}

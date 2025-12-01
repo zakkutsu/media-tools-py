@@ -2,9 +2,10 @@
 
 ## 🗂️ Project Organization
 
-Project ini terbagi menjadi beberapa folder dengan tujuan berbeda:
+Project ini terbagi dengan tujuan yang jelas:
 
-### 1. **Tools Folders** (Original)
+### 1. **Tools Folders** (Original) 🔧 FOR DEVELOPMENT
+
 Folder-folder asli untuk masing-masing tool:
 
 ```
@@ -13,60 +14,46 @@ Folder-folder asli untuk masing-masing tool:
 ├── yt-batch-downloader/
 ├── yt-playlist-downloader/
 ├── socmed-downloader/
-└── media-looper/
+├── media-looper/
+├── media_tools_launcher.py      # Main launcher
+└── launch_media_tools.bat       # Quick run script
 ```
 
 **Tujuan:** 
-- Repository utama untuk source code
-- Dokumentasi individual per tool
-- Testing individual tool
+- ✅ **Development utama** - Edit & test code di sini
+- ✅ Repository untuk source code
+- ✅ Dokumentasi individual per tool
+- ✅ Structure terpisah (easy version control)
 
 **Cara pakai:**
 ```bash
+# Jalankan launcher terpadu
+launch_media_tools.bat
+
+# Atau individual tool
 cd audio-merger
 python audio_merger_gui.py
 ```
 
 ---
 
-### 2. **media-tools-script/** 🔧 (Development)
-Versi unified **untuk development dan debugging**:
+### 2. **media-tools-zakkutsu/** 📦 FOR DISTRIBUTION
+
+Folder khusus **untuk build executable SAJA**:
 
 ```
-media-tools-script/
-├── main.py              # Launcher terpadu
-├── run.bat              # Quick launcher
-├── tools/              # All tools in one place
-└── README.md           # Dev guide
-```
-
-**Tujuan:**
-- ✅ Development & debugging
-- ✅ Fast iteration (instant run)
-- ✅ Easy testing
-- ✅ Full error messages
-
-**Cara pakai:**
-```bash
-cd media-tools-script
-run.bat
-# atau
-python main.py
-```
-
----
-
-### 3. **media-tools-exe/** 📦 (Distribution)
-Versi unified **untuk build executable**:
-
-```
-media-tools-exe/
-├── MediaToolsZakkutsu.spec
-├── build.bat           # Build executable
-├── main.py
-├── tools/
+media-tools-zakkutsu/
+├── tools/                      # All tools (flat structure)
+│   ├── audio_merger.py
+│   ├── audio_merger_gui.py
+│   ├── media_codec_detector.py
+│   ├── ...all other .py files
+├── main.py                     # Unified launcher
+├── MediaToolsZakkutsu.spec     # PyInstaller config
+├── build.bat                   # Build script
+├── requirements.txt
 └── dist/
-    └── MediaToolsZakkutsu.exe  # Output
+    └── MediaToolsZakkutsu.exe  # Output (~75 MB)
 ```
 
 **Tujuan:**
@@ -82,107 +69,120 @@ build.bat
 # Test: dist\MediaToolsZakkutsu.exe
 ```
 
+**Tujuan:**
+- 📦 **Build executable untuk distribusi**
+- ⚠️ JANGAN edit code di sini (edit di original folders)
+- 🔄 Copy updated files dari original folders
+- 🚀 Build & upload ke GitHub Releases
+
+**Cara pakai:**
+```bash
+# Build executable
+cd media-tools-zakkutsu
+build.bat
+
+# Output: dist\MediaToolsZakkutsu.exe
+```
+
 ---
 
 ## 🔄 Workflow
 
-### Development Workflow
-
-```mermaid
-graph LR
-    A[Edit code in<br/>media-tools-script] --> B[Test with<br/>python main.py]
-    B --> C{Works?}
-    C -->|No| A
-    C -->|Yes| D[Copy to<br/>media-tools-exe]
-    D --> E[Build .exe]
-    E --> F[Distribute]
-```
-
 ### Step by Step
 
-1. **Development** di `media-tools-script/`:
+1. **Development** di original folders:
    ```bash
-   cd media-tools-script
-   # Edit tools/audio_merger.py
-   python main.py  # Test instantly
+   # Edit di folder tool asli
+   # Misalnya: audio-merger/audio_merger_gui.py
+   
+   # Test dengan launcher
+   launch_media_tools.bat
    ```
 
-2. **Sync to exe version**:
+2. **Sync ke media-tools-zakkutsu**:
    ```bash
-   cp media-tools-script/tools/audio_merger.py media-tools-exe/tools/
+   # Copy file yang diupdate ke tools/
+   copy audio-merger\audio_merger_gui.py media-tools-zakkutsu\tools\
    ```
 
 3. **Build executable**:
    ```bash
-   cd media-tools-exe
+   cd media-tools-zakkutsu
    build.bat
    ```
 
-4. **Test & distribute**:
+4. **Distribute**:
    ```bash
-   dist\MediaToolsZakkutsu.exe
+   # Upload dist\MediaToolsZakkutsu.exe ke GitHub Releases
    ```
 
 ---
 
 ## 🎯 Kapan Pakai Yang Mana?
 
-### Pakai `media-tools-script/` kalau:
+### Pakai Original Folders kalau:
 - 🔧 Sedang development/coding
 - 🐛 Debugging error
-- ⚡ Butuh test cepat
+- ⚡ Test dengan `launch_media_tools.bat`
+- 📝 Edit dan track changes di Git
 - 💡 Experimenting fitur baru
 
-### Pakai `media-tools-exe/` kalau:
+### Pakai `media-tools-zakkutsu/` kalau:
 - 📦 Siap distribusi
 - 🚀 Build release version
-- 📤 Upload to GitHub
-- 👥 Share dengan end users
-
-### Pakai folder individual kalau:
-- 📖 Baca dokumentasi per tool
-- 🔍 Deep dive satu tool
-- 🧪 Test tool specific features
+- 📤 Upload to GitHub Releases
+- 👥 Share dengan end users (no Python needed)
 
 ---
 
 ## 📊 Comparison Table
 
-| Feature | Original Folders | Script Version | Exe Version |
-|---------|-----------------|----------------|-------------|
-| **Purpose** | Source code | Development | Distribution |
-| **Structure** | Separated | Unified | Unified |
-| **Run method** | Per tool | Launcher | Executable |
-| **Debug** | Easy | Easy | Hard |
-| **Build time** | N/A | Instant | 2-3 min |
-| **Distribution** | ❌ | ❌ | ✅ |
-| **Best for** | Reference | Coding | Users |
+| Feature | Original Folders | media-tools-zakkutsu |
+|---------|------------------|----------------------|
+| **Purpose** | Development | Distribution |
+| **Structure** | Separated folders | Flat tools/ folder |
+| **Run method** | .bat launcher | Build to .exe |
+| **Debug** | ✅ Easy | ❌ Hard |
+| **Build time** | Instant | 2-3 min |
+| **Distribution** | ❌ Source only | ✅ Standalone exe |
+| **Edit code** | ✅ YES | ❌ NO (sync from original) |
+| **Best for** | Coding & Testing | End users |
 
 ---
 
 ## 🗺️ Quick Reference
 
 ```bash
-# Test individual tool
-cd audio-merger && python audio_merger_gui.py
+# Development - Test with launcher
+launch_media_tools.bat
 
-# Development (instant)
-cd media-tools-script && run.bat
+# Development - Individual tool
+cd audio-merger
+python audio_merger_gui.py
 
-# Build exe (distribution)
-cd media-tools-exe && build.bat
+# Distribution - Build exe
+cd media-tools-zakkutsu
+build.bat
 
-# Run exe
-media-tools-exe\dist\MediaToolsZakkutsu.exe
+# Distribution - Output
+media-tools-zakkutsu\dist\MediaToolsZakkutsu.exe
 ```
 
 ---
 
 ## 💡 Tips
 
-- Keep all 3 in sync
-- Develop in `script/`, build in `exe/`
-- Document changes in CHANGELOG
+1. **Always develop in original folders** (audio-merger/, etc.)
+2. **Sync to media-tools-zakkutsu** before building
+3. **Build from media-tools-zakkutsu** for releases
+4. **Never edit code in media-tools-zakkutsu** - sync from original
+
+---
+
+## ⚠️ Important
+
+**media-tools-zakkutsu = EXE BUILD ONLY**  
+Edit di original folders → Copy ke zakkutsu → Build exe
 - Test exe before distributing
 - Original folders = source of truth
 

@@ -47,11 +47,6 @@ datas = [
     ('tools/*.py', 'tools'),
 ]
 
-# Add assets if they exist
-import os
-if os.path.exists('assets'):
-    datas.append(('assets/*', 'assets'))
-
 datas.extend(flet_datas)
 
 a = Analysis(

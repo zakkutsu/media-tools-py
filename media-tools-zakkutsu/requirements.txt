@@ -1,20 +1,8 @@
 # Media Tools Zakkutsu - Requirements
-
-# Core GUI Framework
 flet>=0.25.0
-
-# Audio Processing
 pydub==0.25.1
 audioop-lts==0.2.2
-
-# Media Processing
 ffmpeg-python==0.2.0
-
-# Image Processing
 Pillow>=10.0.0
-
-# File Type Detection
 filetype==1.2.0
-
-# Video/Social Media Downloaders
 yt-dlp>=2024.11.0

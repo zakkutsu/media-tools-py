@@ -42,16 +42,24 @@ hiddenimports = [
 hiddenimports.extend(flet_hiddenimports)
 
 # Data files
+import os
+from pathlib import Path
+
 datas = [
     ('language_config.py', '.'),
-    ('tools/*.py', 'tools'),
 ]
+
+# Add all Python files from tools directory explicitly
+tools_dir = Path('tools')
+if tools_dir.exists():
+    for py_file in tools_dir.glob('*.py'):
+        datas.append((str(py_file), 'tools'))
 
 datas.extend(flet_datas)
 
 a = Analysis(
     ['main.py'],
-    pathex=['tools'],
+    pathex=['.', 'tools'],
     binaries=flet_binaries,
     datas=datas,
     hiddenimports=hiddenimports,

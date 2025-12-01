@@ -11,14 +11,18 @@ from pathlib import Path
 
 # Detect if running as PyInstaller executable
 if getattr(sys, 'frozen', False):
+    # Running as compiled executable
     BASE_DIR = Path(sys._MEIPASS)
+    TOOLS_DIR = BASE_DIR / "tools"
 else:
+    # Running as script
     BASE_DIR = Path(__file__).parent
+    TOOLS_DIR = BASE_DIR / "tools"
 
-# Add tools directory to path
-TOOLS_DIR = BASE_DIR / "tools"
-if str(TOOLS_DIR) not in sys.path:
-    sys.path.insert(0, str(TOOLS_DIR))
+# Add both BASE_DIR and TOOLS_DIR to path
+for path_dir in [str(BASE_DIR), str(TOOLS_DIR)]:
+    if path_dir not in sys.path:
+        sys.path.insert(0, path_dir)
 
 # Import language config
 try:

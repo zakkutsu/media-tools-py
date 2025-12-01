@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Build Executable untuk Media Tools Zakkutsu
 Standalone All-in-One Edition
@@ -9,6 +10,10 @@ import sys
 import os
 from pathlib import Path
 
+# Set UTF-8 encoding for console output
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
+
 print("="*60)
 print("  Media Tools Zakkutsu - EXE Builder")
 print("  All-in-One Standalone Edition")
@@ -18,20 +23,20 @@ print()
 # Check if PyInstaller is installed
 try:
     import PyInstaller
-    print("✅ PyInstaller found")
+    print("[OK] PyInstaller found")
 except ImportError:
-    print("❌ PyInstaller not found")
-    print("📦 Installing PyInstaller...")
+    print("[ERROR] PyInstaller not found")
+    print("[INFO] Installing PyInstaller...")
     try:
         subprocess.run([sys.executable, '-m', 'pip', 'install', 'pyinstaller'], check=True)
-        print("✅ PyInstaller installed successfully")
+        print("[OK] PyInstaller installed successfully")
     except:
-        print("❌ Failed to install PyInstaller")
+        print("[ERROR] Failed to install PyInstaller")
         print("Please run: pip install pyinstaller")
         sys.exit(1)
 
 print()
-print("🔨 Building standalone executable...")
+print("[BUILD] Building standalone executable...")
 print()
 
 # Get current directory
@@ -67,22 +72,23 @@ try:
     
     print()
     print("="*60)
-    print("✅ Build completed successfully!")
+    print("[SUCCESS] Build completed successfully!")
     print("="*60)
     print()
-    print("📁 Output location: dist/MediaToolsZakkutsu.exe")
+    print("[OUTPUT] Location: dist/MediaToolsZakkutsu.exe")
     print()
-    print("📝 Notes:")
+    print("[NOTES]")
     print("  - FFmpeg is NOT included in the EXE")
+    print("  - yt-dlp IS included in the EXE")
     print("  - Users must install FFmpeg separately:")
     print("    winget install FFmpeg")
     print()
-    print("🎉 Ready to distribute!")
+    print("[READY] Ready to distribute!")
     
 except subprocess.CalledProcessError as e:
     print()
     print("="*60)
-    print("❌ Build failed!")
+    print("[ERROR] Build failed!")
     print("="*60)
     print()
     print("Error:", e)
@@ -96,5 +102,5 @@ except subprocess.CalledProcessError as e:
 
 except KeyboardInterrupt:
     print()
-    print("❌ Build cancelled by user")
+    print("[CANCELLED] Build cancelled by user")
     sys.exit(1)

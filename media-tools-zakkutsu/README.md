@@ -66,7 +66,14 @@ Download videos from various social media platforms.
 - **Python 3.8+** (or use standalone EXE)
 - **FFmpeg** (required for most tools)
 
-### Windows - Install FFmpeg:
+### FFmpeg Installation
+
+**Option 1: Auto-Download (Recommended)** 
+- Launch the app and click "Download" button next to FFmpeg status
+- App will download portable FFmpeg (~100 MB) automatically
+- No system installation required!
+
+**Option 2: System Installation**
 ```powershell
 winget install FFmpeg
 ```

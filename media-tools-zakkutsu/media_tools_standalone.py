@@ -50,12 +50,100 @@ import json
 # UTILITY FUNCTIONS
 # ============================================================================
 
-def check_ffmpeg():
-    """Check if FFmpeg is installed"""
+def get_ffmpeg_path():
+    """Get FFmpeg executable path (system or portable)"""
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    portable_ffmpeg = os.path.join(app_dir, 'ffmpeg-portable', 'bin', 'ffmpeg.exe')
+    
+    # Check portable version first
+    if os.path.exists(portable_ffmpeg):
+        return portable_ffmpeg
+    
+    # Check system PATH
     try:
         result = subprocess.run(['ffmpeg', '-version'], capture_output=True, timeout=5)
-        return result.returncode == 0
+        if result.returncode == 0:
+            return 'ffmpeg'  # System FFmpeg
     except:
+        pass
+    
+    return None
+
+def check_ffmpeg():
+    """Check if FFmpeg is installed"""
+    return get_ffmpeg_path() is not None
+
+def download_ffmpeg_portable(page=None, progress_callback=None):
+    """Download and extract FFmpeg portable version"""
+    import urllib.request
+    import zipfile
+    import shutil
+    
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    ffmpeg_dir = os.path.join(app_dir, 'ffmpeg-portable')
+    
+    # FFmpeg portable download URL (Windows 64-bit)
+    ffmpeg_url = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip"
+    zip_path = os.path.join(app_dir, 'ffmpeg-temp.zip')
+    
+    try:
+        if progress_callback:
+            progress_callback("Downloading FFmpeg portable (~100 MB)...", 0)
+        
+        # Download with progress
+        def reporthook(block_num, block_size, total_size):
+            if progress_callback and total_size > 0:
+                downloaded = block_num * block_size
+                percent = min(int((downloaded / total_size) * 50), 50)  # 0-50%
+                progress_callback(f"Downloading: {downloaded//1024//1024}MB / {total_size//1024//1024}MB", percent)
+        
+        urllib.request.urlretrieve(ffmpeg_url, zip_path, reporthook=reporthook)
+        
+        if progress_callback:
+            progress_callback("Extracting FFmpeg...", 60)
+        
+        # Extract ZIP
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            # Get root folder name in ZIP
+            zip_contents = zip_ref.namelist()
+            root_folder = zip_contents[0].split('/')[0]
+            
+            # Extract to temp location
+            temp_extract = os.path.join(app_dir, 'ffmpeg-temp-extract')
+            zip_ref.extractall(temp_extract)
+            
+            # Move bin folder to ffmpeg-portable
+            extracted_bin = os.path.join(temp_extract, root_folder, 'bin')
+            if os.path.exists(extracted_bin):
+                if os.path.exists(ffmpeg_dir):
+                    shutil.rmtree(ffmpeg_dir)
+                os.makedirs(ffmpeg_dir, exist_ok=True)
+                shutil.move(extracted_bin, os.path.join(ffmpeg_dir, 'bin'))
+            
+            # Cleanup temp
+            shutil.rmtree(temp_extract)
+        
+        # Remove ZIP
+        os.remove(zip_path)
+        
+        if progress_callback:
+            progress_callback("FFmpeg installed successfully!", 100)
+        
+        return True
+        
+    except Exception as e:
+        if progress_callback:
+            progress_callback(f"Error: {str(e)}", -1)
+        # Cleanup on error
+        for path in [zip_path, os.path.join(app_dir, 'ffmpeg-temp-extract')]:
+            if os.path.exists(path):
+                try:
+                    if os.path.isfile(path):
+                        os.remove(path)
+                    else:
+                        shutil.rmtree(path)
+                except:
+                    pass
         return False
 
 def check_ytdlp():
@@ -991,8 +1079,15 @@ class MediaLooperGUI:
             filename, ext = os.path.splitext(file_path)
             output_file = f"{filename}_looped_{count}x{ext}"
             
+            # Get FFmpeg path (system or portable)
+            ffmpeg_exe = get_ffmpeg_path()
+            if not ffmpeg_exe:
+                self.status_text.value = "❌ FFmpeg not found!"
+                self.page.update()
+                return
+            
             loop_count = count - 1
-            cmd = ['ffmpeg', '-stream_loop', str(loop_count), '-i', file_path,
+            cmd = [ffmpeg_exe, '-stream_loop', str(loop_count), '-i', file_path,
                    '-c', 'copy', output_file, '-y']
             
             try:
@@ -1124,6 +1219,13 @@ class AudioMergerGUI:
             
             try:
                 from pydub import AudioSegment
+                
+                # Configure pydub to use portable FFmpeg if available
+                ffmpeg_exe = get_ffmpeg_path()
+                if ffmpeg_exe and ffmpeg_exe != 'ffmpeg':
+                    AudioSegment.converter = ffmpeg_exe
+                    AudioSegment.ffmpeg = ffmpeg_exe
+                    AudioSegment.ffprobe = ffmpeg_exe.replace('ffmpeg.exe', 'ffprobe.exe')
                 
                 # Load first file
                 combined = AudioSegment.from_file(self.audio_files[0])
@@ -1313,28 +1415,46 @@ class MediaToolsLauncher:
         )
         
         # System status
+        status_row = [
+            ft.Icon(
+                icons.CHECK_CIRCLE if ffmpeg_ok else icons.ERROR,
+                color=colors.GREEN if ffmpeg_ok else colors.RED,
+                size=20
+            ),
+            ft.Text(
+                "FFmpeg: " + ("OK" if ffmpeg_ok else "Not Found"),
+                color=colors.GREEN if ffmpeg_ok else colors.RED
+            ),
+        ]
+        
+        # Add download button if FFmpeg not found
+        if not ffmpeg_ok:
+            status_row.append(
+                ft.TextButton(
+                    "Download",
+                    icon=icons.DOWNLOAD,
+                    on_click=lambda e: self.show_ffmpeg_download_dialog()
+                )
+            )
+        
+        status_row.extend([
+            ft.Container(width=20),
+            ft.Icon(
+                icons.CHECK_CIRCLE if ytdlp_ok else icons.ERROR,
+                color=colors.GREEN if ytdlp_ok else colors.RED,
+                size=20
+            ),
+            ft.Text(
+                "yt-dlp: " + ("OK" if ytdlp_ok else "Not Found"),
+                color=colors.GREEN if ytdlp_ok else colors.RED
+            ),
+        ])
+        
         status = ft.Container(
-            content=ft.Row([
-                ft.Icon(
-                    icons.CHECK_CIRCLE if ffmpeg_ok else icons.ERROR,
-                    color=colors.GREEN if ffmpeg_ok else colors.RED,
-                    size=20
-                ),
-                ft.Text(
-                    "FFmpeg: " + ("OK" if ffmpeg_ok else "Not Found"),
-                    color=colors.GREEN if ffmpeg_ok else colors.RED
-                ),
-                ft.Container(width=20),
-                ft.Icon(
-                    icons.CHECK_CIRCLE if ytdlp_ok else icons.ERROR,
-                    color=colors.GREEN if ytdlp_ok else colors.RED,
-                    size=20
-                ),
-                ft.Text(
-                    "yt-dlp: " + ("OK" if ytdlp_ok else "Not Found"),
-                    color=colors.GREEN if ytdlp_ok else colors.RED
-                ),
-            ], alignment=ft.MainAxisAlignment.CENTER),
+            content=ft.Row(
+                status_row,
+                alignment=ft.MainAxisAlignment.CENTER
+            ),
             padding=10,
             bgcolor=colors.BLUE_50,
             border_radius=8,
@@ -1433,6 +1553,84 @@ class MediaToolsLauncher:
         elif tool_name == "socmed":
             self.current_tool = SocMedDownloaderGUI(app_page)
         
+        self.page.update()
+    
+    def show_ffmpeg_download_dialog(self):
+        """Show FFmpeg download dialog"""
+        progress_bar = ft.ProgressBar(width=400, value=0)
+        status_text = ft.Text("Ready to download FFmpeg portable...", size=14)
+        
+        def update_progress(message, percent):
+            status_text.value = message
+            if percent >= 0:
+                progress_bar.value = percent / 100.0
+            self.page.update()
+        
+        def start_download(e):
+            download_btn.disabled = True
+            close_btn.disabled = True
+            self.page.update()
+            
+            # Run download in thread
+            import threading
+            def download_thread():
+                success = download_ffmpeg_portable(self.page, update_progress)
+                if success:
+                    status_text.value = "✅ FFmpeg installed successfully! Restart the app."
+                    status_text.color = colors.GREEN
+                    close_btn.disabled = False
+                    # Refresh home screen after 2 seconds
+                    import time
+                    time.sleep(2)
+                    self.page.close(dialog)
+                    self.setup_home()
+                else:
+                    status_text.value = "❌ Download failed. Try manual installation."
+                    status_text.color = colors.RED
+                    download_btn.disabled = False
+                    close_btn.disabled = False
+                self.page.update()
+            
+            threading.Thread(target=download_thread, daemon=True).start()
+        
+        download_btn = ft.ElevatedButton(
+            "Download FFmpeg (~100 MB)",
+            icon=icons.DOWNLOAD,
+            on_click=start_download,
+            bgcolor=colors.BLUE
+        )
+        
+        close_btn = ft.TextButton("Close", on_click=lambda e: self.page.close(dialog))
+        
+        dialog = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Download FFmpeg Portable"),
+            content=ft.Container(
+                content=ft.Column([
+                    ft.Text(
+                        "FFmpeg is required for media processing.\n"
+                        "Download portable version (~100 MB)?",
+                        size=14
+                    ),
+                    ft.Container(height=10),
+                    ft.Text("Source: github.com/BtbN/FFmpeg-Builds", size=12, color=colors.GREY_600),
+                    ft.Container(height=20),
+                    progress_bar,
+                    ft.Container(height=10),
+                    status_text,
+                ], tight=True),
+                width=450,
+                height=200
+            ),
+            actions=[
+                download_btn,
+                close_btn,
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
+        
+        self.page.overlay.append(dialog)
+        dialog.open = True
         self.page.update()
     
     def create_pseudo_page(self, container):

@@ -6,8 +6,13 @@ import importlib.util
 import subprocess
 from language_config import get_language, set_language, get_available_languages, get_all_texts
 
-# Import the GUI classes from both tools
-current_dir = Path(__file__).parent
+# Detect if running as PyInstaller executable
+if getattr(sys, 'frozen', False):
+    # Running as compiled executable
+    current_dir = Path(sys._MEIPASS)
+else:
+    # Running as script
+    current_dir = Path(__file__).parent
 
 # Add paths for imports
 audio_merger_path = str(current_dir / "audio-merger")

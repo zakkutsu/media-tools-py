@@ -52,6 +52,8 @@ build_cmd = [
     '--hidden-import=ffmpeg',
     '--hidden-import=audioop',
     '--collect-all=flet',
+    '--collect-all=yt_dlp',
+    '--copy-metadata=yt-dlp',
     '--noconsole',
     'media_tools_standalone.py'
 ]

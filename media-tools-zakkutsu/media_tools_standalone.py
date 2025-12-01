@@ -34,6 +34,7 @@ Usage:
 """
 
 import flet as ft
+from flet import icons, colors
 import os
 import sys
 import subprocess
@@ -348,8 +349,8 @@ class PlaylistDownloaderGUI:
         download_btn = ft.ElevatedButton(
             "🚀 Start Download",
             on_click=self.start_download,
-            bgcolor=ft.Colors.BLUE,
-            color=ft.Colors.WHITE,
+            bgcolor=colors.BLUE,
+            color=colors.WHITE,
             width=200
         )
         
@@ -466,8 +467,8 @@ class MediaLooperGUI:
         process_btn = ft.ElevatedButton(
             "⚡ Process",
             on_click=self.process_loop,
-            bgcolor=ft.Colors.TEAL,
-            color=ft.Colors.WHITE
+            bgcolor=colors.TEAL,
+            color=colors.WHITE
         )
         
         # Layout
@@ -599,8 +600,8 @@ class AudioMergerGUI:
         merge_btn = ft.ElevatedButton(
             "🎵 Merge Audio",
             on_click=self.start_merge,
-            bgcolor=ft.Colors.BLUE,
-            color=ft.Colors.WHITE
+            bgcolor=colors.BLUE,
+            color=colors.WHITE
         )
         
         # Layout
@@ -707,7 +708,7 @@ class SocMedDownloaderGUI:
         
         # Title
         title = ft.Text("🌐 SocMed Downloader", size=24, weight=ft.FontWeight.BOLD)
-        subtitle = ft.Text("YouTube, TikTok, Instagram, Facebook, Twitter/X", size=14, color=ft.Colors.GREY_600)
+        subtitle = ft.Text("YouTube, TikTok, Instagram, Facebook, Twitter/X", size=14, color=colors.GREY_600)
         
         # URL Input
         self.url_field = ft.TextField(label="🔗 URL", expand=True)
@@ -729,8 +730,8 @@ class SocMedDownloaderGUI:
         download_btn = ft.ElevatedButton(
             "🚀 Download",
             on_click=self.start_download,
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
+            bgcolor=colors.GREEN,
+            color=colors.WHITE,
             width=200
         )
         
@@ -832,15 +833,15 @@ class MediaToolsLauncher:
         header = ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Icon(ft.Icons.APPS, size=50, color=ft.Colors.DEEP_PURPLE),
+                    ft.Icon(icons.APPS, size=50, color=colors.DEEP_PURPLE),
                     ft.Column([
                         ft.Text("Media Tools Zakkutsu", size=32, weight=ft.FontWeight.BOLD),
-                        ft.Text("All-in-One Standalone Edition", size=16, color=ft.Colors.GREY_600),
+                        ft.Text("All-in-One Standalone Edition", size=16, color=colors.GREY_600),
                     ], spacing=0),
                 ], alignment=ft.MainAxisAlignment.CENTER),
             ]),
             padding=30,
-            bgcolor=ft.Colors.DEEP_PURPLE_50,
+            bgcolor=colors.DEEP_PURPLE_50,
             border_radius=15,
             margin=ft.margin.only(bottom=20)
         )
@@ -849,27 +850,27 @@ class MediaToolsLauncher:
         status = ft.Container(
             content=ft.Row([
                 ft.Icon(
-                    ft.Icons.CHECK_CIRCLE if ffmpeg_ok else ft.Icons.ERROR,
-                    color=ft.Colors.GREEN if ffmpeg_ok else ft.Colors.RED,
+                    icons.CHECK_CIRCLE if ffmpeg_ok else icons.ERROR,
+                    color=colors.GREEN if ffmpeg_ok else colors.RED,
                     size=20
                 ),
                 ft.Text(
                     "FFmpeg: " + ("OK" if ffmpeg_ok else "Not Found"),
-                    color=ft.Colors.GREEN if ffmpeg_ok else ft.Colors.RED
+                    color=colors.GREEN if ffmpeg_ok else colors.RED
                 ),
                 ft.Container(width=20),
                 ft.Icon(
-                    ft.Icons.CHECK_CIRCLE if ytdlp_ok else ft.Icons.ERROR,
-                    color=ft.Colors.GREEN if ytdlp_ok else ft.Colors.RED,
+                    icons.CHECK_CIRCLE if ytdlp_ok else icons.ERROR,
+                    color=colors.GREEN if ytdlp_ok else colors.RED,
                     size=20
                 ),
                 ft.Text(
                     "yt-dlp: " + ("OK" if ytdlp_ok else "Not Found"),
-                    color=ft.Colors.GREEN if ytdlp_ok else ft.Colors.RED
+                    color=colors.GREEN if ytdlp_ok else colors.RED
                 ),
             ], alignment=ft.MainAxisAlignment.CENTER),
             padding=10,
-            bgcolor=ft.Colors.BLUE_50,
+            bgcolor=colors.BLUE_50,
             border_radius=8,
             margin=ft.margin.only(bottom=20)
         )
@@ -879,13 +880,13 @@ class MediaToolsLauncher:
             ft.Text("Select a Tool", size=20, weight=ft.FontWeight.BOLD),
             ft.Container(height=10),
             ft.Row([
-                self.create_card("🎵 YT Playlist\nDownloader", ft.Colors.RED, lambda e: self.launch_tool("playlist")),
-                self.create_card("🔁 Media\nLooper", ft.Colors.TEAL, lambda e: self.launch_tool("looper")),
+                self.create_card("🎵 YT Playlist\nDownloader", colors.RED, lambda e: self.launch_tool("playlist")),
+                self.create_card("🔁 Media\nLooper", colors.TEAL, lambda e: self.launch_tool("looper")),
             ], alignment=ft.MainAxisAlignment.CENTER, spacing=20),
             ft.Container(height=20),
             ft.Row([
-                self.create_card("🎵 Audio\nMerger", ft.Colors.BLUE, lambda e: self.launch_tool("merger")),
-                self.create_card("🌐 SocMed\nDownloader", ft.Colors.GREEN, lambda e: self.launch_tool("socmed")),
+                self.create_card("🎵 Audio\nMerger", colors.BLUE, lambda e: self.launch_tool("merger")),
+                self.create_card("🌐 SocMed\nDownloader", colors.GREEN, lambda e: self.launch_tool("socmed")),
             ], alignment=ft.MainAxisAlignment.CENTER, spacing=20),
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER)
         
@@ -893,7 +894,7 @@ class MediaToolsLauncher:
         info = ft.Container(
             content=ft.Column([
                 ft.Divider(height=1),
-                ft.Text("💡 FFmpeg required for optimal functionality", size=12, color=ft.Colors.GREY_600),
+                ft.Text("💡 FFmpeg required for optimal functionality", size=12, color=colors.GREY_600),
                 ft.Row([
                     ft.TextButton("❌ Exit", on_click=lambda e: self.page.window.close()),
                 ], alignment=ft.MainAxisAlignment.CENTER),
@@ -920,9 +921,9 @@ class MediaToolsLauncher:
                 ft.Container(height=15),
                 ft.ElevatedButton(
                     "Launch",
-                    icon=ft.Icons.ROCKET_LAUNCH,
+                    icon=icons.ROCKET_LAUNCH,
                     bgcolor=color,
-                    color=ft.Colors.WHITE,
+                    color=colors.WHITE,
                     on_click=on_click,
                 )
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER),
@@ -931,7 +932,7 @@ class MediaToolsLauncher:
             border=ft.border.all(2, color),
             border_radius=10,
             padding=20,
-            bgcolor=ft.Colors.WHITE,
+            bgcolor=colors.WHITE,
         )
     
     def launch_tool(self, tool_name):
@@ -942,8 +943,8 @@ class MediaToolsLauncher:
         back_btn = ft.ElevatedButton(
             "🏠 Back to Home",
             on_click=lambda e: self.setup_home(),
-            bgcolor=ft.Colors.GREY_600,
-            color=ft.Colors.WHITE
+            bgcolor=colors.GREY_600,
+            color=colors.WHITE
         )
         
         # Tool container

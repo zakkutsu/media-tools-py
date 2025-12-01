@@ -18,7 +18,7 @@ from pathlib import Path
 # Flet 0.25.x uses ft.icons/ft.colors (lowercase)
 try:
     # Try new style (0.25.x)
-    _ = ft.icons.LOOP
+    _ = ft.Icons.LOOP
     icons = ft.icons
     colors = ft.colors
 except AttributeError:
@@ -1046,3 +1046,4 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     ft.app(target=main)
+

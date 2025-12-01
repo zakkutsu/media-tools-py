@@ -715,3 +715,4 @@ if __name__ == "__main__":
     else:
         # Run GUI version
         ft.app(target=main, view=ft.AppView.FLET_APP)
+

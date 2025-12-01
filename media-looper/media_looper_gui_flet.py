@@ -13,6 +13,19 @@ import shutil
 import threading
 from pathlib import Path
 
+# Compatibility layer for different Flet versions
+# Flet 0.21.x uses ft.Icons/ft.Colors (uppercase)
+# Flet 0.25.x uses ft.icons/ft.colors (lowercase)
+try:
+    # Try new style (0.25.x)
+    _ = ft.icons.LOOP
+    icons = ft.icons
+    colors = ft.colors
+except AttributeError:
+    # Fallback to old style (0.21.x)
+    icons = ft.Icons
+    colors = ft.Colors
+
 
 class MediaLooperGUI:
     def __init__(self, page: ft.Page):
@@ -37,13 +50,13 @@ class MediaLooperGUI:
         header = ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Icon(ft.icons.LOOP, size=40, color=ft.colors.WHITE),
-                    ft.Text("Media Looper Tool", size=28, weight=ft.FontWeight.BOLD, color=ft.colors.WHITE),
+                    ft.Icon(icons.LOOP, size=40, color=colors.WHITE),
+                    ft.Text("Media Looper Tool", size=28, weight=ft.FontWeight.BOLD, color=colors.WHITE),
                 ], alignment=ft.MainAxisAlignment.CENTER),
                 ft.Text("Stream Copy Looping - Instant Processing", 
-                       size=14, color=ft.colors.WHITE70, text_align=ft.TextAlign.CENTER),
+                       size=14, color=colors.WHITE70, text_align=ft.TextAlign.CENTER),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=5),
-            bgcolor=ft.colors.TEAL_700,
+            bgcolor=colors.TEAL_700,
             padding=20,
         )
         
@@ -54,12 +67,12 @@ class MediaLooperGUI:
             tabs=[
                 ft.Tab(
                     text="Single Loop",
-                    icon=ft.icons.REPEAT,
+                    icon=icons.REPEAT,
                     content=self.create_single_loop_tab()
                 ),
                 ft.Tab(
                     text="Alternating Loop",
-                    icon=ft.icons.SWAP_HORIZ,
+                    icon=icons.SWAP_HORIZ,
                     content=self.create_alternating_loop_tab()
                 ),
             ],
@@ -86,7 +99,7 @@ class MediaLooperGUI:
         
         browse_btn = ft.ElevatedButton(
             "Browse",
-            icon=ft.icons.FOLDER_OPEN,
+            icon=icons.FOLDER_OPEN,
             on_click=lambda _: self.browse_file(self.single_file),
         )
         
@@ -101,7 +114,7 @@ class MediaLooperGUI:
         
         # Presets
         presets = ft.Row([
-            ft.Text("Quick:", size=12, color=ft.colors.GREY_600),
+            ft.Text("Quick:", size=12, color=colors.GREY_600),
             *[ft.FilledButton(
                 f"{p}x",
                 on_click=lambda e, count=p: setattr(self.single_loop_count, 'value', str(count)) or self.page.update(),
@@ -112,15 +125,15 @@ class MediaLooperGUI:
         # Process button
         process_btn = ft.ElevatedButton(
             "⚡ Process",
-            icon=ft.icons.PLAY_ARROW,
+            icon=icons.PLAY_ARROW,
             on_click=lambda _: self.process_single_loop(),
-            bgcolor=ft.colors.TEAL_600,
-            color=ft.colors.WHITE,
+            bgcolor=colors.TEAL_600,
+            color=colors.WHITE,
             height=50,
         )
         
         # Status
-        self.single_status = ft.Text("Ready", size=12, color=ft.colors.GREY_600)
+        self.single_status = ft.Text("Ready", size=12, color=colors.GREY_600)
         self.single_log = ft.Column([], scroll=ft.ScrollMode.AUTO, expand=True, spacing=5)
         
         return ft.Container(
@@ -132,10 +145,10 @@ class MediaLooperGUI:
                             "• Loop 1 file berkali-kali (A-A-A...)\n"
                             "• Stream copy = instant, zero quality loss\n"
                             "• Contoh: 3 menit MP3 × 20 = 60 menit dalam 2 detik",
-                            size=12, color=ft.colors.GREY_700,
+                            size=12, color=colors.GREY_700,
                         ),
                     ], spacing=5),
-                    bgcolor=ft.colors.BLUE_50,
+                    bgcolor=colors.BLUE_50,
                     padding=15,
                     border_radius=10,
                 ),
@@ -152,7 +165,7 @@ class MediaLooperGUI:
                 self.single_status,
                 ft.Container(
                     content=self.single_log,
-                    bgcolor=ft.colors.GREY_100,
+                    bgcolor=colors.GREY_100,
                     padding=10,
                     border_radius=5,
                     expand=True,
@@ -181,13 +194,13 @@ class MediaLooperGUI:
         
         browse_a_btn = ft.ElevatedButton(
             "Browse A",
-            icon=ft.icons.FOLDER_OPEN,
+            icon=icons.FOLDER_OPEN,
             on_click=lambda _: self.browse_file(self.alt_file_a),
         )
         
         browse_b_btn = ft.ElevatedButton(
             "Browse B",
-            icon=ft.icons.FOLDER_OPEN,
+            icon=icons.FOLDER_OPEN,
             on_click=lambda _: self.browse_file(self.alt_file_b),
         )
         
@@ -202,7 +215,7 @@ class MediaLooperGUI:
         
         # Presets
         presets = ft.Row([
-            ft.Text("Quick:", size=12, color=ft.colors.GREY_600),
+            ft.Text("Quick:", size=12, color=colors.GREY_600),
             *[ft.FilledButton(
                 f"{p}x",
                 on_click=lambda e, count=p: setattr(self.alt_loop_count, 'value', str(count)) or self.page.update(),
@@ -221,7 +234,7 @@ class MediaLooperGUI:
         )
         
         delay_presets = ft.Row([
-            ft.Text("Quick:", size=12, color=ft.colors.GREY_600),
+            ft.Text("Quick:", size=12, color=colors.GREY_600),
             *[ft.FilledButton(
                 f"{p}s",
                 on_click=lambda e, delay=p: setattr(self.alt_delay, 'value', str(delay)) or self.page.update(),
@@ -232,15 +245,15 @@ class MediaLooperGUI:
         # Process button
         process_btn = ft.ElevatedButton(
             "⚡ Process",
-            icon=ft.icons.PLAY_ARROW,
+            icon=icons.PLAY_ARROW,
             on_click=lambda _: self.process_alternating_loop(),
-            bgcolor=ft.colors.ORANGE_600,
-            color=ft.colors.WHITE,
+            bgcolor=colors.ORANGE_600,
+            color=colors.WHITE,
             height=50,
         )
         
         # Status
-        self.alt_status = ft.Text("Ready", size=12, color=ft.colors.GREY_600)
+        self.alt_status = ft.Text("Ready", size=12, color=colors.GREY_600)
         self.alt_log = ft.Column([], scroll=ft.ScrollMode.AUTO, expand=True, spacing=5)
         
         return ft.Container(
@@ -253,10 +266,10 @@ class MediaLooperGUI:
                             "• Ideal: intro-content, Q&A drill, music-silence\n"
                             "• Optional delay: A → [silence] → B (for thinking time)\n"
                             "• ⚠️ Both files MUST have same format & codec!",
-                            size=12, color=ft.colors.GREY_700,
+                            size=12, color=colors.GREY_700,
                         ),
                     ], spacing=5),
-                    bgcolor=ft.colors.ORANGE_50,
+                    bgcolor=colors.ORANGE_50,
                     padding=15,
                     border_radius=10,
                 ),
@@ -269,7 +282,7 @@ class MediaLooperGUI:
                 ft.Row([self.alt_loop_count, presets], spacing=20),
                 ft.Row([self.alt_delay, delay_presets], spacing=20),
                 ft.Text("💡 Use delay for Q&A drill: Question → [pause] → Answer", 
-                       size=11, color=ft.colors.GREY_600, italic=True),
+                       size=11, color=colors.GREY_600, italic=True),
                 ft.Divider(),
                 process_btn,
                 ft.Divider(),
@@ -277,7 +290,7 @@ class MediaLooperGUI:
                 self.alt_status,
                 ft.Container(
                     content=self.alt_log,
-                    bgcolor=ft.colors.GREY_100,
+                    bgcolor=colors.GREY_100,
                     padding=10,
                     border_radius=5,
                     expand=True,
@@ -306,7 +319,7 @@ class MediaLooperGUI:
     def log_message(self, log_container, message, color=None):
         """Add log message"""
         log_container.controls.append(
-            ft.Text(message, size=11, color=color or ft.colors.BLACK87)
+            ft.Text(message, size=11, color=color or colors.BLACK87)
         )
         self.page.update()
     
@@ -362,7 +375,7 @@ class MediaLooperGUI:
     def process_single_loop(self):
         """Process single loop in thread"""
         if self.processing:
-            self.show_snackbar("Already processing!", ft.colors.ORANGE)
+            self.show_snackbar("Already processing!", colors.ORANGE)
             return
         
         file_path = self.single_file.value
@@ -387,7 +400,7 @@ class MediaLooperGUI:
         """Worker thread for single loop"""
         self.processing = True
         self.single_status.value = "Processing..."
-        self.single_status.color = ft.colors.BLUE
+        self.single_status.color = colors.BLUE
         self.single_log.controls.clear()
         self.page.update()
         
@@ -405,7 +418,7 @@ class MediaLooperGUI:
             
             self.log_message(self.single_log, f"Input: {os.path.basename(file_path)}")
             self.log_message(self.single_log, f"Output: {os.path.basename(output_file)}")
-            self.log_message(self.single_log, "\n⚙️ FFmpeg processing...", ft.colors.BLUE)
+            self.log_message(self.single_log, "\n⚙️ FFmpeg processing...", colors.BLUE)
             
             # FFmpeg command
             loop_count = count - 1
@@ -415,23 +428,23 @@ class MediaLooperGUI:
             subprocess.run(cmd, check=True, capture_output=True)
             
             size = os.path.getsize(output_file) / (1024 * 1024)
-            self.log_message(self.single_log, f"\n✅ SUCCESS!", ft.colors.GREEN)
+            self.log_message(self.single_log, f"\n✅ SUCCESS!", colors.GREEN)
             self.log_message(self.single_log, f"📁 {output_file}")
             self.log_message(self.single_log, f"📦 Size: {size:.2f} MB")
             
             self.single_status.value = "Completed!"
-            self.single_status.color = ft.colors.GREEN
-            self.show_snackbar("Processing completed!", ft.colors.GREEN)
+            self.single_status.color = colors.GREEN
+            self.show_snackbar("Processing completed!", colors.GREEN)
             
         except subprocess.CalledProcessError:
-            self.log_message(self.single_log, "\n❌ FFmpeg error!", ft.colors.RED)
+            self.log_message(self.single_log, "\n❌ FFmpeg error!", colors.RED)
             self.single_status.value = "Error"
-            self.single_status.color = ft.colors.RED
-            self.show_snackbar("Processing failed!", ft.colors.RED)
+            self.single_status.color = colors.RED
+            self.show_snackbar("Processing failed!", colors.RED)
         except Exception as e:
-            self.log_message(self.single_log, f"\n❌ Error: {e}", ft.colors.RED)
+            self.log_message(self.single_log, f"\n❌ Error: {e}", colors.RED)
             self.single_status.value = "Error"
-            self.single_status.color = ft.colors.RED
+            self.single_status.color = colors.RED
         finally:
             self.processing = False
             self.page.update()
@@ -439,7 +452,7 @@ class MediaLooperGUI:
     def process_alternating_loop(self):
         """Process alternating loop in thread"""
         if self.processing:
-            self.show_snackbar("Already processing!", ft.colors.ORANGE)
+            self.show_snackbar("Already processing!", colors.ORANGE)
             return
         
         file_a = self.alt_file_a.value
@@ -485,7 +498,7 @@ class MediaLooperGUI:
         """Worker thread for alternating loop"""
         self.processing = True
         self.alt_status.value = "Processing..."
-        self.alt_status.color = ft.colors.BLUE
+        self.alt_status.color = colors.BLUE
         self.alt_log.controls.clear()
         self.page.update()
         
@@ -534,7 +547,7 @@ class MediaLooperGUI:
             filename, ext = os.path.splitext(file_a)
             output_file = f"{filename}_merged_{count}x{ext}"
             
-            self.log_message(self.alt_log, f"\n⚙️ FFmpeg processing...", ft.colors.BLUE)
+            self.log_message(self.alt_log, f"\n⚙️ FFmpeg processing...", colors.BLUE)
             
             # FFmpeg command
             cmd = ['ffmpeg', '-f', 'concat', '-safe', '0', '-i', list_file,
@@ -543,23 +556,23 @@ class MediaLooperGUI:
             subprocess.run(cmd, check=True, capture_output=True)
             
             size = os.path.getsize(output_file) / (1024 * 1024)
-            self.log_message(self.alt_log, f"\n✅ SUCCESS!", ft.colors.GREEN)
+            self.log_message(self.alt_log, f"\n✅ SUCCESS!", colors.GREEN)
             self.log_message(self.alt_log, f"📁 {output_file}")
             self.log_message(self.alt_log, f"📦 Size: {size:.2f} MB")
             
             self.alt_status.value = "Completed!"
-            self.alt_status.color = ft.colors.GREEN
-            self.show_snackbar("Processing completed!", ft.colors.GREEN)
+            self.alt_status.color = colors.GREEN
+            self.show_snackbar("Processing completed!", colors.GREEN)
             
         except subprocess.CalledProcessError:
-            self.log_message(self.alt_log, "\n❌ FFmpeg error! Check codec compatibility.", ft.colors.RED)
+            self.log_message(self.alt_log, "\n❌ FFmpeg error! Check codec compatibility.", colors.RED)
             self.alt_status.value = "Error"
-            self.alt_status.color = ft.colors.RED
-            self.show_snackbar("Processing failed!", ft.colors.RED)
+            self.alt_status.color = colors.RED
+            self.show_snackbar("Processing failed!", colors.RED)
         except Exception as e:
-            self.log_message(self.alt_log, f"\n❌ Error: {e}", ft.colors.RED)
+            self.log_message(self.alt_log, f"\n❌ Error: {e}", colors.RED)
             self.alt_status.value = "Error"
-            self.alt_status.color = ft.colors.RED
+            self.alt_status.color = colors.RED
         finally:
             # Cleanup temp files
             if os.path.exists(list_file):

@@ -29,7 +29,7 @@ def check_and_install_dependencies():
     missing_deps = []
     required_packages = {
         'pydub': 'pydub==0.25.1',
-        'flet': 'flet==0.21.2', 
+        'flet': 'flet>=0.25.0', 
         'ffmpeg': 'ffmpeg-python==0.2.0',
         'PIL': 'Pillow>=10.0.0',
         'filetype': 'filetype==1.2.0',

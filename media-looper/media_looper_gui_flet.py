@@ -103,6 +103,63 @@ class MediaLooperGUI:
             on_click=lambda _: self.browse_file(self.single_file),
         )
         
+        # Output folder
+        self.single_output_folder = ft.TextField(
+            label="Output Folder",
+            hint_text="Same as input folder",
+            read_only=True,
+            expand=True,
+        )
+        
+        browse_output_btn = ft.ElevatedButton(
+            "Browse",
+            icon=icons.FOLDER_OPEN,
+            on_click=lambda _: self.browse_folder(self.single_output_folder),
+        )
+        
+        # Output format
+        self.single_output_format = ft.Dropdown(
+            label="Output Format",
+            hint_text="Auto (same as input)",
+            options=[
+                ft.dropdown.Option("auto", "Auto (same as input)"),
+                ft.dropdown.Option("video", "Video (.mp4)"),
+                ft.dropdown.Option("audio", "Audio (.mp3)"),
+            ],
+            value="auto",
+            width=200,
+        )
+        
+        # Background image for audio->video
+        self.single_bg_image = ft.TextField(
+            label="Background Image (for audio→video)",
+            hint_text="Default: bg/bg.png",
+            read_only=True,
+            expand=True,
+        )
+        
+        browse_bg_btn = ft.ElevatedButton(
+            "Browse",
+            icon=icons.IMAGE,
+            on_click=lambda _: self.browse_image(self.single_bg_image),
+        )
+        
+        use_default_bg_btn = ft.TextButton(
+            "Use Default BG",
+            on_click=lambda _: self.set_default_bg(self.single_bg_image),
+        )
+        
+        # Duration display
+        self.single_duration_display = ft.Container(
+            content=ft.Column([
+                ft.Text("Duration Calculation:", size=12, weight=ft.FontWeight.BOLD),
+                ft.Text("No file selected", size=11, color=colors.GREY_600),
+            ], spacing=2),
+            bgcolor=colors.GREY_50,
+            padding=10,
+            border_radius=5,
+        )
+        
         # Loop count
         self.single_loop_count = ft.TextField(
             label="Loop Count",
@@ -110,6 +167,7 @@ class MediaLooperGUI:
             value="60",
             width=150,
             keyboard_type=ft.KeyboardType.NUMBER,
+            on_change=lambda _: self.update_single_duration(),
         )
         
         # Presets
@@ -117,7 +175,7 @@ class MediaLooperGUI:
             ft.Text("Quick:", size=12, color=colors.GREY_600),
             *[ft.FilledButton(
                 f"{p}x",
-                on_click=lambda e, count=p: setattr(self.single_loop_count, 'value', str(count)) or self.page.update(),
+                on_click=lambda e, count=p: (setattr(self.single_loop_count, 'value', str(count)), self.update_single_duration(), self.page.update())[-1],
                 style=ft.ButtonStyle(padding=8),
             ) for p in [10, 20, 30, 60, 120]]
         ], spacing=5)
@@ -155,6 +213,12 @@ class MediaLooperGUI:
                 ft.Divider(),
                 ft.Text("Input File", size=14, weight=ft.FontWeight.BOLD),
                 ft.Row([self.single_file, browse_btn], spacing=10),
+                self.single_duration_display,
+                ft.Divider(),
+                ft.Text("Output Settings", size=14, weight=ft.FontWeight.BOLD),
+                ft.Row([self.single_output_folder, browse_output_btn], spacing=10),
+                ft.Row([self.single_output_format], spacing=10),
+                ft.Row([self.single_bg_image, browse_bg_btn, use_default_bg_btn], spacing=10),
                 ft.Divider(),
                 ft.Text("Loop Settings", size=14, weight=ft.FontWeight.BOLD),
                 ft.Row([self.single_loop_count, presets], spacing=20),
@@ -204,6 +268,63 @@ class MediaLooperGUI:
             on_click=lambda _: self.browse_file(self.alt_file_b),
         )
         
+        # Output folder
+        self.alt_output_folder = ft.TextField(
+            label="Output Folder",
+            hint_text="Same as File A folder",
+            read_only=True,
+            expand=True,
+        )
+        
+        browse_alt_output_btn = ft.ElevatedButton(
+            "Browse",
+            icon=icons.FOLDER_OPEN,
+            on_click=lambda _: self.browse_folder(self.alt_output_folder),
+        )
+        
+        # Output format
+        self.alt_output_format = ft.Dropdown(
+            label="Output Format",
+            hint_text="Auto (same as input)",
+            options=[
+                ft.dropdown.Option("auto", "Auto (same as input)"),
+                ft.dropdown.Option("video", "Video (.mp4)"),
+                ft.dropdown.Option("audio", "Audio (.mp3)"),
+            ],
+            value="auto",
+            width=200,
+        )
+        
+        # Background image
+        self.alt_bg_image = ft.TextField(
+            label="Background Image (for audio→video)",
+            hint_text="Default: bg/bg.png",
+            read_only=True,
+            expand=True,
+        )
+        
+        browse_alt_bg_btn = ft.ElevatedButton(
+            "Browse",
+            icon=icons.IMAGE,
+            on_click=lambda _: self.browse_image(self.alt_bg_image),
+        )
+        
+        use_default_alt_bg_btn = ft.TextButton(
+            "Use Default BG",
+            on_click=lambda _: self.set_default_bg(self.alt_bg_image),
+        )
+        
+        # Duration display
+        self.alt_duration_display = ft.Container(
+            content=ft.Column([
+                ft.Text("Duration Calculation:", size=12, weight=ft.FontWeight.BOLD),
+                ft.Text("No files selected", size=11, color=colors.GREY_600),
+            ], spacing=2),
+            bgcolor=colors.GREY_50,
+            padding=10,
+            border_radius=5,
+        )
+        
         # Loop count
         self.alt_loop_count = ft.TextField(
             label="Loop Count (Sets)",
@@ -211,6 +332,7 @@ class MediaLooperGUI:
             value="10",
             width=150,
             keyboard_type=ft.KeyboardType.NUMBER,
+            on_change=lambda _: self.update_alt_duration(),
         )
         
         # Presets
@@ -218,7 +340,7 @@ class MediaLooperGUI:
             ft.Text("Quick:", size=12, color=colors.GREY_600),
             *[ft.FilledButton(
                 f"{p}x",
-                on_click=lambda e, count=p: setattr(self.alt_loop_count, 'value', str(count)) or self.page.update(),
+                on_click=lambda e, count=p: (setattr(self.alt_loop_count, 'value', str(count)), self.update_alt_duration(), self.page.update())[-1],
                 style=ft.ButtonStyle(padding=8),
             ) for p in [5, 10, 20, 30, 50]]
         ], spacing=5)
@@ -231,13 +353,14 @@ class MediaLooperGUI:
             width=180,
             keyboard_type=ft.KeyboardType.NUMBER,
             suffix_text="sec",
+            on_change=lambda _: self.update_alt_duration(),
         )
         
         delay_presets = ft.Row([
             ft.Text("Quick:", size=12, color=colors.GREY_600),
             *[ft.FilledButton(
                 f"{p}s",
-                on_click=lambda e, delay=p: setattr(self.alt_delay, 'value', str(delay)) or self.page.update(),
+                on_click=lambda e, delay=p: (setattr(self.alt_delay, 'value', str(delay)), self.update_alt_duration(), self.page.update())[-1],
                 style=ft.ButtonStyle(padding=8),
             ) for p in [0, 1, 2, 3, 5]]
         ], spacing=5)
@@ -277,6 +400,12 @@ class MediaLooperGUI:
                 ft.Text("Input Files", size=14, weight=ft.FontWeight.BOLD),
                 ft.Row([self.alt_file_a, browse_a_btn], spacing=10),
                 ft.Row([self.alt_file_b, browse_b_btn], spacing=10),
+                self.alt_duration_display,
+                ft.Divider(),
+                ft.Text("Output Settings", size=14, weight=ft.FontWeight.BOLD),
+                ft.Row([self.alt_output_folder, browse_alt_output_btn], spacing=10),
+                ft.Row([self.alt_output_format], spacing=10),
+                ft.Row([self.alt_bg_image, browse_alt_bg_btn, use_default_alt_bg_btn], spacing=10),
                 ft.Divider(),
                 ft.Text("Loop Settings", size=14, weight=ft.FontWeight.BOLD),
                 ft.Row([self.alt_loop_count, presets], spacing=20),
@@ -305,6 +434,11 @@ class MediaLooperGUI:
         def on_result(e: ft.FilePickerResultEvent):
             if e.files:
                 target_field.value = e.files[0].path
+                # Update duration display after file selection
+                if target_field == self.single_file:
+                    self.update_single_duration()
+                elif target_field == self.alt_file_a or target_field == self.alt_file_b:
+                    self.update_alt_duration()
                 self.page.update()
         
         file_picker = ft.FilePicker(on_result=on_result)
@@ -315,6 +449,128 @@ class MediaLooperGUI:
             dialog_title="Select Media File",
             allowed_extensions=["mp4", "mkv", "avi", "mov", "mp3", "wav", "aac", "flac", "m4a"],
         )
+    
+    def browse_folder(self, target_field):
+        """Browse folder dialog"""
+        def on_result(e: ft.FilePickerResultEvent):
+            if e.path:
+                target_field.value = e.path
+                self.page.update()
+        
+        folder_picker = ft.FilePicker(on_result=on_result)
+        self.page.overlay.append(folder_picker)
+        self.page.update()
+        
+        folder_picker.get_directory_path(dialog_title="Select Output Folder")
+    
+    def browse_image(self, target_field):
+        """Browse image file dialog"""
+        def on_result(e: ft.FilePickerResultEvent):
+            if e.files:
+                target_field.value = e.files[0].path
+                self.page.update()
+        
+        image_picker = ft.FilePicker(on_result=on_result)
+        self.page.overlay.append(image_picker)
+        self.page.update()
+        
+        image_picker.pick_files(
+            dialog_title="Select Background Image",
+            allowed_extensions=["jpg", "jpeg", "png", "bmp", "webp"],
+        )
+    
+    def set_default_bg(self, target_field):
+        """Set default background image"""
+        default_bg = os.path.join(os.path.dirname(__file__), "bg", "bg.png")
+        if os.path.exists(default_bg):
+            target_field.value = default_bg
+            self.show_snackbar("Default BG set!", colors.GREEN)
+        else:
+            self.show_snackbar("Default BG not found!", colors.RED)
+        self.page.update()
+    
+    def update_single_duration(self):
+        """Update single loop duration display"""
+        file_path = self.single_file.value
+        if not file_path or not os.path.exists(file_path):
+            self.single_duration_display.content = ft.Column([
+                ft.Text("Duration Calculation:", size=12, weight=ft.FontWeight.BOLD),
+                ft.Text("No file selected", size=11, color=colors.GREY_600),
+            ], spacing=2)
+            self.page.update()
+            return
+        
+        duration = self.get_duration(file_path)
+        if duration:
+            try:
+                count = int(self.single_loop_count.value) if self.single_loop_count.value else 1
+                total_duration = duration * count
+                
+                self.single_duration_display.content = ft.Column([
+                    ft.Text("Duration Calculation:", size=12, weight=ft.FontWeight.BOLD),
+                    ft.Text(f"File: {self.format_duration(duration)}", size=11, color=colors.BLUE_700),
+                    ft.Text(f"Loop: {count}x", size=11, color=colors.BLUE_700),
+                    ft.Text(f"Total: {self.format_duration(total_duration)}", size=13, weight=ft.FontWeight.BOLD, color=colors.GREEN_700),
+                ], spacing=2)
+            except:
+                self.single_duration_display.content = ft.Column([
+                    ft.Text("Duration Calculation:", size=12, weight=ft.FontWeight.BOLD),
+                    ft.Text(f"File: {self.format_duration(duration)}", size=11, color=colors.BLUE_700),
+                ], spacing=2)
+        else:
+            self.single_duration_display.content = ft.Column([
+                ft.Text("Duration Calculation:", size=12, weight=ft.FontWeight.BOLD),
+                ft.Text("Could not read duration", size=11, color=colors.ORANGE_600),
+            ], spacing=2)
+        
+        self.page.update()
+    
+    def update_alt_duration(self):
+        """Update alternating loop duration display"""
+        file_a = self.alt_file_a.value
+        file_b = self.alt_file_b.value
+        
+        if not file_a or not os.path.exists(file_a) or not file_b or not os.path.exists(file_b):
+            self.alt_duration_display.content = ft.Column([
+                ft.Text("Duration Calculation:", size=12, weight=ft.FontWeight.BOLD),
+                ft.Text("Select both files", size=11, color=colors.GREY_600),
+            ], spacing=2)
+            self.page.update()
+            return
+        
+        dur_a = self.get_duration(file_a)
+        dur_b = self.get_duration(file_b)
+        
+        if dur_a and dur_b:
+            try:
+                count = int(self.alt_loop_count.value) if self.alt_loop_count.value else 1
+                delay = float(self.alt_delay.value) if self.alt_delay.value else 0
+                pair_duration = dur_a + dur_b + delay
+                total_duration = pair_duration * count
+                
+                delay_str = f" + Delay: {delay}s" if delay > 0 else ""
+                
+                self.alt_duration_display.content = ft.Column([
+                    ft.Text("Duration Calculation:", size=12, weight=ft.FontWeight.BOLD),
+                    ft.Text(f"File A: {self.format_duration(dur_a)}", size=11, color=colors.BLUE_700),
+                    ft.Text(f"File B: {self.format_duration(dur_b)}{delay_str}", size=11, color=colors.BLUE_700),
+                    ft.Text(f"Per Set: {self.format_duration(pair_duration)}", size=11, color=colors.BLUE_700),
+                    ft.Text(f"Loop: {count}x sets", size=11, color=colors.BLUE_700),
+                    ft.Text(f"Total: {self.format_duration(total_duration)}", size=13, weight=ft.FontWeight.BOLD, color=colors.GREEN_700),
+                ], spacing=2)
+            except:
+                self.alt_duration_display.content = ft.Column([
+                    ft.Text("Duration Calculation:", size=12, weight=ft.FontWeight.BOLD),
+                    ft.Text(f"File A: {self.format_duration(dur_a)}", size=11, color=colors.BLUE_700),
+                    ft.Text(f"File B: {self.format_duration(dur_b)}", size=11, color=colors.BLUE_700),
+                ], spacing=2)
+        else:
+            self.alt_duration_display.content = ft.Column([
+                ft.Text("Duration Calculation:", size=12, weight=ft.FontWeight.BOLD),
+                ft.Text("Could not read duration", size=11, color=colors.ORANGE_600),
+            ], spacing=2)
+        
+        self.page.update()
     
     def log_message(self, log_container, message, color=None):
         """Add log message"""
@@ -404,28 +660,90 @@ class MediaLooperGUI:
         self.single_log.controls.clear()
         self.page.update()
         
+        temp_files = []
+        
         try:
             # Duration info
             duration = self.get_duration(file_path)
             if duration:
                 total = duration * count
                 self.log_message(self.single_log, 
-                    f"📊 Duration: {self.format_duration(duration)} → {self.format_duration(total)} ({count}x)")
+                    f"📊 Input Duration: {self.format_duration(duration)}")
+                self.log_message(self.single_log, 
+                    f"📊 Loop Count: {count}x")
+                self.log_message(self.single_log, 
+                    f"📊 Total Duration: {self.format_duration(total)}", colors.GREEN)
             
-            # Prepare output
-            filename, ext = os.path.splitext(file_path)
-            output_file = f"{filename}_looped_{count}x{ext}"
+            # Determine output format and extension
+            output_format = self.single_output_format.value or "auto"
+            input_ext = os.path.splitext(file_path)[1].lower()
+            is_input_video = input_ext in ['.mp4', '.mkv', '.avi', '.mov', '.webm']
             
-            self.log_message(self.single_log, f"Input: {os.path.basename(file_path)}")
+            if output_format == "video":
+                output_ext = ".mp4"
+                needs_conversion = not is_input_video
+            elif output_format == "audio":
+                output_ext = ".mp3"
+                needs_conversion = is_input_video
+            else:  # auto
+                output_ext = input_ext
+                needs_conversion = False
+            
+            # Determine output folder
+            if self.single_output_folder.value:
+                output_folder = self.single_output_folder.value
+            else:
+                output_folder = os.path.dirname(file_path)
+            
+            filename = os.path.splitext(os.path.basename(file_path))[0]
+            output_file = os.path.join(output_folder, f"{filename}_looped_{count}x{output_ext}")
+            
+            self.log_message(self.single_log, f"\nInput: {os.path.basename(file_path)}")
             self.log_message(self.single_log, f"Output: {os.path.basename(output_file)}")
-            self.log_message(self.single_log, "\n⚙️ FFmpeg processing...", colors.BLUE)
             
-            # FFmpeg command
+            # Step 1: Loop the file
+            self.log_message(self.single_log, "\n⚙️ Step 1: Looping...", colors.BLUE)
+            temp_looped = f"temp_looped_{count}x{input_ext}"
+            temp_files.append(temp_looped)
+            
             loop_count = count - 1
             cmd = ['ffmpeg', '-stream_loop', str(loop_count), '-i', file_path,
-                   '-c', 'copy', output_file, '-y']
+                   '-c', 'copy', temp_looped, '-y']
             
-            subprocess.run(cmd, check=True, capture_output=True)
+            subprocess.run(cmd, check=True, capture_output=True, timeout=300)
+            self.log_message(self.single_log, "✓ Looping complete", colors.GREEN)
+            
+            # Step 2: Convert if needed
+            if needs_conversion:
+                self.log_message(self.single_log, "\n⚙️ Step 2: Converting format...", colors.BLUE)
+                
+                if output_format == "video" and not is_input_video:
+                    # Audio to Video - need background image
+                    bg_image = self.single_bg_image.value
+                    if not bg_image:
+                        bg_image = os.path.join(os.path.dirname(__file__), "bg", "bg.png")
+                    
+                    if not os.path.exists(bg_image):
+                        raise Exception("Background image not found! Please select a background image.")
+                    
+                    self.log_message(self.single_log, f"Using BG: {os.path.basename(bg_image)}")
+                    
+                    cmd = ['ffmpeg', '-loop', '1', '-i', bg_image, '-i', temp_looped,
+                           '-c:v', 'libx264', '-tune', 'stillimage', '-c:a', 'aac',
+                           '-b:a', '192k', '-pix_fmt', 'yuv420p', '-shortest',
+                           output_file, '-y']
+                else:
+                    # Video to Audio
+                    cmd = ['ffmpeg', '-i', temp_looped, '-vn', '-c:a', 'libmp3lame',
+                           '-b:a', '192k', output_file, '-y']
+                
+                subprocess.run(cmd, check=True, capture_output=True, timeout=300)
+                self.log_message(self.single_log, "✓ Conversion complete", colors.GREEN)
+            else:
+                # No conversion needed, just move
+                import shutil
+                shutil.move(temp_looped, output_file)
+                temp_files.remove(temp_looped)
             
             size = os.path.getsize(output_file) / (1024 * 1024)
             self.log_message(self.single_log, f"\n✅ SUCCESS!", colors.GREEN)
@@ -436,8 +754,9 @@ class MediaLooperGUI:
             self.single_status.color = colors.GREEN
             self.show_snackbar("Processing completed!", colors.GREEN)
             
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as e:
             self.log_message(self.single_log, "\n❌ FFmpeg error!", colors.RED)
+            self.log_message(self.single_log, str(e.stderr) if e.stderr else "Unknown error", colors.RED)
             self.single_status.value = "Error"
             self.single_status.color = colors.RED
             self.show_snackbar("Processing failed!", colors.RED)
@@ -446,6 +765,13 @@ class MediaLooperGUI:
             self.single_status.value = "Error"
             self.single_status.color = colors.RED
         finally:
+            # Cleanup temp files
+            for temp_file in temp_files:
+                if os.path.exists(temp_file):
+                    try:
+                        os.remove(temp_file)
+                    except:
+                        pass
             self.processing = False
             self.page.update()
     

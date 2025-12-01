@@ -1,8 +1,10 @@
 @echo off
 echo ================================================
-echo   MEDIA TOOLS ZAKKUTSU - ALL-IN-ONE
+echo   MEDIA TOOLS ZAKKUTSU - EXE BUILDER
+echo   All-in-One Standalone Edition
 echo ================================================
 echo.
+
 echo Checking Python...
 python --version >nul 2>&1
 if errorlevel 1 (
@@ -13,14 +15,11 @@ if errorlevel 1 (
 )
 
 echo.
-echo Starting Media Tools Standalone...
+echo Building executable...
 echo.
-python media_tools_standalone.py
 
-if errorlevel 1 (
-    echo.
-    echo ERROR: Failed to start!
-    pause
-)
+python build_exe.py
 
+echo.
+pause
 exit /b 0

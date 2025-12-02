@@ -85,6 +85,52 @@ Starting Media Tools Launcher...
 
 Dependencies yang dibutuhkan (seperti `yt-dlp`) akan **auto-install** saat pertama kali tools dibuka!
 
+#### 📥 Clone Repository (For Developers)
+
+**Pertama kali setup:**
+```bash
+# 1. Clone repository dari GitHub
+git clone https://github.com/zakkutsu/media-tools-py.git
+
+# 2. Masuk ke folder project
+cd media-tools-py
+
+# 3. Double-click launcher untuk auto-setup
+launch_media_tools.bat
+
+# Launcher akan otomatis:
+# - Membuat virtual environment
+# - Install dependencies
+# - Download FFmpeg portable (jika belum ada)
+# - Menjalankan aplikasi
+```
+
+**Update ke versi terbaru:**
+```bash
+# 1. Masuk ke folder project
+cd media-tools-py
+
+# 2. Pull perubahan terbaru
+git pull origin main
+# atau cukup:
+git pull
+
+# 3. Jalankan launcher (akan auto-update dependencies jika ada perubahan)
+launch_media_tools.bat
+```
+
+**Jika ada konflik atau error saat pull:**
+```bash
+# Option 1: Simpan perubahan lokal dulu
+git stash          # Simpan perubahan
+git pull           # Pull update
+git stash pop      # Restore perubahan lokal
+
+# Option 2: Reset ke versi GitHub (buang perubahan lokal)
+git reset --hard   # Buang semua perubahan lokal
+git pull           # Pull update
+```
+
 #### 🔧 Manual Setup (Alternative)
 
 Jika ingin setup manual:
@@ -298,6 +344,52 @@ Starting Media Tools Launcher...
 ```
 
 Required dependencies (like `yt-dlp`) will **auto-install** when you first open each tool!
+
+#### 📥 Clone Repository (For Developers)
+
+**First time setup:**
+```bash
+# 1. Clone repository from GitHub
+git clone https://github.com/zakkutsu/media-tools-py.git
+
+# 2. Navigate to project folder
+cd media-tools-py
+
+# 3. Double-click launcher for auto-setup
+launch_media_tools.bat
+
+# The launcher will automatically:
+# - Create virtual environment
+# - Install dependencies
+# - Download FFmpeg portable (if not found)
+# - Launch the application
+```
+
+**Update to latest version:**
+```bash
+# 1. Navigate to project folder
+cd media-tools-py
+
+# 2. Pull latest changes
+git pull origin main
+# or simply:
+git pull
+
+# 3. Run launcher (will auto-update dependencies if changed)
+launch_media_tools.bat
+```
+
+**If conflicts or errors occur during pull:**
+```bash
+# Option 1: Stash local changes first
+git stash          # Save local changes
+git pull           # Pull updates
+git stash pop      # Restore local changes
+
+# Option 2: Reset to GitHub version (discard local changes)
+git reset --hard   # Discard all local changes
+git pull           # Pull updates
+```
 
 #### 🔧 Manual Setup (Alternative)
 

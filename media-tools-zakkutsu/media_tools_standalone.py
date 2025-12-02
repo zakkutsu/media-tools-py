@@ -51,11 +51,20 @@ import json
 # ============================================================================
 
 def get_ffmpeg_path():
-    """Get FFmpeg executable path (system or portable)"""
+    """Get FFmpeg executable path (bundled, portable, or system)"""
+    # For PyInstaller bundled executable
+    if getattr(sys, 'frozen', False):
+        # Running as compiled executable
+        app_dir = sys._MEIPASS  # PyInstaller temp folder
+        bundled_ffmpeg = os.path.join(app_dir, 'ffmpeg-portable', 'bin', 'ffmpeg.exe')
+        if os.path.exists(bundled_ffmpeg):
+            return bundled_ffmpeg
+    
+    # For running as script
     app_dir = os.path.dirname(os.path.abspath(__file__))
     portable_ffmpeg = os.path.join(app_dir, 'ffmpeg-portable', 'bin', 'ffmpeg.exe')
     
-    # Check portable version first
+    # Check portable version
     if os.path.exists(portable_ffmpeg):
         return portable_ffmpeg
     

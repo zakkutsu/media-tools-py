@@ -42,7 +42,7 @@ print()
 # Get current directory
 current_dir = Path(__file__).parent
 
-# Build command for standalone file
+# Build command for standalone file with bundled FFmpeg
 build_cmd = [
     sys.executable,
     '-m',
@@ -51,6 +51,7 @@ build_cmd = [
     '--onefile',
     '--windowed',
     f'--add-data=language_config.py{os.pathsep}.',
+    f'--add-data=ffmpeg-portable{os.pathsep}ffmpeg-portable',
     '--hidden-import=flet',
     '--hidden-import=yt_dlp',
     '--hidden-import=pydub',
@@ -78,10 +79,10 @@ try:
     print("[OUTPUT] Location: dist/MediaToolsZakkutsu.exe")
     print()
     print("[NOTES]")
-    print("  - FFmpeg is NOT included in the EXE")
-    print("  - yt-dlp IS included in the EXE")
-    print("  - Users must install FFmpeg separately:")
-    print("    winget install FFmpeg")
+    print("  - FFmpeg IS included in the EXE (bundled)")
+    print("  - yt-dlp IS included in the EXE (bundled)")
+    print("  - True standalone - no additional downloads needed")
+    print("  - Users only need to download the EXE")
     print()
     print("[READY] Ready to distribute!")
     

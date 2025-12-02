@@ -68,19 +68,31 @@ if not exist "venv\Scripts\python.exe" (
     echo       Done!
     echo.
     
-    REM Check FFmpeg
+    REM Check and download FFmpeg
     echo [3/3] Checking FFmpeg...
-    ffmpeg -version >nul 2>&1
-    if errorlevel 1 (
-        echo       WARNING: FFmpeg not found!
-        echo       Some features may not work without FFmpeg.
-        echo.
-        echo       To install FFmpeg:
-        echo       - Windows: choco install ffmpeg
-        echo       - Or download from: https://ffmpeg.org/download.html
-        echo.
+    
+    REM Check if ffmpeg-portable exists
+    if exist "ffmpeg-portable\bin\ffmpeg.exe" (
+        echo       FFmpeg portable is available!
     ) else (
-        echo       FFmpeg is available!
+        REM Check system FFmpeg
+        ffmpeg -version >nul 2>&1
+        if errorlevel 1 (
+            echo       FFmpeg not found. Downloading portable version...
+            echo.
+            
+            REM Download FFmpeg portable
+            powershell -Command "& {Write-Host '      Downloading FFmpeg...' -ForegroundColor Cyan; $url = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip'; $output = 'ffmpeg-portable.zip'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri $url -OutFile $output -UserAgent 'Mozilla/5.0'; Write-Host '      Extracting FFmpeg...' -ForegroundColor Cyan; Expand-Archive -Path $output -DestinationPath 'ffmpeg-temp' -Force; $ffmpegDir = Get-ChildItem -Path 'ffmpeg-temp' -Directory | Select-Object -First 1; Move-Item -Path $ffmpegDir.FullName -Destination 'ffmpeg-portable' -Force; Remove-Item -Recurse -Force 'ffmpeg-temp', $output; Write-Host '      FFmpeg ready!' -ForegroundColor Green}"
+            
+            if exist "ffmpeg-portable\bin\ffmpeg.exe" (
+                echo       Done!
+            ) else (
+                echo       WARNING: Failed to download FFmpeg!
+                echo       Some features may not work without FFmpeg.
+            )
+        ) else (
+            echo       System FFmpeg is available!
+        )
     )
     echo.
     

@@ -14,6 +14,51 @@ else:
     # Running as script
     current_dir = Path(__file__).parent
 
+# ============================================
+# FFmpeg Portable Configuration
+# ============================================
+def setup_ffmpeg_portable():
+    """Setup FFmpeg portable path for pydub and other tools"""
+    ffmpeg_portable_path = current_dir / "ffmpeg-portable" / "bin"
+    
+    # Check if FFmpeg portable exists
+    if ffmpeg_portable_path.exists():
+        ffmpeg_exe = ffmpeg_portable_path / "ffmpeg.exe"
+        ffprobe_exe = ffmpeg_portable_path / "ffprobe.exe"
+        
+        if ffmpeg_exe.exists():
+            # Add to PATH environment variable (first priority)
+            os.environ["PATH"] = str(ffmpeg_portable_path) + os.pathsep + os.environ.get("PATH", "")
+            
+            # Configure pydub specifically
+            try:
+                from pydub import AudioSegment
+                AudioSegment.converter = str(ffmpeg_exe)
+                if ffprobe_exe.exists():
+                    AudioSegment.ffprobe = str(ffprobe_exe)
+                print(f"✅ FFmpeg portable configured: {ffmpeg_portable_path}")
+                return True
+            except ImportError:
+                # pydub not yet installed, will be configured after installation
+                print("⚠️  pydub not yet installed, FFmpeg will be configured after dependency installation")
+                return False
+    else:
+        print("⚠️  FFmpeg portable not found. Checking system FFmpeg...")
+        # Check if system FFmpeg is available
+        try:
+            result = subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                print("✅ System FFmpeg detected")
+                return True
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            print("❌ FFmpeg not found! Please run launch_media_tools.bat for auto-setup")
+            return False
+    
+    return False
+
+# Setup FFmpeg portable on startup
+setup_ffmpeg_portable()
+
 # Add paths for imports
 audio_merger_path = str(current_dir / "audio-merger")
 media_detector_path = str(current_dir / "media-codec-detector")
@@ -78,6 +123,8 @@ if missing_deps:
     print("🔄 Attempting auto-installation...")
     if install_missing_dependencies(missing_deps):
         print("✅ Dependencies installed successfully!")
+        # Re-configure FFmpeg after pydub installation
+        setup_ffmpeg_portable()
     else:
         print("❌ Failed to install dependencies. Please run setup_media_tools.py")
 

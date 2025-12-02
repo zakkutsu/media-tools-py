@@ -46,7 +46,8 @@ launch_media_tools.bat
 Launcher akan **otomatis** melakukan:
 - ✅ Membuat virtual environment
 - ✅ Install semua dependencies
-- ✅ Setup FFmpeg
+- ✅ **Download FFmpeg portable (jika belum ada)** 🆕
+- ✅ **Auto-configure FFmpeg untuk semua tools** 🆕
 - ✅ Langsung menjalankan aplikasi
 
 **Tampilan terminal saat first-time setup:**
@@ -69,13 +70,17 @@ Please wait, this may take a few minutes...
       Done!
 
 [3/3] Checking FFmpeg...
-      FFmpeg is available!
+      FFmpeg not found. Downloading portable version...
+      Downloading FFmpeg...
+      Extracting FFmpeg...
+      FFmpeg ready!
 
 ========================================
 Setup Complete!
 ========================================
 
 Starting Media Tools Launcher...
+✅ FFmpeg portable configured: C:\...\ffmpeg-portable\bin
 ```
 
 Dependencies yang dibutuhkan (seperti `yt-dlp`) akan **auto-install** saat pertama kali tools dibuka!
@@ -177,16 +182,39 @@ python playlist_downloader_gui_flet.py
 
 ### 🔧 Troubleshooting
 
-**Issue: "FFmpeg not found"**
+**Issue: "Couldn't find ffmpeg or avconv" (RuntimeWarning)**
+
+Ini adalah **warning normal** dan tidak akan muncul lagi setelah FFmpeg terkonfigurasi. Solusi:
+
 ```bash
+# Option 1: Gunakan launch_media_tools.bat (RECOMMENDED)
+# - Otomatis download FFmpeg portable (~100-150 MB)
+# - FFmpeg tersimpan di folder ffmpeg-portable/
+# - Tidak perlu install ke system
+
+# Option 2: Install FFmpeg ke system
 # Windows
 choco install ffmpeg
+# atau
+winget install ffmpeg
 
 # macOS
 brew install ffmpeg
 
 # Ubuntu/Debian
 sudo apt install ffmpeg
+```
+
+**Catatan:** FFmpeg portable akan **auto-configured** untuk semua tools saat launcher pertama kali dijalankan!
+
+---
+
+**Issue: "FFmpeg not found"**
+```bash
+# Jalankan launcher batch untuk auto-setup
+launch_media_tools.bat
+
+# Atau install manual (lihat di atas)
 ```
 
 **Issue: "No module named 'flet'"**
@@ -368,16 +396,39 @@ python playlist_downloader_gui_flet.py
 
 ### 🔧 Troubleshooting
 
-**Issue: "FFmpeg not found"**
+**Issue: "Couldn't find ffmpeg or avconv" (RuntimeWarning)**
+
+This is a **normal warning** and will not appear after FFmpeg is configured. Solutions:
+
 ```bash
+# Option 1: Use launch_media_tools.bat (RECOMMENDED)
+# - Automatically downloads FFmpeg portable (~100-150 MB)
+# - FFmpeg stored in ffmpeg-portable/ folder
+# - No system installation needed
+
+# Option 2: Install FFmpeg to system
 # Windows
 choco install ffmpeg
+# or
+winget install ffmpeg
 
 # macOS
 brew install ffmpeg
 
 # Ubuntu/Debian
 sudo apt install ffmpeg
+```
+
+**Note:** FFmpeg portable will be **auto-configured** for all tools when launcher runs for the first time!
+
+---
+
+**Issue: "FFmpeg not found"**
+```bash
+# Run batch launcher for auto-setup
+launch_media_tools.bat
+
+# Or install manually (see above)
 ```
 
 **Issue: "No module named 'flet'"**

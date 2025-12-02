@@ -9,15 +9,49 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from language_config import get_language, get_all_texts
 
-# Konfigurasi FFmpeg path sebelum import pydub
-FFMPEG_PATH = r"C:\Users\nonion\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0-essentials_build\bin\ffmpeg.exe"
-FFPROBE_PATH = r"C:\Users\nonion\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0-essentials_build\bin\ffprobe.exe"
+# ============================================
+# FFmpeg Portable Auto-Configuration
+# ============================================
+def setup_ffmpeg_path():
+    """Auto-detect and configure FFmpeg from portable or system"""
+    # Get project root directory
+    project_root = Path(__file__).parent.parent
+    ffmpeg_portable_path = project_root / "ffmpeg-portable" / "bin"
+    
+    # Check FFmpeg portable first
+    if ffmpeg_portable_path.exists():
+        ffmpeg_exe = ffmpeg_portable_path / "ffmpeg.exe"
+        ffprobe_exe = ffmpeg_portable_path / "ffprobe.exe"
+        
+        if ffmpeg_exe.exists():
+            # Add to PATH
+            os.environ["PATH"] = str(ffmpeg_portable_path) + os.pathsep + os.environ.get("PATH", "")
+            return str(ffmpeg_exe), str(ffprobe_exe) if ffprobe_exe.exists() else None
+    
+    # Check system FFmpeg
+    try:
+        import subprocess
+        result = subprocess.run(['where', 'ffmpeg'], capture_output=True, text=True, timeout=5)
+        if result.returncode == 0:
+            system_ffmpeg = result.stdout.strip().split('\n')[0]
+            system_ffprobe_dir = Path(system_ffmpeg).parent
+            system_ffprobe = system_ffprobe_dir / "ffprobe.exe"
+            return system_ffmpeg, str(system_ffprobe) if system_ffprobe.exists() else None
+    except:
+        pass
+    
+    return None, None
 
-# Set environment untuk pydub agar menemukan ffmpeg
-if os.path.exists(FFMPEG_PATH):
-    os.environ["PATH"] = os.path.dirname(FFMPEG_PATH) + os.pathsep + os.environ.get("PATH", "")
+# Setup FFmpeg before importing pydub
+FFMPEG_PATH, FFPROBE_PATH = setup_ffmpeg_path()
 
 from pydub import AudioSegment
+
+# Configure pydub with detected FFmpeg
+if FFMPEG_PATH:
+    AudioSegment.converter = FFMPEG_PATH
+    if FFPROBE_PATH:
+        AudioSegment.ffprobe = FFPROBE_PATH
 
 class AudioMergerGUI:
     def __init__(self, page: ft.Page):

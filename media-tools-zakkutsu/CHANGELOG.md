@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.1.0] - 2025-12-02
+## [1.0.1] - 2025-12-02
 
 ### 🎉 Added
 - **FFmpeg Bundled in EXE** - No separate FFmpeg installation needed
@@ -107,14 +107,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Release Date | Key Feature | EXE Size |
 |---------|-------------|-------------|----------|
-| 1.1.0   | 2025-12-02  | FFmpeg Bundled | 273 MB |
+| 1.0.1   | 2025-12-02  | FFmpeg Bundled | 273 MB |
 | 1.0.0   | 2025-12-01  | Initial Release | 75 MB |
 
 ---
 
 ## Migration Guide
 
-### v1.0 → v1.1.0
+### v1.0.0 → v1.0.1
 
 **No breaking changes!** Simply download the new EXE and replace the old one.
 
@@ -125,8 +125,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ Enhanced UI feedback
 
 **Steps:**
-1. Download `MediaToolsZakkutsu.exe` v1.1.0
-2. Delete old v1.0 EXE (optional)
+1. Download `MediaToolsZakkutsu.exe` v1.0.1
+2. Delete old v1.0.0 EXE (optional)
 3. Run new version - done!
 
 ---

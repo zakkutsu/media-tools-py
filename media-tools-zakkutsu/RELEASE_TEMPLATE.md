@@ -1,6 +1,6 @@
-# Media Tools Zakkutsu v1.1.0 - TRUE Standalone Edition 🎬
+# Media Tools Zakkutsu v1.0.1 - TRUE Standalone Edition 🎬
 
-## 📦 What's New in v1.1.0
+## 📦 What's New in v1.0.1
 
 ### 🎉 Major Updates
 - **✅ FFmpeg Bundled** - FFmpeg now included in the EXE! No separate downloads needed
@@ -131,7 +131,7 @@ python media_tools_standalone.py
 
 ## 🔄 Upgrade Notes
 
-### From v1.0 to v1.1.0
+### From v1.0.0 to v1.0.1
 - **No breaking changes** - All features from v1.0 are preserved
 - **New:** FFmpeg now bundled (no separate installation needed)
 - **Improved:** Progress tracking accuracy
@@ -183,6 +183,6 @@ If you find this tool useful, please:
 
 ---
 
-**Download Now:** [MediaToolsZakkutsu.exe](https://github.com/zakkutsu/media-tools-py/releases/download/v1.1.0/MediaToolsZakkutsu.exe)
+**Download Now:** [MediaToolsZakkutsu.exe](https://github.com/zakkutsu/media-tools-py/releases/download/v1.0.1/MediaToolsZakkutsu.exe)
 
 **Full Changelog:** [CHANGELOG.md](CHANGELOG.md)

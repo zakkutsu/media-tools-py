@@ -124,7 +124,11 @@ class PlaylistDownloader:
     
     def download_video_playlist(self, playlist_url: str, quality: str = "best", 
                               output_template: str = "%(playlist_index)s - %(title)s.%(ext)s",
-                              auto_numbering: bool = True, progress_callback=None) -> bool:
+                              auto_numbering: bool = True, 
+                              embed_thumbnail: bool = True,
+                              embed_metadata: bool = True,
+                              continue_on_error: bool = True,
+                              progress_callback=None) -> bool:
         """
         Download video playlist dengan kualitas terbaik
         
@@ -133,6 +137,9 @@ class PlaylistDownloader:
             quality: Kualitas video ("best", "720p", "480p", dll)
             output_template: Template nama file output
             auto_numbering: Enable/disable auto numbering (playlist_index)
+            embed_thumbnail: Embed YouTube thumbnail (disable for faster download)
+            embed_metadata: Add metadata like title, artist, date (disable for faster download)
+            continue_on_error: Continue downloading if one video fails (skip failed items)
             progress_callback: Function callback untuk update progress (current, total, percentage, title)
         """
         if not self.yt_dlp_available:
@@ -172,11 +179,20 @@ class PlaylistDownloader:
             cmd = self.yt_dlp_cmd + [
                 '-f', format_selector,
                 '-o', output_template,
-                '--embed-thumbnail',  # Embed thumbnail as cover art
-                '--add-metadata',     # Add metadata (title, artist, etc.)
                 '--no-playlist' if 'list=' not in playlist_url else '',
-                playlist_url
             ]
+            
+            # Continue on error - skip failed videos and continue with next
+            if continue_on_error:
+                cmd.append('--ignore-errors')  # Continue downloading even if errors occur
+            
+            # Add optional features (can be disabled for faster/lighter downloads)
+            if embed_thumbnail:
+                cmd.append('--embed-thumbnail')  # Embed thumbnail as cover art
+            if embed_metadata:
+                cmd.append('--add-metadata')     # Add metadata (title, artist, etc.)
+            
+            cmd.append(playlist_url)
             
             # Remove empty string from cmd
             cmd = [arg for arg in cmd if arg]
@@ -185,6 +201,7 @@ class PlaylistDownloader:
             print(f"URL: {playlist_url}")
             print(f"Kualitas: {quality}")
             print(f"Folder: {self.download_folder}")
+            print(f"Continue on Error: {'Enabled (skip failed videos)' if continue_on_error else 'Disabled (stop on error)'}")
             print("="*50)
             
             # Run the download command and show output in real-time
@@ -254,12 +271,20 @@ class PlaylistDownloader:
             
             process.wait()
             
-            if process.returncode == 0:
-                print("\n✅ Download selesai!")
-                return True
+            # Check if continue_on_error is enabled and verify completion
+            if continue_on_error:
+                print("\n🔍 Verifying download completion...")
+                return self._verify_and_retry_playlist(
+                    playlist_url, quality, output_template, auto_numbering,
+                    embed_thumbnail, embed_metadata, progress_callback, is_video=True
+                )
             else:
-                print(f"\n❌ Download gagal dengan kode error: {process.returncode}")
-                return False
+                if process.returncode == 0:
+                    print("\n✅ Download selesai!")
+                    return True
+                else:
+                    print(f"\n❌ Download gagal dengan kode error: {process.returncode}")
+                    return False
                 
         except Exception as e:
             print(f"Error saat download: {e}")
@@ -274,7 +299,11 @@ class PlaylistDownloader:
     def download_audio_playlist(self, playlist_url: str, audio_format: str = "mp3",
                               audio_quality: str = "0",
                               output_template: str = "%(playlist_index)s - %(title)s.%(ext)s",
-                              auto_numbering: bool = True, progress_callback=None) -> bool:
+                              auto_numbering: bool = True,
+                              embed_thumbnail: bool = True,
+                              embed_metadata: bool = True,
+                              continue_on_error: bool = True,
+                              progress_callback=None) -> bool:
         """
         Download audio-only playlist
         
@@ -284,6 +313,9 @@ class PlaylistDownloader:
             audio_quality: Kualitas audio (0=terbaik, 9=terburuk)
             output_template: Template nama file output
             auto_numbering: Enable/disable auto numbering (playlist_index)
+            embed_thumbnail: Embed YouTube thumbnail as album art (disable for faster download)
+            embed_metadata: Add metadata like title, artist, date (disable for faster download)
+            continue_on_error: Continue downloading if one audio fails (skip failed items)
             progress_callback: Function callback untuk update progress (current, total, percentage, title)
         """
         if not self.yt_dlp_available:
@@ -315,16 +347,26 @@ class PlaylistDownloader:
                 '--audio-format', audio_format,
                 '--audio-quality', audio_quality,
                 '-o', output_template,
-                '--embed-thumbnail',  # Embed thumbnail as album art (MP3 cover)
-                '--add-metadata',     # Add metadata (title, artist, album, etc.)
-                playlist_url
             ]
+            
+            # Continue on error - skip failed audios and continue with next
+            if continue_on_error:
+                cmd.append('--ignore-errors')  # Continue downloading even if errors occur
+            
+            # Add optional features (can be disabled for faster/lighter downloads)
+            if embed_thumbnail:
+                cmd.append('--embed-thumbnail')  # Embed thumbnail as album art (MP3 cover)
+            if embed_metadata:
+                cmd.append('--add-metadata')     # Add metadata (title, artist, album, etc.)
+            
+            cmd.append(playlist_url)
             
             print(f"Mulai download audio playlist...")
             print(f"URL: {playlist_url}")
             print(f"Format: {audio_format}")
             print(f"Kualitas: {audio_quality} (0=terbaik)")
             print(f"Folder: {self.download_folder}")
+            print(f"Continue on Error: {'Enabled (skip failed audios)' if continue_on_error else 'Disabled (stop on error)'}")
             print("="*50)
             
             # Run the download command and show output in real-time
@@ -394,12 +436,21 @@ class PlaylistDownloader:
             
             process.wait()
             
-            if process.returncode == 0:
-                print("\n✅ Download selesai!")
-                return True
+            # Check if continue_on_error is enabled and verify completion
+            if continue_on_error:
+                print("\n🔍 Verifying download completion...")
+                return self._verify_and_retry_playlist(
+                    playlist_url, audio_format, output_template, auto_numbering,
+                    embed_thumbnail, embed_metadata, progress_callback, is_video=False,
+                    audio_quality=audio_quality
+                )
             else:
-                print(f"\n❌ Download gagal dengan kode error: {process.returncode}")
-                return False
+                if process.returncode == 0:
+                    print("\n✅ Download selesai!")
+                    return True
+                else:
+                    print(f"\n❌ Download gagal dengan kode error: {process.returncode}")
+                    return False
                 
         except Exception as e:
             print(f"Error saat download: {e}")
@@ -410,6 +461,123 @@ class PlaylistDownloader:
                 os.chdir(original_cwd)
             except:
                 pass
+
+
+    def _verify_and_retry_playlist(self, playlist_url: str, quality_or_format: str,
+                                   output_template: str, auto_numbering: bool,
+                                   embed_thumbnail: bool, embed_metadata: bool,
+                                   progress_callback, is_video: bool = True,
+                                   audio_quality: str = "0", max_retries: int = 3) -> bool:
+        """
+        Verify playlist download completion and retry failed items
+        
+        Args:
+            playlist_url: URL playlist YouTube
+            quality_or_format: Video quality or audio format
+            output_template: Template nama file output
+            auto_numbering: Enable/disable auto numbering
+            embed_thumbnail: Embed thumbnail option
+            embed_metadata: Embed metadata option
+            progress_callback: Progress callback function
+            is_video: True for video, False for audio
+            audio_quality: Audio quality (for audio downloads)
+            max_retries: Maximum retry attempts
+        """
+        import os
+        import glob
+        
+        print("📋 Getting playlist info...")
+        playlist_info = self.get_playlist_info(playlist_url)
+        
+        if not playlist_info or playlist_info['total_videos'] == 0:
+            print("⚠️  Could not verify playlist info")
+            return True  # Assume success if can't verify
+        
+        expected_count = playlist_info['total_videos']
+        print(f"📊 Expected items: {expected_count}")
+        
+        # Count downloaded files
+        downloaded_files = []
+        if is_video:
+            # Video extensions
+            for ext in ['*.mp4', '*.mkv', '*.webm', '*.avi', '*.mov']:
+                downloaded_files.extend(glob.glob(os.path.join(str(self.download_folder), ext)))
+        else:
+            # Audio extensions
+            for ext in ['*.mp3', '*.m4a', '*.opus', '*.wav']:
+                downloaded_files.extend(glob.glob(os.path.join(str(self.download_folder), ext)))
+        
+        downloaded_count = len(downloaded_files)
+        print(f"✅ Downloaded items: {downloaded_count}")
+        
+        # Check if complete
+        if downloaded_count >= expected_count:
+            print(f"\n🎉 Download complete! All {expected_count} items downloaded successfully!")
+            return True
+        
+        missing_count = expected_count - downloaded_count
+        print(f"\n⚠️  Missing {missing_count} items. Starting retry process...")
+        
+        # Retry logic
+        retry_count = 0
+        while retry_count < max_retries and downloaded_count < expected_count:
+            retry_count += 1
+            print(f"\n🔄 Retry attempt {retry_count}/{max_retries}...")
+            print("=" * 60)
+            
+            # Re-run download (yt-dlp will skip existing files)
+            if is_video:
+                self.download_video_playlist(
+                    playlist_url, quality_or_format, output_template,
+                    auto_numbering, embed_thumbnail, embed_metadata,
+                    continue_on_error=False,  # Don't recurse into verify again
+                    progress_callback=progress_callback
+                )
+            else:
+                self.download_audio_playlist(
+                    playlist_url, quality_or_format, audio_quality, output_template,
+                    auto_numbering, embed_thumbnail, embed_metadata,
+                    continue_on_error=False,  # Don't recurse into verify again
+                    progress_callback=progress_callback
+                )
+            
+            # Re-count files
+            downloaded_files = []
+            if is_video:
+                for ext in ['*.mp4', '*.mkv', '*.webm', '*.avi', '*.mov']:
+                    downloaded_files.extend(glob.glob(os.path.join(str(self.download_folder), ext)))
+            else:
+                for ext in ['*.mp3', '*.m4a', '*.opus', '*.wav']:
+                    downloaded_files.extend(glob.glob(os.path.join(str(self.download_folder), ext)))
+            
+            new_downloaded_count = len(downloaded_files)
+            
+            if new_downloaded_count > downloaded_count:
+                print(f"✅ Progress: {downloaded_count} → {new_downloaded_count} items")
+                downloaded_count = new_downloaded_count
+                
+                if downloaded_count >= expected_count:
+                    print(f"\n🎉 All {expected_count} items downloaded successfully after {retry_count} retries!")
+                    return True
+            else:
+                print(f"⚠️  No new files downloaded in this retry")
+            
+            if retry_count < max_retries and downloaded_count < expected_count:
+                import time
+                print("⏳ Waiting 3 seconds before next retry...")
+                time.sleep(3)
+        
+        # Final status
+        if downloaded_count >= expected_count:
+            print(f"\n🎉 Download complete! All {expected_count} items downloaded!")
+            return True
+        else:
+            missing = expected_count - downloaded_count
+            print(f"\n⚠️  Download incomplete after {max_retries} retries.")
+            print(f"Downloaded: {downloaded_count}/{expected_count} items")
+            print(f"Missing: {missing} items")
+            print("\n💡 Some videos might be unavailable, private, or geo-blocked.")
+            return False
 
 
 def main():

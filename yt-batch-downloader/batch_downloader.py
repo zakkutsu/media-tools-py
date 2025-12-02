@@ -148,7 +148,9 @@ class BatchDownloader:
     
     def download_single_video(self, url: str, quality: str = "best", 
                              output_template: str = "%(title)s.%(ext)s",
-                             auto_numbering: bool = False) -> bool:
+                             auto_numbering: bool = False,
+                             embed_thumbnail: bool = True,
+                             embed_metadata: bool = True) -> bool:
         """
         Download a single video
         
@@ -157,6 +159,8 @@ class BatchDownloader:
             quality: Video quality ("best", "720p", "480p", etc.)
             output_template: Output filename template
             auto_numbering: Add number prefix to filename
+            embed_thumbnail: Embed YouTube thumbnail (disable for faster download)
+            embed_metadata: Add metadata like title, artist, date (disable for faster download)
         """
         if not self.yt_dlp_available:
             print("yt-dlp tidak tersedia!")
@@ -194,11 +198,16 @@ class BatchDownloader:
                 '-f', format_selector,
                 '-o', output_template,
                 '--no-playlist',
-                '--embed-thumbnail',  # Embed thumbnail as cover art
-                '--add-metadata',     # Add metadata (title, artist, etc.)
                 '--extractor-args', 'youtube:player_client=default',  # Suppress JS runtime warning
-                url
             ]
+            
+            # Add optional features (can be disabled for faster/lighter downloads)
+            if embed_thumbnail:
+                cmd.append('--embed-thumbnail')  # Embed thumbnail as cover art
+            if embed_metadata:
+                cmd.append('--add-metadata')     # Add metadata (title, artist, etc.)
+            
+            cmd.append(url)
             
             print(f"📥 Downloading: {url}")
             
@@ -232,7 +241,9 @@ class BatchDownloader:
     def download_single_audio(self, url: str, audio_format: str = "mp3",
                              audio_quality: str = "0",
                              output_template: str = "%(title)s.%(ext)s",
-                             auto_numbering: bool = False) -> bool:
+                             auto_numbering: bool = False,
+                             embed_thumbnail: bool = True,
+                             embed_metadata: bool = True) -> bool:
         """
         Download audio only from a single video
         
@@ -242,6 +253,8 @@ class BatchDownloader:
             audio_quality: Audio quality (0=best, 9=worst)
             output_template: Output filename template
             auto_numbering: Add number prefix to filename
+            embed_thumbnail: Embed YouTube thumbnail as album art (disable for faster download)
+            embed_metadata: Add metadata like title, artist, date (disable for faster download)
         """
         if not self.yt_dlp_available:
             print("yt-dlp tidak tersedia!")
@@ -271,11 +284,16 @@ class BatchDownloader:
                 '--audio-quality', audio_quality,
                 '-o', output_template,
                 '--no-playlist',
-                '--embed-thumbnail',  # Embed thumbnail as album art (MP3 cover)
-                '--add-metadata',     # Add metadata (title, artist, album, etc.)
                 '--extractor-args', 'youtube:player_client=default',  # Suppress JS runtime warning
-                url
             ]
+            
+            # Add optional features (can be disabled for faster/lighter downloads)
+            if embed_thumbnail:
+                cmd.append('--embed-thumbnail')  # Embed thumbnail as album art (MP3 cover)
+            if embed_metadata:
+                cmd.append('--add-metadata')     # Add metadata (title, artist, album, etc.)
+            
+            cmd.append(url)
             
             print(f"🎵 Downloading audio: {url}")
             
@@ -310,6 +328,8 @@ class BatchDownloader:
                              output_template: str = "%(title)s.%(ext)s",
                              auto_numbering: bool = False,
                              continue_on_error: bool = True,
+                             embed_thumbnail: bool = True,
+                             embed_metadata: bool = True,
                              progress_callback=None) -> Dict[str, int]:
         """
         Download all videos in the URL list
@@ -319,6 +339,8 @@ class BatchDownloader:
             output_template: Output filename template
             auto_numbering: Add number prefix to filenames
             continue_on_error: Continue downloading other videos if one fails
+            embed_thumbnail: Embed YouTube thumbnail (disable for faster download)
+            embed_metadata: Add metadata like title, artist, date (disable for faster download)
             progress_callback: Function callback untuk update progress (current, total, percentage, title)
         
         Returns:
@@ -342,7 +364,8 @@ class BatchDownloader:
                 percentage = (i / len(self.url_list)) * 100
                 progress_callback(i, len(self.url_list), percentage, f"Processing: {url[:50]}...")
             
-            success = self.download_single_video(url, quality, output_template, auto_numbering)
+            success = self.download_single_video(url, quality, output_template, auto_numbering, 
+                                                embed_thumbnail, embed_metadata)
             
             if success:
                 print(f"✅ [{i}/{len(self.url_list)}] Download berhasil!")
@@ -375,9 +398,24 @@ class BatchDownloader:
                             output_template: str = "%(title)s.%(ext)s",
                             auto_numbering: bool = False,
                             continue_on_error: bool = True,
+                            embed_thumbnail: bool = True,
+                            embed_metadata: bool = True,
                             progress_callback=None) -> Dict[str, int]:
         """
         Download audio only from all videos in the URL list
+        
+        Args:
+            audio_format: Audio format ("mp3", "m4a", etc.)
+            audio_quality: Audio quality (0=best, 9=worst)
+            output_template: Output filename template
+            auto_numbering: Add number prefix to filenames
+            continue_on_error: Continue downloading other videos if one fails
+            embed_thumbnail: Embed YouTube thumbnail as album art (disable for faster download)
+            embed_metadata: Add metadata like title, artist, date (disable for faster download)
+            progress_callback: Function callback untuk update progress (current, total, percentage, title)
+        
+        Returns:
+            Dict with success and failure counts
         """
         if not self.url_list:
             print("Tidak ada URL dalam list!")
@@ -397,7 +435,8 @@ class BatchDownloader:
                 percentage = (i / len(self.url_list)) * 100
                 progress_callback(i, len(self.url_list), percentage, f"Processing: {url[:50]}...")
             
-            success = self.download_single_audio(url, audio_format, audio_quality, output_template, auto_numbering)
+            success = self.download_single_audio(url, audio_format, audio_quality, output_template, 
+                                                auto_numbering, embed_thumbnail, embed_metadata)
             
             if success:
                 print(f"✅ [{i}/{len(self.url_list)}] Download berhasil!")

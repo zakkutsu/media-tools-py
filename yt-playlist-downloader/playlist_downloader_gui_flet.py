@@ -45,6 +45,9 @@ class PlaylistDownloaderGUI:
         self.output_template = "%(playlist_index)s - %(title)s.%(ext)s"
         self.auto_numbering = True
         self.playlist_info = None
+        self.embed_thumbnail = True  # NEW: Optional thumbnail embedding
+        self.embed_metadata = True   # NEW: Optional metadata embedding
+        self.continue_on_error = True  # NEW: Continue download if error occurs
         
         # UI Components
         self.folder_field = None
@@ -234,6 +237,30 @@ class PlaylistDownloaderGUI:
             on_change=self.on_auto_numbering_change
         )
         
+        # Continue on Error Checkbox (NEW)
+        continue_on_error_checkbox = ft.Checkbox(
+            label="🔄 Continue on Error (skip failed items)",
+            value=self.continue_on_error,
+            on_change=self.on_continue_on_error_change,
+            tooltip="Continue downloading other videos/audios even if one fails"
+        )
+        
+        # Embed Thumbnail Checkbox (NEW)
+        embed_thumbnail_checkbox = ft.Checkbox(
+            label="🖼️ Embed Thumbnail (album art/cover) - Disable for faster download",
+            value=self.embed_thumbnail,
+            on_change=self.on_embed_thumbnail_change,
+            tooltip="Embeds YouTube thumbnail as album art. Disable if you have slow internet."
+        )
+        
+        # Embed Metadata Checkbox (NEW)
+        embed_metadata_checkbox = ft.Checkbox(
+            label="📋 Add Metadata (title, artist, date) - Disable for faster download",
+            value=self.embed_metadata,
+            on_change=self.on_embed_metadata_change,
+            tooltip="Adds metadata to downloaded files. Disable if you have slow internet."
+        )
+        
         # Help Text
         help_text = ft.Text(
             "Template variables: %(playlist_index)s (number), %(title)s (title), %(ext)s (extension)",
@@ -249,6 +276,13 @@ class PlaylistDownloaderGUI:
                 ft.Text("File Naming Template:", size=12, weight=ft.FontWeight.BOLD),
                 template_row,
                 auto_numbering_checkbox,
+                continue_on_error_checkbox,
+                ft.Divider(height=1, color=ft.Colors.GREY_300),
+                ft.Text("🎨 Quality & Metadata Options:", size=12, weight=ft.FontWeight.BOLD),
+                embed_thumbnail_checkbox,
+                embed_metadata_checkbox,
+                ft.Text("💡 Tip: Disable thumbnail & metadata for faster downloads on slow internet", 
+                       size=10, color=ft.Colors.BLUE_600, italic=True),
                 help_text
             ]),
             padding=ft.padding.all(10),
@@ -424,6 +458,18 @@ class PlaylistDownloaderGUI:
     def on_auto_numbering_change(self, e):
         """Handle auto numbering checkbox change"""
         self.auto_numbering = e.control.value
+    
+    def on_continue_on_error_change(self, e):
+        """Handle continue on error checkbox change"""
+        self.continue_on_error = e.control.value
+    
+    def on_embed_thumbnail_change(self, e):
+        """Handle embed thumbnail checkbox change"""
+        self.embed_thumbnail = e.control.value
+    
+    def on_embed_metadata_change(self, e):
+        """Handle embed metadata checkbox change"""
+        self.embed_metadata = e.control.value
         
         # Update template accordingly
         current_template = self.output_template
@@ -490,6 +536,9 @@ class PlaylistDownloaderGUI:
             self.log_output(f"Type: {self.download_type}")
             self.log_output(f"Folder: {folder}")
             self.log_output(f"Auto Numbering: {'Enabled' if self.auto_numbering else 'Disabled'}")
+            self.log_output(f"Continue on Error: {'Enabled (skip failed items)' if self.continue_on_error else 'Disabled (stop on error)'}")
+            self.log_output(f"Embed Thumbnail: {'Enabled' if self.embed_thumbnail else 'Disabled'}")
+            self.log_output(f"Embed Metadata: {'Enabled' if self.embed_metadata else 'Disabled'}")
             self.log_output("="*60)
             
             # Disable UI elements
@@ -503,24 +552,39 @@ class PlaylistDownloaderGUI:
             download_type = self.download_type
             template = self.output_template or "%(playlist_index)s - %(title)s.%(ext)s"
             auto_numbering = self.auto_numbering
+            continue_on_error = self.continue_on_error
+            embed_thumbnail = self.embed_thumbnail
+            embed_metadata = self.embed_metadata
             
             try:
                 if download_type == "video_best":
                     success = self.downloader.download_video_playlist(
                         url, quality="best", output_template=template, 
-                        auto_numbering=auto_numbering, progress_callback=self.update_progress)
+                        auto_numbering=auto_numbering, 
+                        embed_thumbnail=embed_thumbnail, embed_metadata=embed_metadata,
+                        continue_on_error=continue_on_error,
+                        progress_callback=self.update_progress)
                 elif download_type == "video_720p":
                     success = self.downloader.download_video_playlist(
                         url, quality="720p", output_template=template, 
-                        auto_numbering=auto_numbering, progress_callback=self.update_progress)
+                        auto_numbering=auto_numbering,
+                        embed_thumbnail=embed_thumbnail, embed_metadata=embed_metadata,
+                        continue_on_error=continue_on_error,
+                        progress_callback=self.update_progress)
                 elif download_type == "video_480p":
                     success = self.downloader.download_video_playlist(
                         url, quality="480p", output_template=template, 
-                        auto_numbering=auto_numbering, progress_callback=self.update_progress)
+                        auto_numbering=auto_numbering,
+                        embed_thumbnail=embed_thumbnail, embed_metadata=embed_metadata,
+                        continue_on_error=continue_on_error,
+                        progress_callback=self.update_progress)
                 elif download_type == "audio_mp3":
                     success = self.downloader.download_audio_playlist(
                         url, audio_format="mp3", output_template=template, 
-                        auto_numbering=auto_numbering, progress_callback=self.update_progress)
+                        auto_numbering=auto_numbering,
+                        embed_thumbnail=embed_thumbnail, embed_metadata=embed_metadata,
+                        continue_on_error=continue_on_error,
+                        progress_callback=self.update_progress)
             except Exception as ex:
                 self.log_output(f"❌ Error during download: {ex}")
                 success = False

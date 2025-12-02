@@ -44,6 +44,8 @@ class BatchDownloaderGUI:
         self.output_template = "%(title)s.%(ext)s"
         self.auto_numbering = False
         self.continue_on_error = True
+        self.embed_thumbnail = True  # NEW: Optional thumbnail embedding
+        self.embed_metadata = True   # NEW: Optional metadata embedding
         
         # Statistics tracking
         self.start_time = None
@@ -328,6 +330,22 @@ class BatchDownloaderGUI:
             on_change=self.on_continue_on_error_change
         )
         
+        # Embed Thumbnail Checkbox (NEW)
+        embed_thumbnail_checkbox = ft.Checkbox(
+            label="🖼️ Embed Thumbnail (album art/cover) - Disable for faster download",
+            value=self.embed_thumbnail,
+            on_change=self.on_embed_thumbnail_change,
+            tooltip="Embeds YouTube thumbnail as album art. Disable if you have slow internet."
+        )
+        
+        # Embed Metadata Checkbox (NEW)
+        embed_metadata_checkbox = ft.Checkbox(
+            label="📋 Add Metadata (title, artist, date) - Disable for faster download",
+            value=self.embed_metadata,
+            on_change=self.on_embed_metadata_change,
+            tooltip="Adds metadata to downloaded files. Disable if you have slow internet."
+        )
+        
         # Help Text
         help_text = ft.Text(
             "Template variables: %(title)s (title), %(ext)s (extension), %(uploader)s (channel)",
@@ -344,6 +362,12 @@ class BatchDownloaderGUI:
                 template_row,
                 auto_numbering_checkbox,
                 continue_on_error_checkbox,
+                ft.Divider(height=1, color=ft.Colors.GREY_300),
+                ft.Text("🎨 Quality & Metadata Options:", size=12, weight=ft.FontWeight.BOLD),
+                embed_thumbnail_checkbox,
+                embed_metadata_checkbox,
+                ft.Text("💡 Tip: Disable thumbnail & metadata for faster downloads on slow internet", 
+                       size=10, color=ft.Colors.BLUE_600, italic=True),
                 help_text
             ]),
             padding=ft.padding.all(10),
@@ -626,6 +650,15 @@ class BatchDownloaderGUI:
         """Handle continue on error checkbox change"""
         self.continue_on_error = e.control.value
     
+    def on_embed_thumbnail_change(self, e):
+        """Handle embed thumbnail checkbox change"""
+        self.embed_thumbnail = e.control.value
+    
+    def on_embed_metadata_change(self, e):
+        """Handle embed metadata checkbox change"""
+        self.embed_metadata = e.control.value
+        self.continue_on_error = e.control.value
+    
     def reset_template(self, e):
         """Reset output template to default"""
         if self.auto_numbering:
@@ -692,6 +725,8 @@ class BatchDownloaderGUI:
             self.log_output(f"Type: {self.download_type}")
             self.log_output(f"Folder: {folder}")
             self.log_output(f"Auto Numbering: {'Enabled' if self.auto_numbering else 'Disabled'}")
+            self.log_output(f"Embed Thumbnail: {'Enabled' if self.embed_thumbnail else 'Disabled'}")
+            self.log_output(f"Embed Metadata: {'Enabled' if self.embed_metadata else 'Disabled'}")
             self.log_output("="*70)
             
             # Start timer for statistics
@@ -710,27 +745,33 @@ class BatchDownloaderGUI:
             template = self.output_template or "%(title)s.%(ext)s"
             auto_numbering = self.auto_numbering
             continue_on_error = self.continue_on_error
+            embed_thumbnail = self.embed_thumbnail
+            embed_metadata = self.embed_metadata
             
             try:
                 if download_type == "video_best":
                     result = self.downloader.batch_download_videos(
                         quality="best", output_template=template, 
                         auto_numbering=auto_numbering, continue_on_error=continue_on_error,
+                        embed_thumbnail=embed_thumbnail, embed_metadata=embed_metadata,
                         progress_callback=self.update_progress)
                 elif download_type == "video_720p":
                     result = self.downloader.batch_download_videos(
                         quality="720p", output_template=template, 
                         auto_numbering=auto_numbering, continue_on_error=continue_on_error,
+                        embed_thumbnail=embed_thumbnail, embed_metadata=embed_metadata,
                         progress_callback=self.update_progress)
                 elif download_type == "video_480p":
                     result = self.downloader.batch_download_videos(
                         quality="480p", output_template=template, 
                         auto_numbering=auto_numbering, continue_on_error=continue_on_error,
+                        embed_thumbnail=embed_thumbnail, embed_metadata=embed_metadata,
                         progress_callback=self.update_progress)
                 elif download_type == "audio_mp3":
                     result = self.downloader.batch_download_audio(
                         audio_format="mp3", output_template=template, 
                         auto_numbering=auto_numbering, continue_on_error=continue_on_error,
+                        embed_thumbnail=embed_thumbnail, embed_metadata=embed_metadata,
                         progress_callback=self.update_progress)
                 
                 # Update UI with results

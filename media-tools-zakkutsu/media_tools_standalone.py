@@ -13,7 +13,7 @@ Tools Included:
 4. SocMed Downloader - Download from TikTok, IG, FB, Twitter/X
 
 Author: Zakkutsu
-Version: 1.0 All-in-One
+Version: 1.1.0
 Date: December 2025
 License: MIT
 

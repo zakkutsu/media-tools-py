@@ -29,7 +29,7 @@
 ### Windows Executable (Recommended)
 **File:** `MediaToolsZakkutsu.exe` (273.65 MB)
 
-**SHA256:** `[CALCULATE_BEFORE_RELEASE]`
+**SHA256:** `2CEEF5994D7AEE01388FDE1AB9DA5A8EC8AF04367CF2AF6D248398DEF3B277F0`
 
 **What's Included:**
 - ✅ All 4 media processing tools

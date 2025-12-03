@@ -3,15 +3,110 @@ import subprocess
 import os
 import threading
 import re
+import sys
+
+def check_spotdl_installed():
+    """Mengecek apakah spotdl sudah terinstall."""
+    try:
+        result = subprocess.run(
+            [sys.executable, '-m', 'pip', 'show', 'spotdl'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        return result.returncode == 0
+    except Exception:
+        return False
+
+def install_spotdl():
+    """Menginstall spotdl via pip."""
+    try:
+        subprocess.run(
+            [sys.executable, '-m', 'pip', 'install', 'spotdl>=4.0.0'],
+            check=True
+        )
+        return True
+    except Exception as e:
+        return False
 
 def main(page: ft.Page):
     page.title = "🎵 Spotify Downloader Pro (SpotDL)"
     page.window_width = 750
-    page.window_height = 700
+    page.window_height = 750
     page.vertical_alignment = ft.MainAxisAlignment.START
     page.padding = 20
     page.theme_mode = ft.ThemeMode.DARK
     page.bgcolor = "#1a1a2e"
+
+    # Cek apakah spotdl terinstall
+    spotdl_installed = check_spotdl_installed()
+
+    # --- ALERT SPOTDL NOT INSTALLED ---
+    def on_install_spotdl(e):
+        install_btn.disabled = True
+        install_btn.text = "⏳ Installing..."
+        install_status.value = "📦 Sedang menginstall spotdl..."
+        install_status.color = ft.Colors.BLUE_400
+        page.update()
+        
+        def install_thread():
+            success = install_spotdl()
+            if success:
+                install_status.value = "✅ spotdl berhasil diinstall! Silakan restart aplikasi."
+                install_status.color = ft.Colors.GREEN_400
+                install_btn.text = "✅ Installed"
+            else:
+                install_status.value = "❌ Gagal install. Coba manual: pip install spotdl"
+                install_status.color = ft.Colors.RED_400
+                install_btn.disabled = False
+                install_btn.text = "🔄 Coba Lagi"
+            page.update()
+        
+        threading.Thread(target=install_thread, daemon=True).start()
+    
+    install_btn = ft.ElevatedButton(
+        "📦 Install spotdl Sekarang",
+        icon=ft.Icons.DOWNLOAD,
+        bgcolor=ft.Colors.BLUE_700,
+        color=ft.Colors.WHITE,
+        on_click=on_install_spotdl,
+        width=250,
+        height=45
+    )
+    
+    install_status = ft.Text(
+        value="⚠️ Library 'spotdl' belum terinstall. Klik tombol di atas untuk install.",
+        color=ft.Colors.ORANGE_400,
+        size=13,
+        weight=ft.FontWeight.BOLD
+    )
+    
+    spotdl_alert = ft.Container(
+        content=ft.Column([
+            ft.Icon(ft.Icons.WARNING_AMBER_ROUNDED, color=ft.Colors.ORANGE_400, size=48),
+            ft.Text(
+                "spotdl Belum Terinstall",
+                size=20,
+                weight=ft.FontWeight.BOLD,
+                color=ft.Colors.WHITE
+            ),
+            install_status,
+            ft.Divider(height=10, color="transparent"),
+            install_btn,
+            ft.Divider(height=10, color="transparent"),
+            ft.Text(
+                "Atau install manual via terminal:\npip install spotdl",
+                size=11,
+                color=ft.Colors.GREY_400,
+                text_align=ft.TextAlign.CENTER
+            )
+        ], horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+        bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.ORANGE_400),
+        border=ft.border.all(2, ft.Colors.ORANGE_700),
+        border_radius=10,
+        padding=30,
+        visible=not spotdl_installed
+    )
 
     # --- KOMPONEN UI ---
     url_input = ft.TextField(
@@ -19,7 +114,8 @@ def main(page: ft.Page):
         width=600,
         border_color=ft.Colors.GREEN_400,
         focused_border_color=ft.Colors.GREEN_200,
-        text_size=14
+        text_size=14,
+        disabled=not spotdl_installed
     )
     
     bitrate_options = ["128k", "192k", "256k", "320k"]
@@ -28,7 +124,8 @@ def main(page: ft.Page):
         width=120,
         options=[ft.dropdown.Option(opt) for opt in bitrate_options],
         value="320k",
-        border_color=ft.Colors.BLUE_400
+        border_color=ft.Colors.BLUE_400,
+        disabled=not spotdl_installed
     )
 
     # Output folder
@@ -55,7 +152,8 @@ def main(page: ft.Page):
         icon=ft.Icons.FOLDER_OPEN,
         bgcolor=ft.Colors.ORANGE_700,
         color=ft.Colors.WHITE,
-        on_click=lambda _: folder_picker.get_directory_path()
+        on_click=lambda _: folder_picker.get_directory_path(),
+        disabled=not spotdl_installed
     )
 
     # Status & Progress
@@ -257,7 +355,8 @@ def main(page: ft.Page):
         height=45,
         style=ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=10),
-        )
+        ),
+        disabled=not spotdl_installed
     )
 
     # --- LAYOUT ---
@@ -267,6 +366,10 @@ def main(page: ft.Page):
                 ft.Text("🎵 Spotify Downloader Pro", size=28, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_400),
                 ft.Text("Download lagu dari Spotify via YouTube Music", size=12, color=ft.Colors.GREY_400),
                 ft.Divider(height=20, color=ft.Colors.GREY_700),
+                
+                # Alert jika spotdl belum terinstall
+                spotdl_alert,
+                ft.Divider(height=10, color="transparent", visible=not spotdl_installed),
                 
                 url_input,
                 ft.Row([

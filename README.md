@@ -18,6 +18,7 @@ Koleksi tools untuk pemrosesan dan analisis file media (audio, video, gambar) de
 4. **🎵 YouTube Playlist Downloader** - Download playlist YouTube lengkap
 5. **📥 SocMed Downloader** - Download video/audio dari YouTube, TikTok, Instagram, Facebook, Twitter/X (dengan batch download TXT/CSV/JSON)
 6. **🔁 Media Looper** - Loop video/audio tanpa re-encoding (stream copy untuk kecepatan maksimal)
+7. **🎵 Spotify Downloader** - Download lagu dari Spotify via YouTube Music match (by spotdl)
 
 ### 🚀 Quick Start (Recommended)
 
@@ -164,6 +165,10 @@ pip install -r requirements.txt
 # macOS: brew install ffmpeg
 # Linux: sudo apt install ffmpeg
 ```
+
+> **⚠️ PENTING - Clone di Device Baru:**  
+> Jika Anda clone repo ini via Git di device lain, **WAJIB jalankan langkah 1-3 di atas** untuk setup virtual environment dan install dependencies. Tanpa ini, tools tidak akan berfungsi karena library Python belum terinstall.  
+> **Quick Fix:** Jalankan `launch_media_tools.bat` (Windows) atau `python setup_media_tools.py` untuk auto-setup.
 
 #### 🎯 Launch Tools
 

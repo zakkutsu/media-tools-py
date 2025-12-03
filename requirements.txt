@@ -13,7 +13,7 @@
 # ==========================================
 
 # ===== Core GUI Framework =====
-flet>=0.25.0              # Modern GUI framework (used by all tools)
+flet>=0.28.0              # Modern GUI framework (used by all tools)
 
 # ===== Audio Processing =====
 pydub==0.25.1             # Audio manipulation library

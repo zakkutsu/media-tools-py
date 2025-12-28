@@ -194,7 +194,7 @@ class SocMedDownloaderGUI:
         output_section = self.create_output_section()
         main_content.controls.append(output_section)
         
-        # Footer
+        # Footer (inside scrollable content)
         footer = ft.Container(
             content=ft.Column([
                 ft.Divider(height=1, color=ft.Colors.GREY_700),
@@ -237,19 +237,13 @@ class SocMedDownloaderGUI:
             bgcolor=ft.Colors.GREY_900,  # Dark grey for light theme
             padding=ft.padding.only(top=10, bottom=10, left=20, right=20),
         )
+        main_content.controls.append(footer)
         
         # Add file picker to overlay
         self.page.overlay.append(self.file_picker)
         
-        # Create main layout with footer
-        main_layout = ft.Column(
-            controls=[main_content, footer],
-            spacing=0,
-            expand=True
-        )
-        
         # Add main content to page
-        self.page.add(main_layout)
+        self.page.add(main_content)
     
     def create_folder_section(self):
         """Create download folder section"""

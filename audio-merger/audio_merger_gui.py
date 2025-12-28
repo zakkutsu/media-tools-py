@@ -333,15 +333,10 @@ class AudioMergerGUI:
             output_folder_section,
             settings_section,
             action_section,
+            footer  # Footer inside scrollable content
         ], scroll=ft.ScrollMode.AUTO, expand=True, spacing=5)
         
-        # Create main layout with footer
-        main_layout = ft.Column([
-            main_content,
-            footer
-        ], spacing=0, expand=True)
-        
-        self.page.add(main_layout)
+        self.page.add(main_content)
         self.page.update()
     
     def pick_folder_dialog(self, e):

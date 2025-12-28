@@ -502,15 +502,16 @@ def main(page: ft.Page):
                             
                             ft.Divider(height=10, color="transparent"),
                             ft.Text("📋 Daftar Lagu:", size=14, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
-                            table_container
+                            table_container,
+                            ft.Divider(height=20, color="transparent"),
+                            footer
                         ],
                         scroll=ft.ScrollMode.AUTO,
                         expand=True
                     ),
                     padding=10,
                     expand=True
-                ),
-                footer
+                )
             ],
             spacing=0,
             expand=True

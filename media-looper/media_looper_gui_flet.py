@@ -79,8 +79,8 @@ class MediaLooperGUI:
             expand=1,
         )
         
-        # Footer
-        footer = ft.Container(
+        # Footer (will be added to each tab's content)
+        self.footer = ft.Container(
             content=ft.Column([
                 ft.Divider(height=1, color=colors.TEAL_700),
                 ft.Container(
@@ -128,7 +128,6 @@ class MediaLooperGUI:
             ft.Column([
                 header,
                 self.tabs,
-                footer,
             ], spacing=0, expand=True)
         )
     
@@ -248,6 +247,50 @@ class MediaLooperGUI:
         self.single_progress_text = ft.Text("", size=11, color=colors.BLUE_700, visible=False)
         self.single_log = ft.Column([], scroll=ft.ScrollMode.AUTO, expand=True, spacing=5)
         
+        # Create footer for this tab
+        footer = ft.Container(
+            content=ft.Column([
+                ft.Divider(height=1, color=colors.TEAL_700),
+                ft.Container(
+                    content=ft.Row([
+                        ft.IconButton(
+                            icon=icons.FACEBOOK,
+                            icon_color=colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Facebook"
+                        ),
+                        ft.IconButton(
+                            icon=icons.CAMERA_ALT,
+                            icon_color=colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Instagram"
+                        ),
+                        ft.IconButton(
+                            icon=icons.EMAIL,
+                            icon_color=colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Email"
+                        ),
+                        ft.IconButton(
+                            icon=icons.PHONE,
+                            icon_color=colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Phone"
+                        ),
+                    ], alignment=ft.MainAxisAlignment.CENTER),
+                    padding=ft.padding.only(top=10, bottom=5)
+                ),
+                ft.Text(
+                    "© 2025 Media Tools Suite. All rights reserved.",
+                    size=11,
+                    color=colors.GREY_400,
+                    text_align=ft.TextAlign.CENTER
+                ),
+            ], spacing=5, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+            bgcolor=colors.TEAL_800,
+            padding=ft.padding.only(top=10, bottom=10, left=20, right=20),
+        )
+        
         return ft.Container(
             content=ft.Column([
                 ft.Container(
@@ -291,6 +334,7 @@ class MediaLooperGUI:
                     border_radius=5,
                     expand=True,
                 ),
+                footer,  # Footer inside scrollable content
             ], spacing=10, scroll=ft.ScrollMode.AUTO),
             padding=20,
             expand=True,
@@ -445,6 +489,50 @@ class MediaLooperGUI:
         self.alt_progress_text = ft.Text("", size=11, color=colors.BLUE_700, visible=False)
         self.alt_log = ft.Column([], scroll=ft.ScrollMode.AUTO, expand=True, spacing=5)
         
+        # Create footer for this tab
+        footer = ft.Container(
+            content=ft.Column([
+                ft.Divider(height=1, color=colors.TEAL_700),
+                ft.Container(
+                    content=ft.Row([
+                        ft.IconButton(
+                            icon=icons.FACEBOOK,
+                            icon_color=colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Facebook"
+                        ),
+                        ft.IconButton(
+                            icon=icons.CAMERA_ALT,
+                            icon_color=colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Instagram"
+                        ),
+                        ft.IconButton(
+                            icon=icons.EMAIL,
+                            icon_color=colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Email"
+                        ),
+                        ft.IconButton(
+                            icon=icons.PHONE,
+                            icon_color=colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Phone"
+                        ),
+                    ], alignment=ft.MainAxisAlignment.CENTER),
+                    padding=ft.padding.only(top=10, bottom=5)
+                ),
+                ft.Text(
+                    "© 2025 Media Tools Suite. All rights reserved.",
+                    size=11,
+                    color=colors.GREY_400,
+                    text_align=ft.TextAlign.CENTER
+                ),
+            ], spacing=5, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+            bgcolor=colors.TEAL_800,
+            padding=ft.padding.only(top=10, bottom=10, left=20, right=20),
+        )
+        
         return ft.Container(
             content=ft.Column([
                 ft.Container(
@@ -493,6 +581,7 @@ class MediaLooperGUI:
                     border_radius=5,
                     expand=True,
                 ),
+                footer,  # Footer inside scrollable content
             ], spacing=10, scroll=ft.ScrollMode.AUTO),
             padding=20,
             expand=True,

@@ -244,15 +244,10 @@ class MediaCodecDetectorGUI:
             action_section,
             self.results_section,
             dummy_section,
+            footer  # Footer inside scrollable content
         ], scroll=ft.ScrollMode.AUTO, expand=True)
         
-        # Create main layout with footer
-        main_layout = ft.Column([
-            main_content,
-            footer
-        ], spacing=0, expand=True)
-        
-        self.page.add(main_layout)
+        self.page.add(main_content)
         self.page.update()
     
     def on_mode_change(self, e):

@@ -502,21 +502,16 @@ class MediaToolsLauncher:
             padding=ft.padding.only(top=10, bottom=10, left=20, right=20),
         )
         
-        # Main layout
+        # Main layout with footer inside scrollable content
         main_content = ft.Column([
             header,
             tools_section,
             info_section,
+            footer  # Footer inside scrollable content
         ], scroll=ft.ScrollMode.AUTO, expand=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
         
-        # Main layout with footer
-        main_layout = ft.Column([
-            main_content,
-            footer
-        ], spacing=0, expand=True)
-        
-        self.home_view = main_layout
-        self.page.add(main_layout)
+        self.home_view = main_content
+        self.page.add(main_content)
         self.page.update()
     
     def create_tool_card(self, title, description, features, color, on_click):

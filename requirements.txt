@@ -34,6 +34,8 @@ filetype==1.2.0           # Detect file types and formats
 # ===== Video/Social Media Downloaders =====
 yt-dlp>=2024.11.0         # YouTube and social media downloader
                           # (YouTube, TikTok, Instagram, Facebook, Twitter/X)
+instaloader>=4.10         # Instagram media downloader (for image posts)
+                          # (Handles Instagram images that yt-dlp cannot)
 
 # ==========================================
 # SYSTEM REQUIREMENTS

@@ -1,6 +1,7 @@
 import yt_dlp
 import os
 import sys
+import re
 
 # --- KONFIGURASI BROWSER UNTUK FB/IG ---
 # Jika gagal download FB/IG karena minta login,
@@ -9,6 +10,62 @@ import sys
 # Jika tidak butuh cookies, biarkan None.
 BROWSER_COOKIES = None 
 # Contoh jika pakai Chrome: BROWSER_COOKIES = 'chrome'
+
+
+def is_instagram_url(url):
+    """Check if URL is from Instagram"""
+    return 'instagram.com' in url.lower()
+
+
+def extract_instagram_shortcode(url):
+    """Extract Instagram post shortcode from URL"""
+    # Match patterns like /p/SHORTCODE/ or /reel/SHORTCODE/
+    match = re.search(r'/(p|reel)/([A-Za-z0-9_-]+)', url)
+    if match:
+        return match.group(2)
+    return None
+
+
+def download_instagram_images(url):
+    """Download Instagram images using instaloader (fallback for image posts)"""
+    try:
+        import instaloader
+        
+        # Extract shortcode
+        shortcode = extract_instagram_shortcode(url)
+        if not shortcode:
+            print("❌ Tidak bisa extract Instagram shortcode dari URL")
+            return False
+        
+        print(f"[Instagram Image Mode] Menggunakan instaloader untuk shortcode: {shortcode}")
+        
+        # Create instaloader instance
+        L = instaloader.Instaloader(
+            download_videos=False,
+            download_video_thumbnails=False,
+            download_geotags=False,
+            download_comments=False,
+            save_metadata=False,
+            compress_json=False,
+            post_metadata_txt_pattern='',
+            filename_pattern='{shortcode}'
+        )
+        
+        # Download post
+        post = instaloader.Post.from_shortcode(L.context, shortcode)
+        
+        # Download the post
+        L.download_post(post, target='')
+        
+        print(f"\n✅ Instagram images downloaded successfully!")
+        return True
+        
+    except ImportError:
+        print("❌ Instaloader tidak terinstall. Install dengan: pip install instaloader")
+        return False
+    except Exception as e:
+        print(f"❌ Error downloading Instagram images: {e}")
+        return False
 
 
 def progress_hook(d):
@@ -91,6 +148,16 @@ def batch_download():
             print(f"{'='*50}")
             
             try:
+                # Check if Instagram URL with image format - use instaloader
+                if format_type == 'image' and is_instagram_url(url):
+                    print(f"[{i}/{len(links)}] Instagram image detected - using Instaloader")
+                    if download_instagram_images(url):
+                        print(f"✅ [{i}/{len(links)}] Sukses!")
+                        success_count += 1
+                        continue
+                    else:
+                        print(f"[{i}/{len(links)}] Falling back to yt-dlp...")
+                
                 # Base options
                 ydl_opts = {
                     'outtmpl': '%(title)s.%(ext)s',
@@ -241,6 +308,16 @@ def run_downloader():
         elif pilihan == '3':
             # Setting Image/Gambar
             print("\n[Info] Mode: Image Download Selected")
+            
+            # Check if Instagram URL - use instaloader
+            if is_instagram_url(url):
+                print("[Info] Instagram detected - using Instaloader for images")
+                success = download_instagram_images(url)
+                if success:
+                    continue
+                else:
+                    print("[Info] Falling back to yt-dlp...")
+            
             ydl_opts.update({
                 'skip_download': False,
                 'writesubtitles': False,

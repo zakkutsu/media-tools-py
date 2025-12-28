@@ -4,6 +4,7 @@ import os
 import sys
 import threading
 import time
+import re
 from pathlib import Path
 
 # Ensure language_config can be imported from current directory
@@ -23,6 +24,62 @@ else:
     def get_text(lang, key, **kwargs):
         return key
     LANGUAGES = {}
+
+
+def is_instagram_url(url):
+    """Check if URL is from Instagram"""
+    return 'instagram.com' in url.lower()
+
+
+def extract_instagram_shortcode(url):
+    """Extract Instagram post shortcode from URL"""
+    match = re.search(r'/(p|reel)/([A-Za-z0-9_-]+)', url)
+    if match:
+        return match.group(2)
+    return None
+
+
+def download_instagram_images(url, log_callback=None):
+    """Download Instagram images using instaloader"""
+    try:
+        import instaloader
+        
+        shortcode = extract_instagram_shortcode(url)
+        if not shortcode:
+            if log_callback:
+                log_callback("❌ Cannot extract Instagram shortcode from URL")
+            return False
+        
+        if log_callback:
+            log_callback(f"📸 Using Instaloader for Instagram shortcode: {shortcode}")
+        
+        L = instaloader.Instaloader(
+            download_videos=False,
+            download_video_thumbnails=False,
+            download_geotags=False,
+            download_comments=False,
+            save_metadata=False,
+            compress_json=False,
+            post_metadata_txt_pattern='',
+            filename_pattern='{shortcode}'
+        )
+        
+        post = instaloader.Post.from_shortcode(L.context, shortcode)
+        L.download_post(post, target='')
+        
+        if log_callback:
+            log_callback(f"✅ Instagram images downloaded successfully!")
+        return True
+        
+    except ImportError:
+        if log_callback:
+            log_callback("❌ Instaloader not installed")
+        return False
+    except Exception as e:
+        if log_callback:
+            log_callback(f"❌ Error: {str(e)}")
+        return False
+
 
 class SocMedDownloaderGUI:
     def __init__(self, page: ft.Page):
@@ -844,6 +901,21 @@ class SocMedDownloaderGUI:
                     }],
                 })
             elif format_choice == 'image':
+                # Check if Instagram - use instaloader
+                if is_instagram_url(url):
+                    self.log_output("📸 Instagram detected - using Instaloader for images")
+                    if download_instagram_images(url, self.log_output):
+                        self.progress_bar.value = 1.0
+                        self.update_status(
+                            get_text(self.current_lang, 'status_success'),
+                            ft.Colors.GREEN_700
+                        )
+                        self.log_output("✅ " + get_text(self.current_lang, 'status_success'))
+                        self.log_output("📁 " + get_text(self.current_lang, 'output_folder', folder=self.download_folder))
+                        return
+                    else:
+                        self.log_output("⚠️ Falling back to yt-dlp...")
+                
                 # Image download - download images from posts
                 ydl_opts.update({
                     'skip_download': False,
@@ -984,6 +1056,16 @@ class SocMedDownloaderGUI:
                 self.page.update()
                 
                 try:
+                    # Check if Instagram image - use instaloader
+                    if format_type == 'image' and is_instagram_url(url):
+                        self.log_output(f"[{i}/{total}] 📸 Instagram image detected - using Instaloader")
+                        if download_instagram_images(url, self.log_output):
+                            self.log_output(f"✅ [{i}/{total}] Success!")
+                            success_count += 1
+                            continue
+                        else:
+                            self.log_output(f"[{i}/{total}] ⚠️ Falling back to yt-dlp...")
+                    
                     # Base options
                     ydl_opts = {
                         'outtmpl': '%(title)s.%(ext)s',

@@ -26,7 +26,7 @@ def extract_instagram_shortcode(url):
     return None
 
 
-def download_instagram_images(url):
+def download_instagram_images(url, download_folder='.'):
     """Download Instagram images using instaloader (fallback for image posts)"""
     try:
         import instaloader
@@ -48,14 +48,16 @@ def download_instagram_images(url):
             save_metadata=False,
             compress_json=False,
             post_metadata_txt_pattern='',
-            filename_pattern='{shortcode}'
+            filename_pattern='{shortcode}',
+            dirname_pattern=download_folder
         )
         
         # Download post
         post = instaloader.Post.from_shortcode(L.context, shortcode)
         
-        # Download the post
-        L.download_post(post, target='')
+        # Download the post (use current dir if folder is '.')
+        target = download_folder if download_folder != '.' else ''
+        L.download_post(post, target=target)
         
         print(f"\n✅ Instagram images downloaded successfully!")
         return True
@@ -151,7 +153,7 @@ def batch_download():
                 # Check if Instagram URL with image format - use instaloader
                 if format_type == 'image' and is_instagram_url(url):
                     print(f"[{i}/{len(links)}] Instagram image detected - using Instaloader")
-                    if download_instagram_images(url):
+                    if download_instagram_images(url, os.getcwd()):
                         print(f"✅ [{i}/{len(links)}] Sukses!")
                         success_count += 1
                         continue
@@ -312,7 +314,7 @@ def run_downloader():
             # Check if Instagram URL - use instaloader
             if is_instagram_url(url):
                 print("[Info] Instagram detected - using Instaloader for images")
-                success = download_instagram_images(url)
+                success = download_instagram_images(url, os.getcwd())
                 if success:
                     continue
                 else:

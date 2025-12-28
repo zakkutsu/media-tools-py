@@ -39,7 +39,7 @@ def extract_instagram_shortcode(url):
     return None
 
 
-def download_instagram_images(url, log_callback=None):
+def download_instagram_images(url, download_folder='.', log_callback=None):
     """Download Instagram images using instaloader"""
     try:
         import instaloader
@@ -61,11 +61,12 @@ def download_instagram_images(url, log_callback=None):
             save_metadata=False,
             compress_json=False,
             post_metadata_txt_pattern='',
-            filename_pattern='{shortcode}'
+            filename_pattern='{shortcode}',
+            dirname_pattern=download_folder
         )
         
         post = instaloader.Post.from_shortcode(L.context, shortcode)
-        L.download_post(post, target='')
+        L.download_post(post, target=download_folder if download_folder != '.' else '')
         
         if log_callback:
             log_callback(f"✅ Instagram images downloaded successfully!")
@@ -904,7 +905,7 @@ class SocMedDownloaderGUI:
                 # Check if Instagram - use instaloader
                 if is_instagram_url(url):
                     self.log_output("📸 Instagram detected - using Instaloader for images")
-                    if download_instagram_images(url, self.log_output):
+                    if download_instagram_images(url, self.download_folder, self.log_output):
                         self.progress_bar.value = 1.0
                         self.update_status(
                             get_text(self.current_lang, 'status_success'),
@@ -1059,7 +1060,7 @@ class SocMedDownloaderGUI:
                     # Check if Instagram image - use instaloader
                     if format_type == 'image' and is_instagram_url(url):
                         self.log_output(f"[{i}/{total}] 📸 Instagram image detected - using Instaloader")
-                        if download_instagram_images(url, self.log_output):
+                        if download_instagram_images(url, self.download_folder, self.log_output):
                             self.log_output(f"✅ [{i}/{total}] Success!")
                             success_count += 1
                             continue

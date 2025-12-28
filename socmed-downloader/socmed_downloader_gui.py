@@ -312,6 +312,7 @@ class SocMedDownloaderGUI:
             content=ft.Column([
                 ft.Radio(value="video", label="🎬 " + get_text(self.current_lang, 'format_video')),
                 ft.Radio(value="audio", label="🎵 " + get_text(self.current_lang, 'format_audio')),
+                ft.Radio(value="image", label="🖼️ " + get_text(self.current_lang, 'format_image')),
             ]),
             value="video",
             on_change=self.on_format_change,
@@ -605,13 +606,14 @@ class SocMedDownloaderGUI:
         self.download_mode = e.control.value
         
         if self.download_mode == 'batch':
-            # Show batch elements
+            # Show batch elements - file picker is now optional
             self.batch_file_btn.visible = True
             self.batch_file_info.visible = True
             self.url_list_container.visible = True
             self.retry_failed_btn.visible = True
-            # Change URL input label
-            self.url_input.label = "🔗 Add URL to Batch List"
+            self.url_count_text.visible = True
+            # Change URL input label to add mode
+            self.url_input.label = get_text(self.current_lang, 'batch_add_url_label')
         else:
             # Hide batch elements
             self.batch_file_btn.visible = False
@@ -650,6 +652,13 @@ class SocMedDownloaderGUI:
                 ft.dropdown.Option("192", get_text(self.current_lang, 'quality_audio_192')),
                 ft.dropdown.Option("128", get_text(self.current_lang, 'quality_audio_128')),
             ]
+            self.quality_dropdown.disabled = False
+        elif self.format_radio.value == "image":
+            # Image format - no quality options needed
+            self.quality_dropdown.options = [
+                ft.dropdown.Option("best", get_text(self.current_lang, 'quality_image_best')),
+            ]
+            self.quality_dropdown.disabled = True
         else:
             # Change to video quality options
             self.quality_dropdown.options = [
@@ -658,6 +667,7 @@ class SocMedDownloaderGUI:
                 ft.dropdown.Option("720", get_text(self.current_lang, 'quality_720p')),
                 ft.dropdown.Option("480", get_text(self.current_lang, 'quality_480p')),
             ]
+            self.quality_dropdown.disabled = False
         
         # Reset to best quality when switching
         self.quality_dropdown.value = "best"
@@ -833,6 +843,17 @@ class SocMedDownloaderGUI:
                         'preferredquality': audio_quality,
                     }],
                 })
+            elif format_choice == 'image':
+                # Image download - download images from posts
+                ydl_opts.update({
+                    'format': 'best',
+                    'writethumbnail': True,
+                    'writeinfojson': False,
+                    # Skip video extraction for image posts
+                    'skip_download': False,
+                })
+                # For Instagram/TikTok image posts
+                ydl_opts['outtmpl'] = '%(title)s_%(id)s.%(ext)s'
             else:
                 # Video with quality selection
                 if quality_choice == 'best':
@@ -895,38 +916,44 @@ class SocMedDownloaderGUI:
             self.page.update()
     
     def download_batch(self):
-        """Download multiple videos from batch file"""
+        """Download multiple videos from batch file or URL list"""
         try:
-            # Check if file is selected
-            if not self.batch_file_path:
+            links = []
+            
+            # Check if URLs were added directly to the list
+            if len(self.url_list.controls) > 0:
+                # Get URLs from the list
+                for control in self.url_list.controls:
+                    if hasattr(control, 'title'):
+                        url = control.title.value
+                        links.append({
+                            'url': url,
+                            'quality': self.quality_dropdown.value,
+                            'format': self.format_radio.value
+                        })
+            
+            # If file is also selected, read from file
+            if self.batch_file_path:
+                from batch_reader import read_batch_file
+                
                 self.update_status(
-                    get_text(self.current_lang, 'batch_no_file'),
-                    ft.Colors.RED_700
+                    get_text(self.current_lang, 'status_validating'),
+                    ft.Colors.BLUE_700
                 )
-                self.download_btn.disabled = False
-                self.page.update()
-                return
+                
+                try:
+                    file_links = read_batch_file(self.batch_file_path)
+                    links.extend(file_links)
+                except Exception as e:
+                    self.update_status(
+                        get_text(self.current_lang, 'batch_error_read', error=str(e)),
+                        ft.Colors.RED_700
+                    )
+                    self.download_btn.disabled = False
+                    self.page.update()
+                    return
             
-            # Import batch reader
-            from batch_reader import read_batch_file
-            
-            # Read links from file
-            self.update_status(
-                get_text(self.current_lang, 'status_validating'),
-                ft.Colors.BLUE_700
-            )
-            
-            try:
-                links = read_batch_file(self.batch_file_path)
-            except Exception as e:
-                self.update_status(
-                    get_text(self.current_lang, 'batch_error_read', error=str(e)),
-                    ft.Colors.RED_700
-                )
-                self.download_btn.disabled = False
-                self.page.update()
-                return
-            
+            # Check if we have any links
             if not links:
                 self.update_status(
                     get_text(self.current_lang, 'batch_no_links'),
@@ -988,6 +1015,17 @@ class SocMedDownloaderGUI:
                                 'preferredquality': audio_quality,
                             }],
                         })
+                    elif format_type == 'image':
+                        # Image download - download images from posts
+                        ydl_opts.update({
+                            'format': 'best',
+                            'writethumbnail': True,
+                            'writeinfojson': False,
+                            # Skip video extraction for image posts
+                            'skip_download': False,
+                        })
+                        # For Instagram/TikTok image posts
+                        ydl_opts['outtmpl'] = '%(title)s_%(id)s.%(ext)s'
                     else:
                         # Video with quality selection
                         if quality == 'best':

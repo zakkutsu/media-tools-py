@@ -55,9 +55,15 @@ def batch_download():
         print("\n>> Pilih Format Default:")
         print("1. Video")
         print("2. Audio (MP3)")
-        format_choice = input(">> Pilihan (1/2): ").strip()
+        print("3. Gambar/Image")
+        format_choice = input(">> Pilihan (1/2/3): ").strip()
         
-        default_format = 'video' if format_choice == '1' else 'audio'
+        if format_choice == '2':
+            default_format = 'audio'
+        elif format_choice == '3':
+            default_format = 'image'
+        else:
+            default_format = 'video'
         
         default_quality = 'best'
         if format_choice == '1':
@@ -104,6 +110,14 @@ def batch_download():
                             'preferredquality': '192',
                         }],
                     })
+                elif format_type == 'image':
+                    ydl_opts.update({
+                        'format': 'best',
+                        'writethumbnail': True,
+                        'writeinfojson': False,
+                        'skip_download': False,
+                    })
+                    ydl_opts['outtmpl'] = '%(title)s_%(id)s.%(ext)s'
                 else:
                     # Video with quality
                     if quality == 'best':
@@ -175,7 +189,8 @@ def run_downloader():
         print("\n>> Pilih Format:")
         print("1. Video")
         print("2. Audio (MP3)")
-        pilihan = input(">> Pilihan (1/2): ").strip()
+        print("3. Gambar/Image")
+        pilihan = input(">> Pilihan (1/2/3): ").strip()
         
         # Quality selection for video
         quality = "best"
@@ -223,6 +238,16 @@ def run_downloader():
                     'preferredquality': '192', # Bitrate 192kbps (standar bagus)
                 }],
             })
+        elif pilihan == '3':
+            # Setting Image/Gambar
+            print("\n[Info] Mode: Image Download Selected")
+            ydl_opts.update({
+                'format': 'best',
+                'writethumbnail': True,
+                'writeinfojson': False,
+                'skip_download': False,
+            })
+            ydl_opts['outtmpl'] = '%(title)s_%(id)s.%(ext)s'
         else:
             # Setting Video dengan quality selector
             print(f"\n[Info] Mode: Video Selected (Quality: {quality})")

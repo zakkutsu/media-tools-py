@@ -846,13 +846,12 @@ class SocMedDownloaderGUI:
             elif format_choice == 'image':
                 # Image download - download images from posts
                 ydl_opts.update({
-                    'format': 'best',
-                    'writethumbnail': True,
-                    'writeinfojson': False,
-                    # Skip video extraction for image posts
                     'skip_download': False,
+                    'writesubtitles': False,
+                    'writeautomaticsub': False,
                 })
-                # For Instagram/TikTok image posts
+                # Don't specify format for images, let yt-dlp handle it
+                # This allows downloading of image posts from Instagram/TikTok
                 ydl_opts['outtmpl'] = '%(title)s_%(id)s.%(ext)s'
             else:
                 # Video with quality selection
@@ -1018,13 +1017,12 @@ class SocMedDownloaderGUI:
                     elif format_type == 'image':
                         # Image download - download images from posts
                         ydl_opts.update({
-                            'format': 'best',
-                            'writethumbnail': True,
-                            'writeinfojson': False,
-                            # Skip video extraction for image posts
                             'skip_download': False,
+                            'writesubtitles': False,
+                            'writeautomaticsub': False,
                         })
-                        # For Instagram/TikTok image posts
+                        # Don't specify format for images, let yt-dlp handle it
+                        # This allows downloading of image posts from Instagram/TikTok
                         ydl_opts['outtmpl'] = '%(title)s_%(id)s.%(ext)s'
                     else:
                         # Video with quality selection

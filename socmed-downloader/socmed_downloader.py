@@ -112,11 +112,11 @@ def batch_download():
                     })
                 elif format_type == 'image':
                     ydl_opts.update({
-                        'format': 'best',
-                        'writethumbnail': True,
-                        'writeinfojson': False,
                         'skip_download': False,
+                        'writesubtitles': False,
+                        'writeautomaticsub': False,
                     })
+                    # Don't specify format for images, let yt-dlp handle it
                     ydl_opts['outtmpl'] = '%(title)s_%(id)s.%(ext)s'
                 else:
                     # Video with quality
@@ -242,11 +242,12 @@ def run_downloader():
             # Setting Image/Gambar
             print("\n[Info] Mode: Image Download Selected")
             ydl_opts.update({
-                'format': 'best',
-                'writethumbnail': True,
-                'writeinfojson': False,
                 'skip_download': False,
+                'writesubtitles': False,
+                'writeautomaticsub': False,
             })
+            # Don't specify format for images, let yt-dlp handle it
+            # This allows downloading of image posts from Instagram/TikTok
             ydl_opts['outtmpl'] = '%(title)s_%(id)s.%(ext)s'
         else:
             # Setting Video dengan quality selector

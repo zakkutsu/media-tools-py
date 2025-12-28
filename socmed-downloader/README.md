@@ -14,8 +14,9 @@ Program Python untuk mendownload video dan audio dari berbagai platform social m
 
 - **Multi-Platform Support**: YouTube, TikTok, Instagram, Facebook, Twitter/X
 - **Dual Format**: Video (MP4) dan Audio (MP3 192kbps)
+- **Image Download**: Download gambar dari TikTok (Instagram tidak support)
 - **Quality Selector**: Pilih kualitas 480p, 720p, 1080p, atau Terbaik (otomatis)
-- **Batch Download**: Download multiple links dari TXT/CSV/JSON/Excel/Word
+- **Batch Download**: Download multiple links dari TXT/CSV/JSON/Excel/Word atau input manual
 - **TikTok Watermark Removal**: Download TikTok tanpa watermark
 - **Cookie Support**: Browser cookies untuk bypass login Instagram/Facebook
 - **GUI Modern**: Interface grafis multi-bahasa (ID/EN/JP) dengan Flet
@@ -26,13 +27,15 @@ Program Python untuk mendownload video dan audio dari berbagai platform social m
 
 ## Platform yang Didukung
 
-| Platform | Video | Audio | Notes |
-|----------|-------|-------|-------|
-| YouTube | ✅ | ✅ | Playlist, Shorts, 8K support |
-| TikTok | ✅ | ✅ | Tanpa watermark otomatis |
-| Instagram | ✅ | ✅ | Butuh cookies browser |
-| Facebook | ✅ | ✅ | Butuh cookies browser |
-| Twitter/X | ✅ | ✅ | Video & GIF support |
+| Platform | Video | Audio | Image | Notes |
+|----------|-------|-------|-------|-------|
+| YouTube | ✅ | ✅ | ❌ | Playlist, Shorts, 8K support |
+| TikTok | ✅ | ✅ | ✅ | Tanpa watermark otomatis |
+| Instagram | ✅ | ✅ | ❌ | Butuh cookies browser, video only |
+| Facebook | ✅ | ✅ | ❌ | Butuh cookies browser |
+| Twitter/X | ✅ | ✅ | ⚠️ | Video & GIF support, image limited |
+
+> **Note**: Image download support terbatas. Instagram **tidak mendukung** download gambar karena limitasi yt-dlp. Hanya TikTok yang full support untuk image carousel.
 
 ## Instalasi
 

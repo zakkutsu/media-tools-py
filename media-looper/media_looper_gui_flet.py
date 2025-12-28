@@ -119,7 +119,7 @@ class MediaLooperGUI:
                     text_align=ft.TextAlign.CENTER
                 ),
             ], spacing=5, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-            bgcolor=colors.TEAL_900,
+            bgcolor=colors.TEAL_800,  # Darker teal for light theme
             padding=ft.padding.only(top=10, bottom=10, left=20, right=20),
         )
         

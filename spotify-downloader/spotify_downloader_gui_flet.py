@@ -425,7 +425,7 @@ def main(page: ft.Page):
         """Create footer with social media icons and copyright"""
         return ft.Container(
             content=ft.Column([
-                ft.Divider(height=1, color=ft.Colors.GREEN_700),
+                ft.Divider(height=1, color=ft.Colors.GREY_800),
                 ft.Container(
                     content=ft.Row([
                         ft.IconButton(
@@ -466,7 +466,7 @@ def main(page: ft.Page):
                     text_align=ft.TextAlign.CENTER
                 ),
             ], spacing=5, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-            bgcolor=ft.Colors.GREEN_900,
+            bgcolor="#0f0f1e",  # Darker purple-black matching page bgcolor
             padding=ft.padding.only(top=10, bottom=10, left=20, right=20),
         )
     

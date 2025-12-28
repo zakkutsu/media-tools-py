@@ -79,11 +79,56 @@ class MediaLooperGUI:
             expand=1,
         )
         
+        # Footer
+        footer = ft.Container(
+            content=ft.Column([
+                ft.Divider(height=1, color=colors.TEAL_700),
+                ft.Container(
+                    content=ft.Row([
+                        ft.IconButton(
+                            icon=icons.FACEBOOK,
+                            icon_color=colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Facebook"
+                        ),
+                        ft.IconButton(
+                            icon=icons.CAMERA_ALT,
+                            icon_color=colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Instagram"
+                        ),
+                        ft.IconButton(
+                            icon=icons.EMAIL,
+                            icon_color=colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Email"
+                        ),
+                        ft.IconButton(
+                            icon=icons.PHONE,
+                            icon_color=colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Phone"
+                        ),
+                    ], alignment=ft.MainAxisAlignment.CENTER),
+                    padding=ft.padding.only(top=10, bottom=5)
+                ),
+                ft.Text(
+                    "© 2025 Media Tools Suite. All rights reserved.",
+                    size=11,
+                    color=colors.GREY_400,
+                    text_align=ft.TextAlign.CENTER
+                ),
+            ], spacing=5, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+            bgcolor=colors.TEAL_900,
+            padding=ft.padding.only(top=10, bottom=10, left=20, right=20),
+        )
+        
         # Main layout
         self.page.add(
             ft.Column([
                 header,
                 self.tabs,
+                footer,
             ], spacing=0, expand=True)
         )
     

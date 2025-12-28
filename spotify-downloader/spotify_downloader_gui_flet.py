@@ -64,7 +64,7 @@ def main(page: ft.Page):
         
         threading.Thread(target=install_thread, daemon=True).start()
     
-    install_btn = ft.ElevatedButton(
+    install_btn = ft.Button(
         "📦 Install spotdl Sekarang",
         icon=ft.Icons.DOWNLOAD,
         bgcolor=ft.Colors.BLUE_700,
@@ -102,7 +102,7 @@ def main(page: ft.Page):
             )
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER),
         bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.ORANGE_400),
-        border=ft.border.all(2, ft.Colors.ORANGE_700),
+        border=ft.Border.all(2, ft.Colors.ORANGE_700),
         border_radius=10,
         padding=30,
         visible=not spotdl_installed
@@ -131,29 +131,13 @@ def main(page: ft.Page):
     # Output folder
     default_output_folder = os.path.join(os.path.expanduser("~"), "Downloads", "Music_Downloads")
     output_folder_field = ft.TextField(
-        label="📁 Folder Output",
+        label="📁 Folder Output (Bisa diedit manual)",
         value=default_output_folder,
-        width=400,
-        read_only=True,
+        width=520,
         text_size=12,
-        border_color=ft.Colors.ORANGE_400
-    )
-    
-    def pick_folder_result(e: ft.FilePickerResultEvent):
-        if e.path:
-            output_folder_field.value = e.path
-            page.update()
-
-    folder_picker = ft.FilePicker(on_result=pick_folder_result)
-    page.overlay.append(folder_picker)
-
-    pick_folder_btn = ft.ElevatedButton(
-        "Pilih Folder",
-        icon=ft.Icons.FOLDER_OPEN,
-        bgcolor=ft.Colors.ORANGE_700,
-        color=ft.Colors.WHITE,
-        on_click=lambda _: folder_picker.get_directory_path(),
-        disabled=not spotdl_installed
+        border_color=ft.Colors.ORANGE_400,
+        disabled=not spotdl_installed,
+        hint_text="Edit path atau gunakan default"
     )
 
     # Status & Progress
@@ -171,20 +155,56 @@ def main(page: ft.Page):
             ft.DataColumn(ft.Text("Status", weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE)),
         ],
         rows=[],
-        border=ft.border.all(1, ft.Colors.GREY_700),
+        border=ft.Border.all(1, ft.Colors.GREY_700),
         border_radius=10,
         heading_row_color=ft.Colors.with_opacity(0.1, ft.Colors.WHITE),
-        data_row_max_height=45
+        data_row_max_height=45,
+        visible=True
     )
     
-    # Container scrollable untuk tabel
-    table_container = ft.Container(
-        content=ft.Column([song_table], scroll=ft.ScrollMode.ADAPTIVE),
-        height=350,
-        border=ft.border.all(1, ft.Colors.GREY_600),
-        border_radius=10,
+    # Footer untuk tabel
+    table_footer = ft.Container(
+        content=ft.Row([
+            ft.Text("✨ Total: ", size=12, color=ft.Colors.GREY_400),
+            ft.Text("0", size=12, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_400, key="footer_total"),
+            ft.Text(" lagu | ", size=12, color=ft.Colors.GREY_400),
+            ft.Text("✅ Selesai: ", size=12, color=ft.Colors.GREY_400),
+            ft.Text("0", size=12, weight=ft.FontWeight.BOLD, color=ft.Colors.CYAN_400, key="footer_done"),
+            ft.Text(" | ❌ Error: ", size=12, color=ft.Colors.GREY_400),
+            ft.Text("0", size=12, weight=ft.FontWeight.BOLD, color=ft.Colors.RED_400, key="footer_error"),
+        ], alignment=ft.MainAxisAlignment.CENTER),
         padding=10,
-        bgcolor=ft.Colors.with_opacity(0.05, ft.Colors.WHITE)
+        bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.BLUE_900),
+        border=ft.border.only(top=ft.BorderSide(1, ft.Colors.GREY_600)),
+        border_radius=ft.border_radius.only(bottom_left=10, bottom_right=10)
+    )
+    
+    # ListView untuk tabel yang bisa discroll dengan smooth
+    table_listview = ft.ListView(
+        controls=[song_table],
+        spacing=0,
+        padding=10,
+        auto_scroll=True,  # Auto scroll ke bawah saat ada item baru
+        expand=True
+    )
+    
+    # Container scrollable untuk tabel dengan footer
+    table_container = ft.Container(
+        content=ft.Column([
+            ft.Container(
+                content=table_listview,
+                height=300,
+                border=ft.border.only(
+                    left=ft.BorderSide(1, ft.Colors.GREY_600),
+                    right=ft.BorderSide(1, ft.Colors.GREY_600),
+                    top=ft.BorderSide(1, ft.Colors.GREY_600)
+                ),
+                border_radius=ft.border_radius.only(top_left=10, top_right=10),
+                bgcolor=ft.Colors.with_opacity(0.05, ft.Colors.WHITE)
+            ),
+            table_footer
+        ], spacing=0),
+        border_radius=10,
     )
 
     # --- ICON STATUS ---
@@ -226,79 +246,120 @@ def main(page: ft.Page):
             '--bitrate', bitrate,
         ]
 
+        # Set environment untuk UTF-8 encoding (fix Unicode error di Windows)
+        env = os.environ.copy()
+        env['PYTHONIOENCODING'] = 'utf-8'
+        env['PYTHONUTF8'] = '1'
+
         try:
             process = subprocess.Popen(
                 dl_cmd, 
                 stdout=subprocess.PIPE, 
                 stderr=subprocess.STDOUT, 
-                text=True, 
+                encoding='utf-8',
+                errors='replace',  # Replace karakter yang tidak bisa di-encode
                 startupinfo=startupinfo,
-                bufsize=1,
-                universal_newlines=True
+                env=env,
+                bufsize=1
             )
 
             song_index = 0
             completed_count = 0
             error_count = 0
             current_song = ""
+            total_songs = 0
+            
+            # Fungsi untuk update footer
+            def update_footer():
+                # Cari text controls di footer
+                for control in table_footer.content.controls:
+                    if hasattr(control, 'key'):
+                        if control.key == "footer_total":
+                            control.value = str(total_songs)
+                        elif control.key == "footer_done":
+                            control.value = str(completed_count)
+                        elif control.key == "footer_error":
+                            control.value = str(error_count)
             
             for line in process.stdout:
                 line = line.strip()
                 if not line:
                     continue
                 
-                # Deteksi lagu baru yang sedang diproses
-                if "Processing" in line or "Searching" in line:
-                    # Parsing nama lagu dari output
-                    if " - " in line:
-                        parts = line.split(":")
-                        if len(parts) > 1:
-                            song_info = parts[-1].strip()
-                        else:
-                            song_info = line
+                # Print untuk debugging (bisa dilihat di console)
+                print(f"DEBUG: {line}")
+                
+                # Deteksi jumlah total lagu
+                if "Found" in line and ("song" in line.lower() or "track" in line.lower()):
+                    status_text.value = f"📋 {line}"
+                    # Extract jumlah lagu
+                    import re
+                    match = re.search(r'Found (\d+)', line)
+                    if match:
+                        total_songs = int(match.group(1))
+                    update_footer()
+                    page.update()
+                
+                # Deteksi lagu yang berhasil didownload
+                # Format: Downloaded "Artist - Title": URL
+                if line.startswith("Downloaded") and '"' in line:
+                    # Extract nama lagu dari dalam quotes
+                    match = re.search(r'Downloaded "(.*?)"', line)
+                    if match:
+                        song_info = match.group(1)
                         
-                        # Bersihkan nama lagu
-                        song_info = re.sub(r'^(Processing|Searching)\s*:?\s*', '', song_info).strip()
-                        
-                        if song_info and " - " in song_info:
+                        if " - " in song_info:
                             song_index += 1
-                            current_song = song_info
+                            completed_count += 1
                             
                             # Pisahkan Artis dan Judul
                             parts = song_info.split(" - ", 1)
-                            artist = parts[0].strip() if len(parts) > 1 else "-"
-                            title = parts[1].strip() if len(parts) > 1 else song_info
+                            artist = parts[0].strip()
+                            title = parts[1].strip()
                             
                             row_obj = ft.DataRow(cells=[
                                 ft.DataCell(ft.Text(str(song_index), color=ft.Colors.GREY_300)),
                                 ft.DataCell(ft.Text(artist[:25] + "..." if len(artist) > 25 else artist, color=ft.Colors.CYAN_200, size=12)),
                                 ft.DataCell(ft.Text(title[:35] + "..." if len(title) > 35 else title, color=ft.Colors.WHITE, size=12)),
                                 ft.DataCell(ft.Text("-", color=ft.Colors.GREY_400, size=12)),
-                                ft.DataCell(get_status_icon("downloading")),
+                                ft.DataCell(get_status_icon("done")),
                             ])
                             song_table.rows.append(row_obj)
-                            status_text.value = f"🔄 Downloading: {title[:40]}..."
+                            
+                            # Update status dan footer
+                            if total_songs > 0:
+                                status_text.value = f"🔄 Downloading: {title[:30]}... ({completed_count}/{total_songs})"
+                            else:
+                                status_text.value = f"🔄 Downloading: {title[:40]}..."
+                            
+                            update_footer()
+                            progress_label.value = f"✅ {completed_count} lagu selesai"
+                            
+                            # Scroll ke bawah otomatis
+                            try:
+                                table_listview.scroll_to(offset=-1, duration=100)
+                            except:
+                                pass
+                            
                             page.update()
                 
-                # Deteksi download selesai
-                elif "Downloaded" in line or "Skipping" in line or "already exists" in line.lower():
-                    if song_table.rows:
-                        song_table.rows[-1].cells[4].content = get_status_icon("done")
-                        completed_count += 1
-                        progress_label.value = f"✅ {completed_count} lagu selesai"
-                        page.update()
-                
                 # Deteksi error
-                elif "error" in line.lower() or "failed" in line.lower() or "no results" in line.lower():
-                    if song_table.rows:
-                        song_table.rows[-1].cells[4].content = get_status_icon("error")
-                        error_count += 1
-                        page.update()
-                
-                # Update status text untuk info lain
-                elif "Found" in line:
-                    status_text.value = f"📋 {line}"
+                if "Error" in line and "Provider" in line:
+                    error_count += 1
+                    # Bisa juga tambahkan row untuk error jika mau
+                    status_text.value = f"⚠️ {completed_count} berhasil, {error_count} error"
+                    status_text.color = ft.Colors.ORANGE_400
+                    update_footer()
                     page.update()
+                
+                # Update progress bar jika ada info progress
+                if "complete" in line.lower() and "/" in line:
+                    match = re.search(r'(\d+)/(\d+)', line)
+                    if match:
+                        current = int(match.group(1))
+                        total = int(match.group(2))
+                        progress_label.value = f"📊 Progress: {current}/{total}"
+                        page.update()
 
             process.wait()
             
@@ -346,7 +407,7 @@ def main(page: ft.Page):
         t.start()
 
     # --- TOMBOL DOWNLOAD ---
-    btn_download = ft.ElevatedButton(
+    btn_download = ft.Button(
         "🚀 Mulai Download",
         bgcolor=ft.Colors.GREEN_700,
         color=ft.Colors.WHITE,
@@ -359,39 +420,102 @@ def main(page: ft.Page):
         disabled=not spotdl_installed
     )
 
+    # --- FOOTER ---
+    def create_footer():
+        """Create footer with social media icons and copyright"""
+        return ft.Container(
+            content=ft.Column([
+                ft.Divider(height=1, color=ft.Colors.GREEN_700),
+                ft.Container(
+                    content=ft.Row([
+                        ft.IconButton(
+                            icon=ft.Icons.FACEBOOK,
+                            icon_color=ft.Colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Facebook",
+                            on_click=lambda _: None
+                        ),
+                        ft.IconButton(
+                            icon=ft.Icons.CAMERA_ALT,
+                            icon_color=ft.Colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Instagram",
+                            on_click=lambda _: None
+                        ),
+                        ft.IconButton(
+                            icon=ft.Icons.EMAIL,
+                            icon_color=ft.Colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Email",
+                            on_click=lambda _: None
+                        ),
+                        ft.IconButton(
+                            icon=ft.Icons.PHONE,
+                            icon_color=ft.Colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Phone",
+                            on_click=lambda _: None
+                        ),
+                    ], alignment=ft.MainAxisAlignment.CENTER),
+                    padding=ft.padding.only(top=10, bottom=5)
+                ),
+                ft.Text(
+                    "© 2025 Media Tools Suite. All rights reserved.",
+                    size=11,
+                    color=ft.Colors.GREY_500,
+                    text_align=ft.TextAlign.CENTER
+                ),
+            ], spacing=5, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+            bgcolor=ft.Colors.GREEN_900,
+            padding=ft.padding.only(top=10, bottom=10, left=20, right=20),
+        )
+    
+    footer = create_footer()
+
     # --- LAYOUT ---
     page.add(
-        ft.Container(
-            content=ft.Column([
-                ft.Text("🎵 Spotify Downloader Pro", size=28, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_400),
-                ft.Text("Download lagu dari Spotify via YouTube Music", size=12, color=ft.Colors.GREY_400),
-                ft.Divider(height=20, color=ft.Colors.GREY_700),
-                
-                # Alert jika spotdl belum terinstall
-                spotdl_alert,
-                ft.Divider(height=10, color="transparent", visible=not spotdl_installed),
-                
-                url_input,
-                ft.Row([
-                    bitrate_dropdown,
-                    output_folder_field,
-                    pick_folder_btn
-                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                
-                ft.Divider(height=15, color="transparent"),
-                ft.Row([btn_download], alignment=ft.MainAxisAlignment.CENTER),
-                ft.Divider(height=15, color="transparent"),
-                
-                ft.Row([status_text, progress_label], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                progress_bar,
-                
-                ft.Divider(height=10, color="transparent"),
-                ft.Text("📋 Daftar Lagu:", size=14, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
-                table_container
-            ]),
-            padding=10
+        ft.Column(
+            controls=[
+                ft.Container(
+                    content=ft.Column(
+                        controls=[
+                            ft.Text("🎵 Spotify Downloader Pro", size=28, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_400),
+                            ft.Text("Download lagu dari Spotify via YouTube Music", size=12, color=ft.Colors.GREY_400),
+                            ft.Divider(height=20, color=ft.Colors.GREY_700),
+                            
+                            # Alert jika spotdl belum terinstall
+                            spotdl_alert,
+                            ft.Divider(height=10, color="transparent", visible=not spotdl_installed),
+                            
+                            url_input,
+                            ft.Row([
+                                bitrate_dropdown,
+                                output_folder_field
+                            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                            
+                            ft.Divider(height=15, color="transparent"),
+                            ft.Row([btn_download], alignment=ft.MainAxisAlignment.CENTER),
+                            ft.Divider(height=15, color="transparent"),
+                            
+                            ft.Row([status_text, progress_label], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                            progress_bar,
+                            
+                            ft.Divider(height=10, color="transparent"),
+                            ft.Text("📋 Daftar Lagu:", size=14, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+                            table_container
+                        ],
+                        scroll=ft.ScrollMode.AUTO,
+                        expand=True
+                    ),
+                    padding=10,
+                    expand=True
+                ),
+                footer
+            ],
+            spacing=0,
+            expand=True
         )
     )
 
 if __name__ == "__main__":
-    ft.app(target=main)
+    ft.run(main)

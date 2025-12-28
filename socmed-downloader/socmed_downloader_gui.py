@@ -194,11 +194,62 @@ class SocMedDownloaderGUI:
         output_section = self.create_output_section()
         main_content.controls.append(output_section)
         
+        # Footer
+        footer = ft.Container(
+            content=ft.Column([
+                ft.Divider(height=1, color=ft.Colors.ORANGE_700),
+                ft.Container(
+                    content=ft.Row([
+                        ft.IconButton(
+                            icon=ft.Icons.FACEBOOK,
+                            icon_color=ft.Colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Facebook"
+                        ),
+                        ft.IconButton(
+                            icon=ft.Icons.CAMERA_ALT,
+                            icon_color=ft.Colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Instagram"
+                        ),
+                        ft.IconButton(
+                            icon=ft.Icons.EMAIL,
+                            icon_color=ft.Colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Email"
+                        ),
+                        ft.IconButton(
+                            icon=ft.Icons.PHONE,
+                            icon_color=ft.Colors.WHITE70,
+                            icon_size=20,
+                            tooltip="Phone"
+                        ),
+                    ], alignment=ft.MainAxisAlignment.CENTER),
+                    padding=ft.padding.only(top=10, bottom=5)
+                ),
+                ft.Text(
+                    "© 2025 Media Tools Suite. All rights reserved.",
+                    size=11,
+                    color=ft.Colors.GREY_400,
+                    text_align=ft.TextAlign.CENTER
+                ),
+            ], spacing=5, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+            bgcolor=ft.Colors.ORANGE_900,
+            padding=ft.padding.only(top=10, bottom=10, left=20, right=20),
+        )
+        
         # Add file picker to overlay
         self.page.overlay.append(self.file_picker)
         
+        # Create main layout with footer
+        main_layout = ft.Column(
+            controls=[main_content, footer],
+            spacing=0,
+            expand=True
+        )
+        
         # Add main content to page
-        self.page.add(main_content)
+        self.page.add(main_layout)
     
     def create_folder_section(self):
         """Create download folder section"""

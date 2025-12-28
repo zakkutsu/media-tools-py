@@ -200,7 +200,7 @@ class PlaylistDownloaderGUI:
         # Footer
         footer = ft.Container(
             content=ft.Column([
-                ft.Divider(height=1, color=ft.Colors.PURPLE_700),
+                ft.Divider(height=1, color=ft.Colors.BLUE_700),
                 ft.Container(
                     content=ft.Row([
                         ft.IconButton(
@@ -237,7 +237,7 @@ class PlaylistDownloaderGUI:
                     text_align=ft.TextAlign.CENTER
                 ),
             ], spacing=5, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-            bgcolor=ft.Colors.PURPLE_900,
+            bgcolor=ft.Colors.BLUE_900,
             padding=ft.padding.only(top=10, bottom=10, left=20, right=20),
         )
         

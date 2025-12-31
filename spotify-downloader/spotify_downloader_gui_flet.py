@@ -126,7 +126,7 @@ def main(page: ft.Page):
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=10),
         padding=20,
         bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.RED_400),
-        border=ft.Border.all(2, ft.Colors.RED_700),
+        border=ft.border.all(2, ft.Colors.RED_700),
         border_radius=10,
         visible=not ffmpeg_available and spotdl_installed
     )
@@ -152,7 +152,7 @@ def main(page: ft.Page):
             )
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER),
         bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.ORANGE_400),
-        border=ft.Border.all(2, ft.Colors.ORANGE_700),
+        border=ft.border.all(2, ft.Colors.ORANGE_700),
         border_radius=10,
         padding=30,
         visible=not spotdl_installed
@@ -205,7 +205,7 @@ def main(page: ft.Page):
             ft.DataColumn(ft.Text("Status", weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE)),
         ],
         rows=[],
-        border=ft.Border.all(1, ft.Colors.GREY_700),
+        border=ft.border.all(1, ft.Colors.GREY_700),
         border_radius=10,
         heading_row_color=ft.Colors.with_opacity(0.1, ft.Colors.WHITE),
         data_row_max_height=45,

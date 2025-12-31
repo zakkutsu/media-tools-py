@@ -65,9 +65,10 @@ batch_downloader_path = str(current_dir / "yt-batch-downloader")
 playlist_downloader_path = str(current_dir / "yt-playlist-downloader")
 socmed_downloader_path = str(current_dir / "socmed-downloader")
 media_looper_path = str(current_dir / "media-looper")
+universal_converter_path = str(current_dir / "universal-converter")
 
 # Add all tool paths to sys.path
-tool_paths = [audio_merger_path, media_detector_path, batch_downloader_path, playlist_downloader_path, socmed_downloader_path, media_looper_path]
+tool_paths = [audio_merger_path, media_detector_path, batch_downloader_path, playlist_downloader_path, socmed_downloader_path, media_looper_path, universal_converter_path]
 for path in tool_paths:
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -82,7 +83,8 @@ def check_and_install_dependencies():
         'ffmpeg': 'ffmpeg-python==0.2.0',
         'PIL': 'Pillow>=10.0.0',
         'filetype': 'filetype==1.2.0',
-        'yt_dlp': 'yt-dlp'
+        'yt_dlp': 'yt-dlp',
+        'pdf2image': 'pdf2image>=1.16.3'
     }
     
     for package, install_name in required_packages.items():
@@ -247,6 +249,20 @@ except Exception as e:
     print(f"Failed to import MediaLooperGUI: {e}")
     MediaLooperGUI = None
 
+# Import Universal Converter (Flet-based)
+try:
+    universal_converter_spec = importlib.util.spec_from_file_location(
+        "universal_converter_gui",
+        current_dir / "universal-converter" / "universal_converter_gui.py"
+    )
+    if universal_converter_spec and universal_converter_spec.loader:
+        universal_converter_module = importlib.util.module_from_spec(universal_converter_spec)
+        universal_converter_spec.loader.exec_module(universal_converter_module)
+        UniversalConverterGUI = universal_converter_module.main
+except Exception as e:
+    print(f"Failed to import UniversalConverterGUI: {e}")
+    UniversalConverterGUI = None
+
 class MediaToolsLauncher:
     def __init__(self, page: ft.Page):
         self.page = page
@@ -371,6 +387,19 @@ class MediaToolsLauncher:
             on_click=self.launch_media_looper
         )
         
+        universal_converter_card = self.create_tool_card(
+            title="🔄 Universal Converter",
+            description="Smart file converter for images, videos, audio, and PDF with format validation",
+            features=[
+                "🖼️ Images (JPG, PNG, WEBP, BMP, ICO)",
+                "🎬 Video & Audio (MP4, MP3, GIF, etc)",
+                "📄 PDF to Image (per page)",
+                "🧠 Smart format detection"
+            ],
+            color=ft.Colors.DEEP_PURPLE,
+            on_click=self.launch_universal_converter
+        )
+        
         # Tool selection section
         tools_section = ft.Container(
             content=ft.Column([
@@ -389,6 +418,10 @@ class MediaToolsLauncher:
                 ft.Row([
                     socmed_downloader_card,
                     media_looper_card,
+                ], alignment=ft.MainAxisAlignment.CENTER, spacing=20, wrap=True),
+                ft.Container(height=10),  # Spacing
+                ft.Row([
+                    universal_converter_card,
                 ], alignment=ft.MainAxisAlignment.CENTER, spacing=20, wrap=True),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=20),
             margin=ft.margin.only(bottom=30)
@@ -595,6 +628,15 @@ class MediaToolsLauncher:
         
         self.switch_to_app("media_looper")
     
+    def launch_universal_converter(self, e):
+        """Launch Universal Converter tool"""
+        if UniversalConverterGUI is None:
+            error_msg = "Universal Converter is not available.\n\nMake sure universal_converter_gui.py exists in the universal-converter/ folder\n\nAlso check that Pillow and pdf2image are installed with:\npip install Pillow pdf2image"
+            self.show_error(error_msg)
+            return
+        
+        self.switch_to_app("universal_converter")
+    
     def switch_to_app(self, app_name):
         """Switch to specific application"""
         self.page.controls.clear()
@@ -642,6 +684,9 @@ class MediaToolsLauncher:
         elif app_name == "media_looper":
             # Media Looper (Flet-based)
             self.current_app = MediaLooperGUI(self.create_app_page(app_container))
+        elif app_name == "universal_converter":
+            # Universal Converter (Flet-based)
+            UniversalConverterGUI(self.create_app_page(app_container))
         elif app_name == "batch_downloader_tkinter":
             # Fallback Tkinter-based Batch Downloader
             self.launch_tkinter_app("batch_downloader")

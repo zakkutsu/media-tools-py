@@ -7,24 +7,6 @@ import time
 import re
 from pathlib import Path
 
-# Ensure language_config can be imported from current directory
-_current_file_dir = Path(__file__).parent.resolve()
-_lang_config_path = _current_file_dir / "language_config.py"
-
-# Import language_config from THIS folder specifically
-import importlib.util
-spec = importlib.util.spec_from_file_location("socmed_language_config", _lang_config_path)
-if spec and spec.loader:
-    socmed_lang_module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(socmed_lang_module)
-    get_text = socmed_lang_module.get_text
-    LANGUAGES = socmed_lang_module.LANGUAGES
-else:
-    # Fallback
-    def get_text(lang, key, **kwargs):
-        return key
-    LANGUAGES = {}
-
 
 def is_instagram_url(url):
     """Check if URL is from Instagram"""
@@ -93,7 +75,6 @@ class SocMedDownloaderGUI:
         self.page.padding = 10
         
         # State
-        self.current_lang = 'id'
         self.download_folder = str(Path.home() / "Downloads" / "SocMed_Downloads")
         self.download_mode = 'single'  # 'single' or 'batch'
         self.batch_file_path = None
@@ -118,36 +99,17 @@ class SocMedDownloaderGUI:
             spacing=10
         )
         
-        # Language selector section (top right)
-        self.lang_dropdown = ft.Dropdown(
-            label=get_text(self.current_lang, 'language_label'),
-            width=200,
-            options=[
-                ft.dropdown.Option("id", "🇮🇩 Bahasa Indonesia"),
-                ft.dropdown.Option("en", "🇺🇸 English"),
-                ft.dropdown.Option("jp", "🇯🇵 日本語"),
-            ],
-            value=self.current_lang,
-            on_change=self.change_language,
-        )
-        
-        lang_section = ft.Container(
-            content=ft.Row([self.lang_dropdown], alignment=ft.MainAxisAlignment.END),
-            padding=ft.padding.only(bottom=10)
-        )
-        main_content.controls.append(lang_section)
-        
         # Title Section (centered)
         title_section = ft.Container(
             content=ft.Column([
                 ft.Text(
-                    get_text(self.current_lang, 'app_title'),
+                    "🌐 SocMed Downloader",
                     size=24,
                     weight=ft.FontWeight.BOLD,
                     text_align=ft.TextAlign.CENTER
                 ),
                 ft.Text(
-                    get_text(self.current_lang, 'subtitle'),
+                    "Download videos & audio from social media platforms",
                     size=14,
                     color=ft.Colors.GREY_600,
                     text_align=ft.TextAlign.CENTER
@@ -155,7 +117,7 @@ class SocMedDownloaderGUI:
                 ft.Container(height=5),
                 ft.Container(
                     content=ft.Text(
-                        "🌐 " + get_text(self.current_lang, 'platform_support'),
+                        "🌐 TikTok, Instagram, Facebook, Twitter/X & Other Platforms",
                         size=13,
                         color=ft.Colors.WHITE,
                         weight=ft.FontWeight.W_500,
@@ -248,14 +210,14 @@ class SocMedDownloaderGUI:
     def create_folder_section(self):
         """Create download folder section"""
         self.folder_field = ft.TextField(
-            label=get_text(self.current_lang, 'download_folder_label'),
+            label="📁 Download Folder",
             value=self.download_folder,
             expand=True,
             on_change=self.on_folder_change
         )
         
         browse_btn = ft.ElevatedButton(
-            text=get_text(self.current_lang, 'batch_file_button') or "Browse",
+            text="Browse",
             icon=ft.Icons.FOLDER_OPEN,
             on_click=self.browse_folder
         )
@@ -270,8 +232,8 @@ class SocMedDownloaderGUI:
         # Download Mode selector
         self.mode_radio = ft.RadioGroup(
             content=ft.Row([
-                ft.Radio(value="single", label=get_text(self.current_lang, 'mode_single')),
-                ft.Radio(value="batch", label=get_text(self.current_lang, 'mode_batch')),
+                ft.Radio(value="single", label="Single (1 link)"),
+                ft.Radio(value="batch", label="Batch (Multiple links from file)"),
             ]),
             value="single",
             on_change=self.change_mode,
@@ -279,11 +241,11 @@ class SocMedDownloaderGUI:
         
         # Batch file picker button
         self.batch_file_btn = ft.ElevatedButton(
-            text=get_text(self.current_lang, 'batch_file_button'),
+            text="Select Batch File",
             icon=ft.Icons.FILE_OPEN,
             on_click=lambda _: self.file_picker.pick_files(
                 allowed_extensions=['txt', 'csv', 'json'],
-                dialog_title=get_text(self.current_lang, 'batch_file_label'),
+                dialog_title="Select Batch File",
             ),
             visible=False,
             style=ft.ButtonStyle(bgcolor=ft.Colors.GREEN_100)
@@ -291,7 +253,7 @@ class SocMedDownloaderGUI:
         
         # Batch file info
         self.batch_file_info = ft.Text(
-            get_text(self.current_lang, 'batch_supported'),
+            "Supported: TXT, CSV, JSON",
             size=11,
             color=ft.Colors.GREY_600,
             italic=True,
@@ -309,8 +271,8 @@ class SocMedDownloaderGUI:
         
         # URL Input
         self.url_input = ft.TextField(
-            label=get_text(self.current_lang, 'url_label'),
-            hint_text=get_text(self.current_lang, 'url_hint'),
+            label="Enter Video/Audio URL:",
+            hint_text="TikTok, Instagram, Facebook, Twitter/X, or other platforms",
             expand=True,
             multiline=False,
             autocorrect=False,
@@ -354,7 +316,7 @@ class SocMedDownloaderGUI:
         return ft.Container(
             content=ft.Column([
                 ft.Text(
-                    "🔗 " + get_text(self.current_lang, 'mode_label'), 
+                    "🔗 Download Mode:", 
                     size=16, 
                     weight=ft.FontWeight.BOLD
                 ),
@@ -365,7 +327,7 @@ class SocMedDownloaderGUI:
                 self.selected_file_text,
                 ft.Container(height=10),
                 ft.Text(
-                    get_text(self.current_lang, 'url_label'),
+                    "Enter Video/Audio URL:",
                     size=12,
                     weight=ft.FontWeight.BOLD
                 ),
@@ -413,9 +375,9 @@ class SocMedDownloaderGUI:
         # Format selector with radio group
         self.format_radio = ft.RadioGroup(
             content=ft.Column([
-                ft.Radio(value="video", label="🎬 " + get_text(self.current_lang, 'format_video')),
-                ft.Radio(value="audio", label="🎵 " + get_text(self.current_lang, 'format_audio')),
-                ft.Radio(value="image", label="🖼️ " + get_text(self.current_lang, 'format_image')),
+                ft.Radio(value="video", label="🎬 Video (MP4)"),
+                ft.Radio(value="audio", label="🎵 Audio (MP3)"),
+                ft.Radio(value="image", label="🖼️ Image/Photo (JPG/PNG)"),
             ]),
             value="video",
             on_change=self.on_format_change,
@@ -423,34 +385,34 @@ class SocMedDownloaderGUI:
         
         # Quality selector
         self.quality_dropdown = ft.Dropdown(
-            label=get_text(self.current_lang, 'quality_label'),
+            label="Select Quality:",
             width=300,
             options=[
-                ft.dropdown.Option("best", get_text(self.current_lang, 'quality_best')),
-                ft.dropdown.Option("1080", get_text(self.current_lang, 'quality_1080p')),
-                ft.dropdown.Option("720", get_text(self.current_lang, 'quality_720p')),
-                ft.dropdown.Option("480", get_text(self.current_lang, 'quality_480p')),
+                ft.dropdown.Option("best", "Best (Automatic)"),
+                ft.dropdown.Option("1080", "1080p (Full HD)"),
+                ft.dropdown.Option("720", "720p (HD)"),
+                ft.dropdown.Option("480", "480p (SD)"),
             ],
             value="best",
         )
         
         # Cookies selector
         self.cookies_dropdown = ft.Dropdown(
-            label=get_text(self.current_lang, 'cookies_label'),
+            label="Browser Cookies (for IG/FB):",
             width=300,
             options=[
-                ft.dropdown.Option("none", get_text(self.current_lang, 'cookies_none')),
-                ft.dropdown.Option("chrome", get_text(self.current_lang, 'cookies_chrome')),
-                ft.dropdown.Option("edge", get_text(self.current_lang, 'cookies_edge')),
-                ft.dropdown.Option("firefox", get_text(self.current_lang, 'cookies_firefox')),
-                ft.dropdown.Option("brave", get_text(self.current_lang, 'cookies_brave')),
+                ft.dropdown.Option("none", "None"),
+                ft.dropdown.Option("chrome", "Google Chrome"),
+                ft.dropdown.Option("edge", "Microsoft Edge"),
+                ft.dropdown.Option("firefox", "Mozilla Firefox"),
+                ft.dropdown.Option("brave", "Brave Browser"),
             ],
             value="none",
         )
         
         # Help text for cookies
         self.cookies_help = ft.Text(
-            get_text(self.current_lang, 'help_cookies'),
+            "Use browser cookies to download private/age-restricted content",
             size=10,
             color=ft.Colors.GREY_600,
             italic=True,
@@ -459,7 +421,7 @@ class SocMedDownloaderGUI:
         return ft.Container(
             content=ft.Column([
                 ft.Text(
-                    "⚙️ " + get_text(self.current_lang, 'format_label'), 
+                    "⚙️ Select Format:", 
                     size=16, 
                     weight=ft.FontWeight.BOLD
                 ),
@@ -483,7 +445,7 @@ class SocMedDownloaderGUI:
         """Create buttons section similar to yt downloader"""
         # Main download button
         self.download_btn = ft.ElevatedButton(
-            text="🚀 " + get_text(self.current_lang, 'download_button'),
+            text="🚀 Start Download",
             icon=ft.Icons.PLAY_ARROW,
             on_click=self.start_download,
             width=200,
@@ -496,7 +458,7 @@ class SocMedDownloaderGUI:
         
         # Clear button
         self.clear_btn = ft.OutlinedButton(
-            text="🗑️ " + get_text(self.current_lang, 'clear_button'),
+            text="🗑️ Clear",
             icon=ft.Icons.CLEAR,
             on_click=self.clear_form,
             width=140,
@@ -531,15 +493,15 @@ class SocMedDownloaderGUI:
         """Create progress section with enhanced details"""
         # Progress label and bar
         self.progress_label = ft.Text(
-            get_text(self.current_lang, 'status_ready'), 
+            "Ready to download", 
             size=12, 
             weight=ft.FontWeight.BOLD
         )
         self.progress_bar = ft.ProgressBar(value=0, expand=True)
         
         # Enhanced progress info
-        self.speed_label = ft.Text(get_text(self.current_lang, 'speed_label') + ": -- MB/s", size=11, color=ft.Colors.BLUE_600)
-        self.eta_label = ft.Text(get_text(self.current_lang, 'eta_label') + ": --:--", size=11, color=ft.Colors.GREEN_600)
+        self.speed_label = ft.Text("Speed: -- MB/s", size=11, color=ft.Colors.BLUE_600)
+        self.eta_label = ft.Text("ETA: --:--", size=11, color=ft.Colors.GREEN_600)
         self.stats_text = ft.Text("", size=11, color=ft.Colors.GREY_700)
         
         # Info container (for platform and title detection)
@@ -553,7 +515,7 @@ class SocMedDownloaderGUI:
         
         return ft.Container(
             content=ft.Column([
-                ft.Text("📊 " + get_text(self.current_lang, 'progress_section_title'), size=16, weight=ft.FontWeight.BOLD),
+                ft.Text("📊 Download Progress", size=16, weight=ft.FontWeight.BOLD),
                 self.info_container,
                 ft.Container(height=5),
                 self.progress_label,
@@ -585,7 +547,7 @@ class SocMedDownloaderGUI:
         
         return ft.Container(
             content=ft.Column([
-                ft.Text("📋 " + get_text(self.current_lang, 'log_section_title'), size=16, weight=ft.FontWeight.BOLD),
+                ft.Text("📋 Download Log", size=16, weight=ft.FontWeight.BOLD),
                 ft.Container(
                     content=self.output_log,
                     border=ft.border.all(1, ft.Colors.GREY_300),
@@ -638,7 +600,7 @@ class SocMedDownloaderGUI:
         # Add to UI list
         url_item = ft.ListTile(
             title=ft.Text(url, size=12),
-            subtitle=ft.Text(get_text(self.current_lang, 'ready_status'), color=ft.Colors.BLUE_600),
+            subtitle=ft.Text("Ready", color=ft.Colors.BLUE_600),
             trailing=ft.IconButton(
                 icon=ft.Icons.DELETE,
                 icon_color=ft.Colors.RED_400,
@@ -694,16 +656,6 @@ class SocMedDownloaderGUI:
         except Exception as e:
             pass
     
-    def change_language(self, e):
-        """Change the interface language"""
-        self.current_lang = e.control.value
-        # Rebuild UI with new language
-        self.page.controls.clear()
-        self.page.overlay.clear()
-        self.page.overlay.append(self.file_picker)
-        self.build_ui()
-        self.page.update()
-    
     def change_mode(self, e):
         """Change download mode between single and batch"""
         self.download_mode = e.control.value
@@ -716,7 +668,7 @@ class SocMedDownloaderGUI:
             self.retry_failed_btn.visible = True
             self.url_count_text.visible = True
             # Change URL input label to add mode
-            self.url_input.label = get_text(self.current_lang, 'batch_add_url_label')
+            self.url_input.label = "Add URL to batch list:"
         else:
             # Hide batch elements
             self.batch_file_btn.visible = False
@@ -727,7 +679,7 @@ class SocMedDownloaderGUI:
             self.retry_failed_btn.visible = False
             self.batch_file_path = None
             # Reset URL input label
-            self.url_input.label = get_text(self.current_lang, 'url_label')
+            self.url_input.label = "Enter Video/Audio URL:"
         
         self.page.update()
     
@@ -737,11 +689,7 @@ class SocMedDownloaderGUI:
             file = e.files[0]
             self.batch_file_path = file.path
             filename = Path(file.path).name
-            self.selected_file_text.value = get_text(
-                self.current_lang, 
-                'batch_file_selected', 
-                filename=filename
-            )
+            self.selected_file_text.value = f"📄 Selected: {filename}"
             self.selected_file_text.visible = True
             self.page.update()
     
@@ -750,25 +698,25 @@ class SocMedDownloaderGUI:
         if self.format_radio.value == "audio":
             # Change to audio quality options
             self.quality_dropdown.options = [
-                ft.dropdown.Option("best", get_text(self.current_lang, 'quality_audio_best')),
-                ft.dropdown.Option("320", get_text(self.current_lang, 'quality_audio_320')),
-                ft.dropdown.Option("192", get_text(self.current_lang, 'quality_audio_192')),
-                ft.dropdown.Option("128", get_text(self.current_lang, 'quality_audio_128')),
+                ft.dropdown.Option("best", "Best (320 kbps)"),
+                ft.dropdown.Option("320", "320 kbps"),
+                ft.dropdown.Option("192", "192 kbps"),
+                ft.dropdown.Option("128", "128 kbps"),
             ]
             self.quality_dropdown.disabled = False
         elif self.format_radio.value == "image":
             # Image format - no quality options needed
             self.quality_dropdown.options = [
-                ft.dropdown.Option("best", get_text(self.current_lang, 'quality_image_best')),
+                ft.dropdown.Option("best", "Original Quality"),
             ]
             self.quality_dropdown.disabled = True
         else:
             # Change to video quality options
             self.quality_dropdown.options = [
-                ft.dropdown.Option("best", get_text(self.current_lang, 'quality_best')),
-                ft.dropdown.Option("1080", get_text(self.current_lang, 'quality_1080p')),
-                ft.dropdown.Option("720", get_text(self.current_lang, 'quality_720p')),
-                ft.dropdown.Option("480", get_text(self.current_lang, 'quality_480p')),
+                ft.dropdown.Option("best", "Best (Automatic)"),
+                ft.dropdown.Option("1080", "1080p (Full HD)"),
+                ft.dropdown.Option("720", "720p (HD)"),
+                ft.dropdown.Option("480", "480p (SD)"),
             ]
             self.quality_dropdown.disabled = False
         
@@ -808,13 +756,13 @@ class SocMedDownloaderGUI:
         """Show platform and title info"""
         self.info_container.content = ft.Column([
             ft.Text(
-                get_text(self.current_lang, 'detected_platform', platform=platform),
+                f"🌐 Platform: {platform}",
                 size=12,
                 weight=ft.FontWeight.BOLD,
                 color=ft.Colors.BLUE_900,
             ),
             ft.Text(
-                get_text(self.current_lang, 'detected_title', title=title),
+                f"📹 Title: {title}",
                 size=12,
                 color=ft.Colors.BLUE_800,
             ),
@@ -836,9 +784,9 @@ class SocMedDownloaderGUI:
             
             # Update speed and ETA
             if speed:
-                self.speed_label.value = f"{get_text(self.current_lang, 'speed_label')}: {speed}"
+                self.speed_label.value = f"Speed: {speed}"
             if eta:
-                self.eta_label.value = f"{get_text(self.current_lang, 'eta_label')}: {eta}"
+                self.eta_label.value = f"ETA: {eta}"
             
             # Update statistics
             if self.start_time:
@@ -854,10 +802,10 @@ class SocMedDownloaderGUI:
     
     def reset_progress(self):
         """Reset progress display"""
-        self.progress_label.value = get_text(self.current_lang, 'status_ready')
+        self.progress_label.value = "Ready to download"
         self.progress_bar.value = 0
-        self.speed_label.value = get_text(self.current_lang, 'speed_label') + ": -- MB/s"
-        self.eta_label.value = get_text(self.current_lang, 'eta_label') + ": --:--"
+        self.speed_label.value = "Speed: -- MB/s"
+        self.eta_label.value = "ETA: --:--"
         self.stats_text.value = ""
         self.start_time = None
         self.page.update()
@@ -874,19 +822,19 @@ class SocMedDownloaderGUI:
             except:
                 percent_num = 0
             
-            self.progress_label.value = get_text(self.current_lang, 'progress_downloading', percent=percent_str, speed=speed_str)
+            self.progress_label.value = f"⏬ Downloading... {percent_str} at {speed_str}"
             self.progress_label.color = ft.Colors.BLUE_700
             self.progress_bar.value = percent_num / 100.0
             
             # Update speed display
             if speed_str != 'N/A':
-                self.speed_label.value = f"{get_text(self.current_lang, 'speed_label')}: {speed_str}"
+                self.speed_label.value = f"Speed: {speed_str}"
             
             self.page.update()
             
         elif d['status'] == 'finished':
             self.update_status(
-                get_text(self.current_lang, 'status_processing'),
+                "⏳ Processing...",
                 ft.Colors.ORANGE_700
             )
     
@@ -903,7 +851,7 @@ class SocMedDownloaderGUI:
             
             if not url:
                 self.update_status(
-                    get_text(self.current_lang, 'error_empty_url'),
+                    "❌ Please enter a URL",
                     ft.Colors.RED_700
                 )
                 self.download_btn.disabled = False
@@ -953,11 +901,11 @@ class SocMedDownloaderGUI:
                     if download_instagram_images(url, self.download_folder, self.log_output):
                         self.progress_bar.value = 1.0
                         self.update_status(
-                            get_text(self.current_lang, 'status_success'),
+                            "✅ Download completed successfully!",
                             ft.Colors.GREEN_700
                         )
-                        self.log_output("✅ " + get_text(self.current_lang, 'status_success'))
-                        self.log_output("📁 " + get_text(self.current_lang, 'output_folder', folder=self.download_folder))
+                        self.log_output("✅ Download completed successfully!")
+                        self.log_output(f"📁 Saved to: {self.download_folder}")
                         return
                     else:
                         self.log_output("⚠️ Falling back to yt-dlp...")
@@ -989,7 +937,7 @@ class SocMedDownloaderGUI:
             
             # Extract info first
             self.update_status(
-                get_text(self.current_lang, 'status_validating'),
+                "🔍 Validating URL...",
                 ft.Colors.BLUE_700
             )
             
@@ -1003,7 +951,7 @@ class SocMedDownloaderGUI:
                 
                 # Start download
                 self.update_status(
-                    get_text(self.current_lang, 'status_downloading'),
+                    "⏬ Downloading...",
                     ft.Colors.BLUE_700
                 )
                 ydl.download([url])
@@ -1011,22 +959,22 @@ class SocMedDownloaderGUI:
             # Success
             self.progress_bar.value = 1.0
             self.update_status(
-                get_text(self.current_lang, 'status_success'),
+                "✅ Download completed successfully!",
                 ft.Colors.GREEN_700
             )
-            self.log_output("✅ " + get_text(self.current_lang, 'status_success'))
-            self.log_output("📁 " + get_text(self.current_lang, 'output_folder', folder=self.download_folder))
+            self.log_output("✅ Download completed successfully!")
+            self.log_output(f"📁 Saved to: {self.download_folder}")
             
         except Exception as e:
             self.progress_bar.value = 0
             error_msg = str(e)
             if 'Unsupported URL' in error_msg:
-                error_msg = get_text(self.current_lang, 'error_invalid_url')
+                error_msg = "Invalid or unsupported URL"
             self.update_status(
-                get_text(self.current_lang, 'status_error', error=error_msg),
+                f"❌ Error: {error_msg}",
                 ft.Colors.RED_700
             )
-            self.log_output("❌ " + get_text(self.current_lang, 'status_error', error=error_msg))
+            self.log_output(f"❌ Error: {error_msg}")
         
         finally:
             self.download_btn.disabled = False
@@ -1054,7 +1002,7 @@ class SocMedDownloaderGUI:
                 from batch_reader import read_batch_file
                 
                 self.update_status(
-                    get_text(self.current_lang, 'status_validating'),
+                    "🔍 Reading batch file...",
                     ft.Colors.BLUE_700
                 )
                 
@@ -1063,7 +1011,7 @@ class SocMedDownloaderGUI:
                     links.extend(file_links)
                 except Exception as e:
                     self.update_status(
-                        get_text(self.current_lang, 'batch_error_read', error=str(e)),
+                        f"❌ Error reading batch file: {str(e)}",
                         ft.Colors.RED_700
                     )
                     self.download_btn.disabled = False
@@ -1073,7 +1021,7 @@ class SocMedDownloaderGUI:
             # Check if we have any links
             if not links:
                 self.update_status(
-                    get_text(self.current_lang, 'batch_no_links'),
+                    "❌ No URLs found in batch file or list",
                     ft.Colors.RED_700
                 )
                 self.download_btn.disabled = False
@@ -1095,7 +1043,7 @@ class SocMedDownloaderGUI:
                 
                 # Update status
                 self.update_status(
-                    get_text(self.current_lang, 'batch_processing', current=i, total=total),
+                    f"⏬ Processing [{i}/{total}]...",
                     ft.Colors.BLUE_700
                 )
                 self.progress_bar.visible = True
@@ -1181,20 +1129,14 @@ class SocMedDownloaderGUI:
             # Show completion status
             self.progress_bar.visible = False
             self.update_status(
-                get_text(
-                    self.current_lang, 
-                    'batch_complete', 
-                    total=total, 
-                    success=success_count, 
-                    failed=failed_count
-                ) + "\n" + get_text(self.current_lang, 'output_folder', folder=self.download_folder),
+                f"✅ Batch complete! Total: {total} | Success: {success_count} | Failed: {failed_count}\n📁 Saved to: {self.download_folder}",
                 ft.Colors.GREEN_700 if failed_count == 0 else ft.Colors.ORANGE_700
             )
             
         except Exception as e:
             self.progress_bar.visible = False
             self.update_status(
-                get_text(self.current_lang, 'status_error', error=str(e)),
+                f"❌ Error: {str(e)}",
                 ft.Colors.RED_700
             )
         
@@ -1208,7 +1150,7 @@ class SocMedDownloaderGUI:
         if self.download_mode == 'single':
             url = self.url_input.value.strip()
             if not url:
-                self.log_output("❌ " + get_text(self.current_lang, 'error_empty_url'))
+                self.log_output("❌ Please enter a URL")
                 return
         elif self.download_mode == 'batch':
             if not self.batch_file_path and len(self.url_list.controls) == 0:

@@ -12,10 +12,6 @@ from pathlib import Path
 import asyncio
 import time
 
-# Add parent directory to path for language_config
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from language_config import get_language, get_all_texts
-
 # Import our batch downloader
 from batch_downloader import BatchDownloader
 
@@ -29,11 +25,6 @@ class BatchDownloaderGUI:
         self.page.window_resizable = True
         self.page.theme_mode = ft.ThemeMode.LIGHT
         self.page.padding = 10
-        
-        # Language configuration
-        self.current_language = get_language()
-        self.translations = get_all_texts("youtube_downloader", self.current_language)
-        self.common_translations = get_all_texts("common", self.current_language)
         
         # Initialize downloader
         self.downloader = BatchDownloader()
@@ -88,13 +79,13 @@ class BatchDownloaderGUI:
         title_section = ft.Container(
             content=ft.Column([
                 ft.Text(
-                    self.translations.get("title_batch", "🎬 YouTube Batch Downloader"),
+                    "🎬 YouTube Batch Downloader",
                     size=24,
                     weight=ft.FontWeight.BOLD,
                     text_align=ft.TextAlign.CENTER
                 ),
                 ft.Text(
-                    self.translations.get("desc_batch", "Download multiple individual YouTube videos"),
+                    "Download multiple individual YouTube videos",
                     size=14,
                     color=ft.Colors.GREY_600,
                     text_align=ft.TextAlign.CENTER
@@ -105,9 +96,9 @@ class BatchDownloaderGUI:
         main_content.controls.append(title_section)
         
         # yt-dlp Status Section
-        self.ytdlp_status_text = ft.Text(self.translations.get("ytdlp_status", "Checking yt-dlp status..."), size=12)
+        self.ytdlp_status_text = ft.Text("Checking yt-dlp status...", size=12)
         self.install_btn = ft.ElevatedButton(
-            text=self.translations.get("install_ytdlp", "📦 Install/Update yt-dlp"),
+            text="📦 Install/Update yt-dlp",
             on_click=self.install_update_ytdlp,
             icon=ft.Icons.DOWNLOAD
         )
@@ -126,14 +117,14 @@ class BatchDownloaderGUI:
         
         # Download Folder Section
         self.folder_field = ft.TextField(
-            label=self.translations.get("download_folder", "📁 Download Folder"),
+            label="📁 Download Folder",
             value=self.download_folder,
             expand=True,
             on_change=self.on_folder_change
         )
         
         browse_btn = ft.ElevatedButton(
-            text=self.common_translations.get("browse", "Browse"),
+            text="Browse",
             icon=ft.Icons.FOLDER_OPEN,
             on_click=self.browse_folder
         )
@@ -154,7 +145,7 @@ class BatchDownloaderGUI:
         
         # Download Buttons
         self.download_btn = ft.ElevatedButton(
-            text=self.translations.get("start_download", "🚀 Start Batch Download"),
+            text="🚀 Start Download",
             icon=ft.Icons.PLAY_ARROW,
             on_click=self.start_download,
             width=200,
@@ -166,7 +157,7 @@ class BatchDownloaderGUI:
         )
         
         self.retry_failed_btn = ft.ElevatedButton(
-            text="🔄 " + self.translations.get("retry", "Retry Failed"),
+            text="🔄 Retry Failed",
             icon=ft.Icons.REFRESH,
             on_click=self.retry_failed_downloads,
             width=150,
@@ -260,14 +251,14 @@ class BatchDownloaderGUI:
         """Create URL management section"""
         # URL Input
         self.url_field = ft.TextField(
-            label=self.translations.get("url_input", "🔗 YouTube URL"),
-            hint_text=self.translations.get("url_input", "Paste YouTube video URL here..."),
+            label="Enter YouTube URL",
+            hint_text="Paste YouTube video URL here...",
             expand=True,
             on_submit=self.add_url
         )
         
         add_btn = ft.ElevatedButton(
-            text=self.translations.get("add_url", "Add URL"),
+            text="Add URL",
             icon=ft.Icons.ADD,
             on_click=self.add_url
         )
@@ -276,27 +267,27 @@ class BatchDownloaderGUI:
         
         # URL Management Buttons
         load_btn = ft.ElevatedButton(
-            text=self.translations.get("load_from_file", "📄 Load from File"),
+            text="📄 Load from File",
             icon=ft.Icons.FILE_OPEN,
             on_click=self.load_urls_from_file,
             style=ft.ButtonStyle(bgcolor=ft.Colors.GREEN_100)
         )
         
         save_btn = ft.ElevatedButton(
-            text=self.translations.get("save_to_file", "💾 Save to File"),
+            text="💾 Save to File",
             icon=ft.Icons.SAVE,
             on_click=self.save_urls_to_file,
             style=ft.ButtonStyle(bgcolor=ft.Colors.BLUE_100)
         )
         
         clear_btn = ft.ElevatedButton(
-            text=self.translations.get("clear_all", "🗑️ Clear All"),
+            text="🗑️ Clear All",
             icon=ft.Icons.CLEAR,
             on_click=self.clear_all_urls,
             style=ft.ButtonStyle(bgcolor=ft.Colors.RED_100)
         )
         
-        self.url_count_text = ft.Text(self.translations.get("url_list", "URLs") + ": 0", weight=ft.FontWeight.BOLD, size=14)
+        self.url_count_text = ft.Text("URLs: 0", weight=ft.FontWeight.BOLD, size=14)
         
         button_row = ft.Row([
             load_btn, save_btn, clear_btn,
@@ -832,7 +823,7 @@ class BatchDownloaderGUI:
             # Re-enable UI elements
             try:
                 self.download_btn.disabled = False
-                self.download_btn.text = "🚀 Start Batch Download"
+                self.download_btn.text = "🚀 Start Download"
                 
                 # Enable retry/clear buttons if there are failed downloads
                 if len(self.downloader.failed_downloads) > 0:

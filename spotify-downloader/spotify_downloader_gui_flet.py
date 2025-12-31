@@ -4,6 +4,8 @@ import os
 import threading
 import re
 import sys
+import shutil
+from pathlib import Path
 
 def check_spotdl_installed():
     """Mengecek apakah spotdl sudah terinstall."""
@@ -18,6 +20,21 @@ def check_spotdl_installed():
     except Exception:
         return False
 
+def check_ffmpeg_available():
+    """Check if FFmpeg is available in PATH or current folder"""
+    # Check if ffmpeg.exe exists in current folder
+    current_dir = Path(__file__).parent
+    ffmpeg_local = current_dir / "ffmpeg.exe"
+    
+    if ffmpeg_local.exists():
+        return True, str(ffmpeg_local)
+    
+    # Check if ffmpeg is in system PATH
+    if shutil.which("ffmpeg"):
+        return True, "System PATH"
+    
+    return False, None
+
 def install_spotdl():
     """Menginstall spotdl via pip."""
     try:
@@ -30,9 +47,9 @@ def install_spotdl():
         return False
 
 def main(page: ft.Page):
-    page.title = "🎵 Spotify Downloader Pro (SpotDL)"
-    page.window_width = 750
-    page.window_height = 750
+    page.title = "🎵 Spotify Downloader (No API Key Required)"
+    page.window_width = 800
+    page.window_height = 850
     page.vertical_alignment = ft.MainAxisAlignment.START
     page.padding = 20
     page.theme_mode = ft.ThemeMode.DARK
@@ -40,6 +57,9 @@ def main(page: ft.Page):
 
     # Cek apakah spotdl terinstall
     spotdl_installed = check_spotdl_installed()
+    
+    # Cek FFmpeg
+    ffmpeg_available, ffmpeg_location = check_ffmpeg_available()
 
     # --- ALERT SPOTDL NOT INSTALLED ---
     def on_install_spotdl(e):
@@ -79,6 +99,36 @@ def main(page: ft.Page):
         color=ft.Colors.ORANGE_400,
         size=13,
         weight=ft.FontWeight.BOLD
+    )
+    
+    # FFmpeg warning (if not available)
+    ffmpeg_warning = ft.Container(
+        content=ft.Column([
+            ft.Icon(ft.Icons.WARNING, color=ft.Colors.RED_400, size=32),
+            ft.Text(
+                "FFmpeg Not Detected!",
+                size=16,
+                weight=ft.FontWeight.BOLD,
+                color=ft.Colors.WHITE
+            ),
+            ft.Text(
+                "⚠️ spotdl requires FFmpeg to convert audio. Download ffmpeg.exe and place it in this folder.",
+                size=12,
+                color=ft.Colors.ORANGE_300,
+                text_align=ft.TextAlign.CENTER
+            ),
+            ft.Text(
+                "Download: https://ffmpeg.org/download.html",
+                size=11,
+                color=ft.Colors.BLUE_300,
+                italic=True
+            ),
+        ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=10),
+        padding=20,
+        bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.RED_400),
+        border=ft.Border.all(2, ft.Colors.RED_700),
+        border_radius=10,
+        visible=not ffmpeg_available and spotdl_installed
     )
     
     spotdl_alert = ft.Container(
@@ -206,7 +256,55 @@ def main(page: ft.Page):
         ], spacing=0),
         border_radius=10,
     )
+    
+    # Log container for debugging
+    log_text = ft.Text(
+        value="Ready to download. No API key required - using anonymous mode.",
+        font_family="Consolas",
+        size=11,
+        color=ft.Colors.GREEN_400,
+        selectable=True
+    )
+    log_container = ft.Column(
+        [log_text],
+        scroll=ft.ScrollMode.ALWAYS,
+        height=120,
+        spacing=2
+    )
+    log_section = ft.ExpansionTile(
+        title=ft.Text("📜 Download Log", weight=ft.FontWeight.BOLD),
+        subtitle=ft.Text("Expand to see detailed download progress", size=11),
+        controls=[
+            ft.Container(
+                content=log_container,
+                bgcolor=ft.Colors.BLACK,
+                padding=10,
+                border_radius=5
+            )
+        ],
+        initially_expanded=False
+    )
 
+    # --- ICON STATUS / LOG FUNCTIONS ---
+    def add_log(message, is_error=False):
+        """Add message to log container"""
+        try:
+            color = ft.Colors.RED_400 if is_error else ft.Colors.GREEN_400
+            timestamp = __import__('datetime').datetime.now().strftime("%H:%M:%S")
+            log_text.value += f"\n[{timestamp}] {message}"
+            log_text.color = color
+            # Auto-scroll to bottom
+            log_container.scroll_to(offset=-1, duration=100)
+            page.update()
+        except:
+            pass
+    
+    def clear_log():
+        """Clear log content"""
+        log_text.value = "Ready to download."
+        log_text.color = ft.Colors.GREEN_400
+        page.update()
+    
     # --- ICON STATUS ---
     def get_status_icon(status):
         if status == "waiting":
@@ -223,11 +321,34 @@ def main(page: ft.Page):
     def run_download_process(url, output_folder, bitrate):
         """Fungsi ini berjalan di background thread"""
         
+        # Clear previous log
+        clear_log()
+        add_log("✨ Starting new download session...")
+        
+        # Check FFmpeg first
+        ffmpeg_ok, ffmpeg_path = check_ffmpeg_available()
+        if not ffmpeg_ok:
+            status_text.value = "❌ FFmpeg not found! Download required."
+            status_text.color = ft.Colors.RED_400
+            add_log("❌ ERROR: FFmpeg not detected in PATH or current folder.", True)
+            add_log("   Download ffmpeg.exe from https://ffmpeg.org/download.html", True)
+            add_log("   Place ffmpeg.exe in the same folder as this script.", True)
+            progress_bar.visible = False
+            page.update()
+            return
+        
+        add_log(f"✅ FFmpeg detected: {ffmpeg_path}")
+        add_log(f"🔗 URL: {url}")
+        add_log(f"📂 Output: {output_folder}")
+        add_log(f"🎵 Bitrate: {bitrate}")
+        add_log("🔍 Starting download without API key (anonymous mode)...")
+        
         # Update UI: Mulai
         status_text.value = "🚀 Memulai download..."
         status_text.color = ft.Colors.YELLOW_200
         progress_bar.visible = True
         song_table.rows.clear()
+        add_log("📋 Clearing previous results...")
         page.update()
 
         # Flags untuk menyembunyikan window CMD (khusus Windows)
@@ -286,8 +407,13 @@ def main(page: ft.Page):
                 if not line:
                     continue
                 
-                # Print untuk debugging (bisa dilihat di console)
-                print(f"DEBUG: {line}")
+                # Log everything to console
+                if "Downloading" in line or "Downloaded" in line or "Found" in line:
+                    add_log(f"📝 {line}")
+                elif "Error" in line:
+                    add_log(f"❌ {line}", True)
+                elif "%" not in line:  # Skip progress bar spam
+                    add_log(f"   {line}")
                 
                 # Deteksi jumlah total lagu
                 if "Found" in line and ("song" in line.lower() or "track" in line.lower()):
@@ -366,16 +492,20 @@ def main(page: ft.Page):
             if completed_count > 0:
                 status_text.value = f"🎉 Selesai! {completed_count} lagu berhasil didownload."
                 status_text.color = ft.Colors.GREEN_400
+                add_log(f"✅ SUCCESS: Downloaded {completed_count} song(s)")
             elif error_count > 0:
                 status_text.value = f"⚠️ Download selesai dengan {error_count} error."
                 status_text.color = ft.Colors.ORANGE_400
+                add_log(f"⚠️ WARNING: {error_count} error(s) occurred", True)
             else:
                 status_text.value = "⚠️ Tidak ada lagu yang didownload. Cek link atau koneksi."
                 status_text.color = ft.Colors.ORANGE_400
+                add_log("⚠️ No songs downloaded. Check URL or connection.", True)
         
         except Exception as e:
             status_text.value = f"❌ Error: {str(e)}"
             status_text.color = ft.Colors.RED_400
+            add_log(f"❌ EXCEPTION: {str(e)}", True)
         
         finally:
             progress_bar.visible = False
@@ -487,6 +617,10 @@ def main(page: ft.Page):
                             spotdl_alert,
                             ft.Divider(height=10, color="transparent", visible=not spotdl_installed),
                             
+                            # FFmpeg warning
+                            ffmpeg_warning,
+                            ft.Divider(height=10, color="transparent", visible=not ffmpeg_available and spotdl_installed),
+                            
                             url_input,
                             ft.Row([
                                 bitrate_dropdown,
@@ -503,6 +637,8 @@ def main(page: ft.Page):
                             ft.Divider(height=10, color="transparent"),
                             ft.Text("📋 Daftar Lagu:", size=14, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
                             table_container,
+                            ft.Divider(height=15, color="transparent"),
+                            log_section,
                             ft.Divider(height=20, color="transparent"),
                             footer
                         ],

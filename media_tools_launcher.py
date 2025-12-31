@@ -4,7 +4,6 @@ import sys
 from pathlib import Path
 import importlib.util
 import subprocess
-from language_config import get_language, set_language, get_available_languages, get_all_texts
 
 # Detect if running as PyInstaller executable
 if getattr(sys, 'frozen', False):
@@ -258,11 +257,6 @@ class MediaToolsLauncher:
         self.page.window_min_height = 500
         self.page.theme_mode = ft.ThemeMode.LIGHT
         
-        # Language configuration
-        self.current_language = get_language()
-        self.translations = get_all_texts("launcher", self.current_language)
-        self.common_translations = get_all_texts("common", self.current_language)
-        
         # State management
         self.current_app = None
         self.home_view = None
@@ -270,16 +264,6 @@ class MediaToolsLauncher:
         
         # Initialize UI
         self.setup_home_ui()
-        
-    def change_language(self, e):
-        """Handle language change"""
-        new_lang = e.control.value
-        if set_language(new_lang):
-            self.current_language = new_lang
-            self.translations = get_all_texts("launcher", self.current_language)
-            self.common_translations = get_all_texts("common", self.current_language)
-            # Refresh UI
-            self.setup_home_ui()
     
     def setup_home_ui(self):
         """Setup the main home interface"""
@@ -287,38 +271,19 @@ class MediaToolsLauncher:
         # Clear page
         self.page.controls.clear()
         
-        # Language selector dropdown
-        languages = get_available_languages()
-        language_options = [
-            ft.dropdown.Option(key=lang_code, text=f"{lang_data['flag']} {lang_data['name']}")
-            for lang_code, lang_data in languages.items()
-        ]
-        
-        language_selector = ft.Dropdown(
-            value=self.current_language,
-            options=language_options,
-            width=250,
-            on_change=self.change_language,
-            border_color=ft.Colors.DEEP_PURPLE,
-            focused_border_color=ft.Colors.DEEP_PURPLE_400,
-            label=self.common_translations.get("select_language", "Pilih Bahasa"),
-        )
-        
         # Header
         header = ft.Container(
             content=ft.Column([
                 ft.Row([
                     ft.Icon(ft.Icons.BUILD_CIRCLE, size=50, color=ft.Colors.DEEP_PURPLE),
                     ft.Column([
-                        ft.Text(self.translations.get("title", "Media Tools"), 
+                        ft.Text("Media Tools", 
                                size=32, weight=ft.FontWeight.BOLD),
-                        ft.Text(self.translations.get("subtitle", "Suite"), 
+                        ft.Text("Suite", 
                                size=24, weight=ft.FontWeight.W_300, color=ft.Colors.GREY_600),
                     ], spacing=0),
-                    ft.Container(expand=True),  # Spacer
-                    language_selector,
                 ], alignment=ft.MainAxisAlignment.CENTER, spacing=20),
-                ft.Text(self.translations.get("description", "Pilih tool yang ingin Anda gunakan"), 
+                ft.Text("Select the tool you want to use", 
                        size=16, color=ft.Colors.GREY_700, text_align=ft.TextAlign.CENTER),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=15),
             padding=30,
@@ -329,9 +294,8 @@ class MediaToolsLauncher:
         
         # Tool cards
         audio_merger_card = self.create_tool_card(
-            title=self.translations.get("tool_audio_merger", "🎵 Audio Merger"),
-            description=self.translations.get("audio_merger_desc", 
-                "Gabungkan multiple file audio menjadi satu dengan efek transisi seperti crossfade dan gap"),
+            title="🎵 Audio Merger",
+            description="Merge multiple audio files into one with transition effects like crossfade and gap",
             features=[
                 "✨ Crossfade & Gap effects",
                 "🎚️ Multi-format support",
@@ -343,9 +307,8 @@ class MediaToolsLauncher:
         )
         
         media_detector_card = self.create_tool_card(
-            title=self.translations.get("tool_media_detector", "🎬 Media Codec Detector"), 
-            description=self.translations.get("media_detector_desc",
-                "Deteksi format kontainer dan codec dari file media (gambar, video, audio)"),
+            title="🎬 Media Codec Detector", 
+            description="Detect container format and codecs from media files (images, videos, audio)",
             features=[
                 "🕵️ Comprehensive codec detection", 
                 "📱 Image format analysis",
@@ -357,9 +320,8 @@ class MediaToolsLauncher:
         )
         
         batch_downloader_card = self.create_tool_card(
-            title=self.translations.get("tool_batch_downloader", "📥 Batch Downloader"),
-            description=self.translations.get("batch_downloader_desc",
-                "Download multiple individual YouTube videos dengan modern Flet interface"),
+            title="📥 Batch Downloader",
+            description="Download multiple individual YouTube videos with modern Flet interface",
             features=[
                 "� Modern Flet GUI interface",
                 "📝 URL management & batch loading",
@@ -371,9 +333,8 @@ class MediaToolsLauncher:
         )
         
         playlist_downloader_card = self.create_tool_card(
-            title=self.translations.get("tool_playlist_downloader", "🎵 Playlist Downloader"),
-            description=self.translations.get("playlist_downloader_desc",
-                "Download complete YouTube playlists dengan elegant interface"),
+            title="🎵 Playlist Downloader",
+            description="Download complete YouTube playlists with elegant interface",
             features=[
                 "📱 Modern Flet GUI interface",
                 "🎵 Full playlist downloading",
@@ -385,9 +346,8 @@ class MediaToolsLauncher:
         )
         
         socmed_downloader_card = self.create_tool_card(
-            title=self.translations.get("tool_socmed_downloader", "📥 SocMed Downloader"),
-            description=self.translations.get("socmed_downloader_desc",
-                "Download video/audio dari YouTube, TikTok, Instagram, Facebook, Twitter/X"),
+            title="🌐 SocMed Downloader",
+            description="Download video/audio from YouTube, TikTok, Instagram, Facebook, Twitter/X",
             features=[
                 "🌐 Multi-platform (YT, TikTok, IG, FB, X)",
                 "🎬 Video & Audio (MP3) support",
@@ -399,9 +359,8 @@ class MediaToolsLauncher:
         )
         
         media_looper_card = self.create_tool_card(
-            title=self.translations.get("tool_media_looper", "🔁 Media Looper"),
-            description=self.translations.get("media_looper_desc",
-                "Loop video/audio N kali tanpa re-encoding menggunakan FFmpeg stream copy"),
+            title="🔁 Media Looper",
+            description="Loop video/audio N times without re-encoding using FFmpeg stream copy",
             features=[
                 "⚡ Super cepat (stream copy, no re-encode)",
                 "🎵 Audio & Video support",
@@ -415,7 +374,7 @@ class MediaToolsLauncher:
         # Tool selection section
         tools_section = ft.Container(
             content=ft.Column([
-                ft.Text(self.translations.get("select_tool", "Pilih Tool"), 
+                ft.Text("Select Tool", 
                        size=20, weight=ft.FontWeight.BOLD, text_align=ft.TextAlign.CENTER),
                 ft.Row([
                     audio_merger_card,
@@ -441,16 +400,15 @@ class MediaToolsLauncher:
                 ft.Divider(height=1, color=ft.Colors.GREY_300),
                 ft.Row([
                     ft.Icon(ft.Icons.INFO_OUTLINE, size=20, color=ft.Colors.GREY_600),
-                    ft.Text(self.translations.get("info_message", 
-                           "Kedua tool memerlukan FFmpeg untuk berfungsi dengan optimal"), 
+                    ft.Text("These tools require FFmpeg to function optimally", 
                            size=14, color=ft.Colors.GREY_600),
                 ], alignment=ft.MainAxisAlignment.CENTER),
                 ft.Row([
-                    ft.TextButton(self.translations.get("documentation", "📖 Dokumentasi"), 
+                    ft.TextButton("📖 Documentation", 
                                  on_click=self.show_docs),
-                    ft.TextButton(self.translations.get("system_requirements", "⚙️ System Requirements"), 
+                    ft.TextButton("⚙️ System Requirements", 
                                  on_click=self.show_requirements),
-                    ft.TextButton(self.translations.get("exit", "❌ Exit"), 
+                    ft.TextButton("❌ Exit", 
                                  on_click=self.exit_app),
                 ], alignment=ft.MainAxisAlignment.CENTER, spacing=20),
             ], spacing=15),
@@ -548,7 +506,7 @@ class MediaToolsLauncher:
                         ft.Column(feature_items, spacing=5),
                         ft.Container(height=15),  # Spacing
                         ft.ElevatedButton(
-                            self.translations.get("launch_tool", "Launch Tool"),
+                            "Launch Tool",
                             icon=ft.Icons.ROCKET_LAUNCH,
                             bgcolor=color,
                             color=ft.Colors.WHITE,
@@ -578,7 +536,7 @@ class MediaToolsLauncher:
     def launch_audio_merger(self, e):
         """Launch Audio Merger tool"""
         if AudioMergerGUI is None:
-            error_msg = "Audio Merger tidak tersedia.\n\nPastikan file audio_merger_gui.py ada di folder audio-merger/\n\nPeriksa juga bahwa semua dependencies sudah terinstall dengan:\npip install -r requirements.txt"
+            error_msg = "Audio Merger is not available.\n\nMake sure audio_merger_gui.py exists in the audio-merger/ folder\n\nAlso check that all dependencies are installed with:\npip install -r requirements.txt"
             self.show_error(error_msg)
             return
         
@@ -587,7 +545,7 @@ class MediaToolsLauncher:
     def launch_media_detector(self, e):
         """Launch Media Codec Detector tool"""
         if MediaCodecDetectorGUI is None:
-            error_msg = "Media Codec Detector tidak tersedia.\n\nPastikan file media_codec_detector_gui.py ada di folder media-codec-detector/\n\nPeriksa juga bahwa semua dependencies sudah terinstall dengan:\npip install -r requirements.txt"
+            error_msg = "Media Codec Detector is not available.\n\nMake sure media_codec_detector_gui.py exists in the media-codec-detector/ folder\n\nAlso check that all dependencies are installed with:\npip install -r requirements.txt"
             self.show_error(error_msg)
             return
         
@@ -602,7 +560,7 @@ class MediaToolsLauncher:
             # Fallback to Tkinter version
             self.switch_to_app("batch_downloader_tkinter")
         else:
-            error_msg = "YouTube Batch Downloader tidak tersedia.\n\nPastikan file batch_downloader_gui_flet.py atau batch_downloader_gui.py ada di folder yt-batch-downloader/\n\nPeriksa juga bahwa yt-dlp sudah terinstall dengan:\npip install yt-dlp"
+            error_msg = "YouTube Batch Downloader is not available.\n\nMake sure batch_downloader_gui_flet.py or batch_downloader_gui.py exists in the yt-batch-downloader/ folder\n\nAlso check that yt-dlp is installed with:\npip install yt-dlp"
             self.show_error(error_msg)
             return
     
@@ -615,14 +573,14 @@ class MediaToolsLauncher:
             # Fallback to Tkinter version
             self.switch_to_app("playlist_downloader_tkinter")
         else:
-            error_msg = "YouTube Playlist Downloader tidak tersedia.\n\nPastikan file playlist_downloader_gui_flet.py atau playlist_downloader_gui.py ada di folder yt-playlist-downloader/\n\nPeriksa juga bahwa yt-dlp sudah terinstall dengan:\npip install yt-dlp"
+            error_msg = "YouTube Playlist Downloader is not available.\n\nMake sure playlist_downloader_gui_flet.py or playlist_downloader_gui.py exists in the yt-playlist-downloader/ folder\n\nAlso check that yt-dlp is installed with:\npip install yt-dlp"
             self.show_error(error_msg)
             return
     
     def launch_socmed_downloader(self, e):
         """Launch SocMed Downloader tool"""
         if SocMedDownloaderGUI is None:
-            error_msg = "SocMed Downloader tidak tersedia.\n\nPastikan file socmed_downloader_gui.py ada di folder socmed-downloader/\n\nPeriksa juga bahwa yt-dlp sudah terinstall dengan:\npip install yt-dlp"
+            error_msg = "SocMed Downloader is not available.\n\nMake sure socmed_downloader_gui.py exists in the socmed-downloader/ folder\n\nAlso check that yt-dlp is installed with:\npip install yt-dlp"
             self.show_error(error_msg)
             return
         
@@ -631,7 +589,7 @@ class MediaToolsLauncher:
     def launch_media_looper(self, e):
         """Launch Media Looper tool"""
         if MediaLooperGUI is None:
-            error_msg = "Media Looper tidak tersedia.\n\nPastikan file media_looper_gui_flet.py ada di folder media-looper/\n\nPeriksa juga bahwa FFmpeg sudah terinstall dan ada di system PATH."
+            error_msg = "Media Looper is not available.\n\nMake sure media_looper_gui_flet.py exists in the media-looper/ folder\n\nAlso check that FFmpeg is installed and in the system PATH."
             self.show_error(error_msg)
             return
         
@@ -644,7 +602,7 @@ class MediaToolsLauncher:
         # Create back button
         back_button = ft.Container(
             content=ft.ElevatedButton(
-                self.common_translations.get("back_to_home", "🏠 Back to Home"),
+                "🏠 Back to Home",
                 icon=ft.Icons.HOME,
                 on_click=self.back_to_home,
                 bgcolor=ft.Colors.GREY_600,
@@ -812,25 +770,25 @@ class MediaToolsLauncher:
             
             docs_content = ft.Container(
                 content=ft.Column([
-                    ft.Text("📖 Dokumentasi Media Tools", size=20, weight=ft.FontWeight.BOLD),
+                    ft.Text("📖 Media Tools Documentation", size=20, weight=ft.FontWeight.BOLD),
                     ft.Divider(),
                     ft.Text("🎵 Audio Merger:", weight=ft.FontWeight.BOLD),
-                    ft.Text("• Gabungkan multiple file audio dengan efek transisi\n• Format: MP3, WAV, FLAC, M4A, OGG, AAC, WMA\n• Efek: Crossfade, Gap/Jeda, Gabungan langsung", size=12),
+                    ft.Text("• Merge multiple audio files with transition effects\n• Formats: MP3, WAV, FLAC, M4A, OGG, AAC, WMA\n• Effects: Crossfade, Gap, Direct merge", size=12),
                     ft.Container(height=10),
                     ft.Text("🎬 Media Codec Detector:", weight=ft.FontWeight.BOLD),
-                    ft.Text("• Deteksi codec dan format file media\n• Support: Gambar, Video, Audio\n• Analisis stream dan container format", size=12),
+                    ft.Text("• Detect codec and media file format\n• Support: Images, Videos, Audio\n• Stream and container format analysis", size=12),
                     ft.Container(height=10),
                     ft.Text("📥 YouTube Batch Downloader:", weight=ft.FontWeight.BOLD),
-                    ft.Text("• Download multiple individual YouTube videos\n• Quality selection & auto-numbering\n• URL management dari file atau manual input", size=12),
+                    ft.Text("• Download multiple individual YouTube videos\n• Quality selection & auto-numbering\n• URL management from file or manual input", size=12),
                     ft.Container(height=10),
                     ft.Text("🎵 YouTube Playlist Downloader:", weight=ft.FontWeight.BOLD),
                     ft.Text("• Download entire YouTube playlists\n• Progress tracking per video\n• Flexible naming templates\n• Modern Flet interface", size=12),
                     ft.Container(height=10),
-                    ft.Text("� SocMed Downloader:", weight=ft.FontWeight.BOLD),
-                    ft.Text("• Download video/audio dari YouTube, TikTok, Instagram, Facebook, Twitter/X\n• Support video & audio (MP3) download\n• Batch download dari file TXT/CSV/JSON\n• Quality selector (480p-1080p)", size=12),
+                    ft.Text("🌐 SocMed Downloader:", weight=ft.FontWeight.BOLD),
+                    ft.Text("• Download video/audio from YouTube, TikTok, Instagram, Facebook, Twitter/X\n• Support video & audio (MP3) download\n• Batch download from TXT/CSV/JSON files\n• Quality selector (480p-1080p)", size=12),
                     ft.Container(height=10),
-                    ft.Text("�💡 Tips:", weight=ft.FontWeight.BOLD),
-                    ft.Text("• Pastikan FFmpeg sudah terinstall\n• YouTube tools memerlukan yt-dlp\n• Gunakan virtual environment untuk dependencies", size=12),
+                    ft.Text("💡 Tips:", weight=ft.FontWeight.BOLD),
+                    ft.Text("• Make sure FFmpeg is installed\n• YouTube tools require yt-dlp\n• Use virtual environment for dependencies", size=12),
                 ], spacing=5, scroll=ft.ScrollMode.AUTO),
                 width=500,
                 height=450,
@@ -838,9 +796,9 @@ class MediaToolsLauncher:
             )
             
             dialog = ft.AlertDialog(
-                title=ft.Text("Dokumentasi"),
+                title=ft.Text("Documentation"),
                 content=docs_content,
-                actions=[ft.TextButton("Tutup", on_click=lambda e: self.page.close(dialog))],
+                actions=[ft.TextButton("Close", on_click=lambda e: self.page.close(dialog))],
                 actions_alignment=ft.MainAxisAlignment.END,
                 modal=True
             )
@@ -862,16 +820,16 @@ class MediaToolsLauncher:
                     ft.Text("⚙️ System Requirements", size=20, weight=ft.FontWeight.BOLD),
                     ft.Divider(),
                     ft.Text("🐍 Python:", weight=ft.FontWeight.BOLD),
-                    ft.Text("• Python 3.8 atau lebih baru\n• Virtual environment (recommended)", size=12),
+                    ft.Text("• Python 3.8 or newer\n• Virtual environment (recommended)", size=12),
                     ft.Container(height=10),
-                    ft.Text("📦 FFmpeg (Wajib):", weight=ft.FontWeight.BOLD),
+                    ft.Text("📦 FFmpeg (Required):", weight=ft.FontWeight.BOLD),
                     ft.Text("Windows: choco install ffmpeg\nmacOS: brew install ffmpeg\nLinux: sudo apt install ffmpeg", size=12),
                     ft.Container(height=10),
                     ft.Text("📚 Python Dependencies:", weight=ft.FontWeight.BOLD),
                     ft.Text("• pydub (audio processing)\n• flet (GUI framework)\n• ffmpeg-python (FFmpeg wrapper)\n• Pillow (image processing)\n• filetype (file type detection)\n• yt-dlp (YouTube downloader)", size=12),
                     ft.Container(height=10),
                     ft.Text("💾 Disk Space:", weight=ft.FontWeight.BOLD),
-                    ft.Text("• ~200MB untuk dependencies\n• Space tambahan untuk file output", size=12),
+                    ft.Text("• ~200MB for dependencies\n• Additional space for output files", size=12),
                 ], spacing=5, scroll=ft.ScrollMode.AUTO),
                 width=500,
                 height=400,
@@ -881,7 +839,7 @@ class MediaToolsLauncher:
             dialog = ft.AlertDialog(
                 title=ft.Text("System Requirements"),
                 content=req_content,
-                actions=[ft.TextButton("Tutup", on_click=lambda e: self.page.close(dialog))],
+                actions=[ft.TextButton("Close", on_click=lambda e: self.page.close(dialog))],
                 actions_alignment=ft.MainAxisAlignment.END,
                 modal=True
             )

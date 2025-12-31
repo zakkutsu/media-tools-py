@@ -12,10 +12,6 @@ from pathlib import Path
 import asyncio
 import time
 
-# Add parent directory to path for language_config
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from language_config import get_language, get_all_texts
-
 # Import our playlist downloader
 from playlist_downloader import PlaylistDownloader
 
@@ -29,11 +25,6 @@ class PlaylistDownloaderGUI:
         self.page.window_resizable = True
         self.page.theme_mode = ft.ThemeMode.LIGHT
         self.page.padding = 10
-        
-        # Language configuration
-        self.current_language = get_language()
-        self.translations = get_all_texts("youtube_downloader", self.current_language)
-        self.common_translations = get_all_texts("common", self.current_language)
         
         # Initialize downloader
         self.downloader = PlaylistDownloader()
@@ -80,13 +71,13 @@ class PlaylistDownloaderGUI:
         title_section = ft.Container(
             content=ft.Column([
                 ft.Text(
-                    self.translations.get("title_playlist", "🎵 YouTube Playlist Downloader"),
+                    "🎵 YouTube Playlist Downloader",
                     size=24,
                     weight=ft.FontWeight.BOLD,
                     text_align=ft.TextAlign.CENTER
                 ),
                 ft.Text(
-                    self.translations.get("desc_playlist", "Download complete YouTube playlists with ease"),
+                    "Download complete YouTube playlists",
                     size=14,
                     color=ft.Colors.GREY_600,
                     text_align=ft.TextAlign.CENTER
@@ -97,9 +88,9 @@ class PlaylistDownloaderGUI:
         main_content.controls.append(title_section)
         
         # yt-dlp Status Section
-        self.ytdlp_status_text = ft.Text(self.translations.get("ytdlp_status", "Checking yt-dlp status..."), size=12)
+        self.ytdlp_status_text = ft.Text("Checking yt-dlp status...", size=12)
         self.install_btn = ft.ElevatedButton(
-            text=self.translations.get("install_ytdlp", "📦 Install/Update yt-dlp"),
+            text="📦 Install/Update yt-dlp",
             on_click=self.install_update_ytdlp,
             icon=ft.Icons.DOWNLOAD
         )
@@ -118,14 +109,14 @@ class PlaylistDownloaderGUI:
         
         # Download Folder Section
         self.folder_field = ft.TextField(
-            label=self.translations.get("download_folder", "📁 Download Folder"),
+            label="📁 Download Folder",
             value=self.download_folder,
             expand=True,
             on_change=self.on_folder_change
         )
         
         browse_btn = ft.ElevatedButton(
-            text=self.common_translations.get("browse", "Browse"),
+            text="Browse",
             icon=ft.Icons.FOLDER_OPEN,
             on_click=self.browse_folder
         )
@@ -138,8 +129,8 @@ class PlaylistDownloaderGUI:
         
         # Playlist URL Section
         self.url_field = ft.TextField(
-            label=self.translations.get("url_input", "🔗 Playlist URL"),
-            hint_text=self.translations.get("url_input", "Paste YouTube playlist URL here..."),
+            label="🔗 Playlist URL",
+            hint_text="Paste YouTube playlist URL here...",
             expand=True,
             on_change=self.on_url_change,
             on_submit=self.get_playlist_info
@@ -172,7 +163,7 @@ class PlaylistDownloaderGUI:
         
         # Download Button
         self.download_btn = ft.ElevatedButton(
-            text=self.translations.get("start_download", "🚀 Start Download"),
+            text="🚀 Start Download",
             icon=ft.Icons.PLAY_ARROW,
             on_click=self.start_download,
             width=200,

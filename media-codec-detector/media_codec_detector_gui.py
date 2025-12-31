@@ -8,10 +8,6 @@ from PIL import Image
 from pathlib import Path
 import sys
 
-# Add parent directory to path for language_config
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from language_config import get_language, get_all_texts
-
 class MediaCodecDetectorGUI:
     def __init__(self, page: ft.Page):
         self.page = page
@@ -21,10 +17,6 @@ class MediaCodecDetectorGUI:
         self.page.window_min_width = 700
         self.page.window_min_height = 600
         self.page.theme_mode = ft.ThemeMode.LIGHT
-        
-        # Language configuration
-        self.current_language = get_language()
-        self.common_translations = get_all_texts("common", self.current_language)
         
         # State variables
         self.selected_path = ""
@@ -39,18 +31,15 @@ class MediaCodecDetectorGUI:
     def setup_ui(self):
         """Setup user interface"""
         
-        # Get translations for media detector
-        self.detector_translations = get_all_texts("media_detector", self.current_language)
-        
         # Header
         header = ft.Container(
             content=ft.Column([
                 ft.Row([
                     ft.Icon(ft.Icons.MOVIE, size=40, color=ft.Colors.PURPLE),
-                    ft.Text(self.detector_translations.get("title", "Media Codec Detector"), 
+                    ft.Text("🎬 Media Codec Detector", 
                            size=28, weight=ft.FontWeight.BOLD),
                 ], alignment=ft.MainAxisAlignment.CENTER),
-                ft.Text(self.detector_translations.get("description", "Deteksi format kontainer dan codec dari file media"), 
+                ft.Text("Detect container format and codecs from media files", 
                        size=14, color=ft.Colors.GREY_700, text_align=ft.TextAlign.CENTER),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER),
             padding=20,
@@ -62,8 +51,8 @@ class MediaCodecDetectorGUI:
         # Mode selection
         self.mode_radio = ft.RadioGroup(
             content=ft.Row([
-                ft.Radio(value="file", label=self.detector_translations.get("mode_file", "📄 Analisis File Tunggal")),
-                ft.Radio(value="folder", label=self.detector_translations.get("mode_folder", "📁 Analisis Semua File dalam Folder")),
+                ft.Radio(value="file", label="📄 Single File Analysis"),
+                ft.Radio(value="folder", label="📁 Analyze All Files in Folder"),
             ], alignment=ft.MainAxisAlignment.CENTER),
             value="file",
             on_change=self.on_mode_change
@@ -71,7 +60,7 @@ class MediaCodecDetectorGUI:
         
         mode_section = ft.Container(
             content=ft.Column([
-                ft.Text(self.detector_translations.get("step1", "1. Pilih Mode Analisis"), 
+                ft.Text("1. Select Analysis Mode", 
                        size=16, weight=ft.FontWeight.BOLD),
                 self.mode_radio,
             ]),
@@ -82,9 +71,9 @@ class MediaCodecDetectorGUI:
         )
         
         # File/Folder selection
-        self.path_text = ft.Text(self.detector_translations.get("no_selection", "📁 Belum ada file/folder dipilih"), size=14)
+        self.path_text = ft.Text("📁 No file/folder selected", size=14)
         self.select_button = ft.ElevatedButton(
-            self.detector_translations.get("select_file", "Pilih File"),
+            "Select File",
             icon=ft.Icons.FILE_OPEN,
             on_click=self.pick_file_dialog,
             bgcolor=ft.Colors.PURPLE,
@@ -93,7 +82,7 @@ class MediaCodecDetectorGUI:
         
         selection_section = ft.Container(
             content=ft.Column([
-                ft.Text(self.detector_translations.get("step2", "2. Pilih File/Folder Media"), 
+                ft.Text("2. Select Media File/Folder", 
                        size=16, weight=ft.FontWeight.BOLD),
                 ft.Row([self.select_button, self.path_text], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
             ]),
@@ -105,7 +94,7 @@ class MediaCodecDetectorGUI:
         
         # File list (for folder mode)
         self.files_list = ft.Column([], scroll=ft.ScrollMode.AUTO, height=120)
-        self.files_section_title = ft.Text(self.detector_translations.get("files_found", "File Media Ditemukan"), 
+        self.files_section_title = ft.Text("Media Files Found", 
                                            size=16, weight=ft.FontWeight.BOLD)
         self.files_section = ft.Container(
             content=ft.Column([
@@ -124,7 +113,7 @@ class MediaCodecDetectorGUI:
         
         # Analysis button
         self.analyze_button = ft.ElevatedButton(
-            self.detector_translations.get("start_analysis", "🕵️ Mulai Analisis"),
+            "🕵️ Start Analysis",
             icon=ft.Icons.SEARCH,
             on_click=self.start_analysis,
             bgcolor=ft.Colors.GREEN,
@@ -148,7 +137,7 @@ class MediaCodecDetectorGUI:
         
         # Results section
         self.results_list = ft.Column([], scroll=ft.ScrollMode.AUTO)
-        self.results_section_title = ft.Text(self.detector_translations.get("analysis_results", "📊 Hasil Analisis"), 
+        self.results_section_title = ft.Text("📊 Analysis Results", 
                                              size=16, weight=ft.FontWeight.BOLD)
         self.results_section = ft.Container(
             content=ft.Column([
@@ -163,31 +152,6 @@ class MediaCodecDetectorGUI:
                 )
             ]),
             visible=False,
-            margin=ft.margin.only(top=20)
-        )
-        
-        # Create dummy files section
-        self.dummy_button = ft.ElevatedButton(
-            "🧪 Buat File Dummy untuk Testing",
-            icon=ft.Icons.SCIENCE,
-            on_click=self.create_dummy_files,
-            bgcolor=ft.Colors.ORANGE,
-            color=ft.Colors.WHITE,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=8),
-                padding=ft.padding.all(10)
-            )
-        )
-        
-        dummy_section = ft.Container(
-            content=ft.Column([
-                ft.Text("🧪 Utilities", size=16, weight=ft.FontWeight.BOLD),
-                self.dummy_button,
-                ft.Text("Buat file test untuk demonstrasi analisis", size=12, color=ft.Colors.GREY_600)
-            ]),
-            padding=15,
-            border=ft.border.all(1, ft.Colors.ORANGE_200),
-            border_radius=8,
             margin=ft.margin.only(top=20)
         )
         
@@ -243,7 +207,6 @@ class MediaCodecDetectorGUI:
             self.files_section,
             action_section,
             self.results_section,
-            dummy_section,
             footer  # Footer inside scrollable content
         ], scroll=ft.ScrollMode.AUTO, expand=True)
         
@@ -255,18 +218,18 @@ class MediaCodecDetectorGUI:
         self.analysis_mode = e.control.value
         
         if self.analysis_mode == "file":
-            self.select_button.text = self.detector_translations.get("select_file", "Pilih File")
+            self.select_button.text = "Select File"
             self.select_button.icon = ft.Icons.FILE_OPEN
             self.files_section.visible = False
         else:
-            self.select_button.text = self.detector_translations.get("select_folder", "Pilih Folder")
+            self.select_button.text = "Select Folder"
             self.select_button.icon = ft.Icons.FOLDER_OPEN
             self.files_section.visible = True
         
         # Reset selection
         self.selected_path = ""
         self.media_files = []
-        self.path_text.value = self.detector_translations.get("no_selection", "📁 Belum ada file/folder dipilih")
+        self.path_text.value = "📁 No file/folder selected"
         self.files_list.controls.clear()
         self.results_list.controls.clear()
         self.results_section.visible = False
@@ -288,7 +251,7 @@ class MediaCodecDetectorGUI:
             self.page.overlay.append(get_file_dialog)
             self.page.update()
             get_file_dialog.pick_files(
-                dialog_title="Pilih File Media",
+                dialog_title="Select Media File",
                 allow_multiple=False,
                 allowed_extensions=["jpg", "jpeg", "png", "gif", "bmp", "tiff", "webp", "ico", 
                                    "mp4", "avi", "mov", "mkv", "webm", "flv", "3gp", "wmv",
@@ -313,11 +276,12 @@ class MediaCodecDetectorGUI:
             return
             
         # Define supported media formats
-        image_formats = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp', 'ico']
-        video_formats = ['mp4', 'avi', 'mov', 'mkv', 'webm', 'flv', '3gp', 'wmv']
+        image_formats = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp', 'ico', 'svg', 'psd', 'raw', 'heic']
+        video_formats = ['mp4', 'avi', 'mov', 'mkv', 'webm', 'flv', '3gp', 'wmv', 'm4v', 'ts', 'mts', 'vob']
         audio_formats = ['mp3', 'aac', 'flac', 'wav', 'ogg', 'm4a', 'wma']
+        document_formats = ['pdf', 'doc', 'docx', 'txt', 'xlsx']
         
-        all_formats = image_formats + video_formats + audio_formats
+        all_formats = image_formats + video_formats + audio_formats + document_formats
         self.media_files = []
         
         for format_ext in all_formats:
@@ -365,7 +329,7 @@ class MediaCodecDetectorGUI:
                 )
         else:
             self.files_list.controls.append(
-                ft.Text("❌ Tidak ada file media ditemukan", color=ft.Colors.RED)
+                ft.Text("❌ No media files found", color=ft.Colors.RED)
             )
         
         self.page.update()
@@ -373,7 +337,7 @@ class MediaCodecDetectorGUI:
     def start_analysis(self, e):
         """Start the media analysis process"""
         if not self.media_files:
-            self.show_snackbar("❌ Pilih file atau folder yang berisi media terlebih dahulu!", ft.Colors.RED)
+            self.show_snackbar("❌ Please select a file or folder containing media first!", ft.Colors.RED)
             return
         
         if self.is_processing:
@@ -383,7 +347,7 @@ class MediaCodecDetectorGUI:
         self.is_processing = True
         self.analyze_button.disabled = True
         self.progress_bar.visible = True
-        self.status_text.value = "🔄 Memulai analisis media..."
+        self.status_text.value = "🔄 Starting media analysis..."
         self.results_list.controls.clear()
         self.results_section.visible = True
         self.page.update()
@@ -399,7 +363,9 @@ class MediaCodecDetectorGUI:
             
             for i, file_path in enumerate(self.media_files, 1):
                 filename = os.path.basename(file_path)
-                self.update_status(f"🕵️ Menganalisis file {i}/{total_files}: {filename}")
+                progress = (i / total_files) * 100
+                self.update_status(f"🕵️ Analyzing ({progress:.0f}%): {filename}")
+                self.update_progress(progress / 100)
                 
                 result = self.analyze_single_file(file_path)
                 self.analysis_results.append(result)
@@ -407,13 +373,13 @@ class MediaCodecDetectorGUI:
                 # Update results in real-time
                 self.add_result_to_ui(result)
             
-            self.update_status(f"✅ Analisis selesai! {total_files} file dianalisis.")
-            self.show_snackbar_safe(f"🎉 Analisis selesai untuk {total_files} file!", ft.Colors.GREEN)
+            self.update_status(f"✅ Analysis Complete! Successfully analyzed {total_files} file(s).")
+            self.show_snackbar_safe(f"🎉 Analysis complete for {total_files} files!", ft.Colors.GREEN)
             
         except Exception as e:
             error_msg = f"❌ Error: {str(e)}"
             self.update_status(error_msg)
-            self.show_snackbar_safe(f"❌ Gagal menganalisis media: {str(e)}", ft.Colors.RED)
+            self.show_snackbar_safe(f"❌ Failed to analyze media: {str(e)}", ft.Colors.RED)
         
         finally:
             # Reset UI state
@@ -435,13 +401,13 @@ class MediaCodecDetectorGUI:
         
         try:
             if not os.path.exists(file_path):
-                result['error'] = "File tidak ditemukan"
+                result['error'] = "File not found"
                 return result
             
             # Detect file type
             kind = filetype.guess(file_path)
             if kind is None:
-                result['error'] = "Tidak dapat menentukan tipe file"
+                result['error'] = "Cannot determine file type"
                 return result
             
             result['mime_type'] = kind.mime
@@ -453,12 +419,33 @@ class MediaCodecDetectorGUI:
             elif 'video' in result['mime_type'] or 'audio' in result['mime_type']:
                 result['details'] = self.analyze_video_audio(file_path)
             else:
-                result['details'] = {'type': 'Bukan file media standar'}
+                result['details'] = {'type': 'Not a standard media file'}
         
         except Exception as e:
             result['error'] = str(e)
         
         return result
+    
+    def get_codec_description(self, codec_name):
+        """Get user-friendly description of codec"""
+        descriptions = {
+            'h264': 'H.264/AVC - Most common video codec, excellent compression',
+            'h265': 'H.265/HEVC - Advanced codec, better compression than H.264',
+            'vp9': 'VP9 - Google\'s royalty-free codec, used in YouTube',
+            'av1': 'AV1 - Next-gen codec, superior compression',
+            'mpeg4': 'MPEG-4 - Older codec, still widely supported',
+            'aac': 'AAC - Advanced Audio Coding, high quality',
+            'mp3': 'MP3 - Universal audio format',
+            'opus': 'Opus - Modern codec, excellent for voice',
+            'vorbis': 'Vorbis - Open-source audio codec',
+            'flac': 'FLAC - Lossless audio, perfect quality',
+            'pcm': 'PCM - Uncompressed raw audio',
+        }
+        codec_lower = codec_name.lower()
+        for key, desc in descriptions.items():
+            if key in codec_lower:
+                return desc
+        return 'Unknown codec'
     
     def analyze_image(self, file_path):
         """Analyze image file"""
@@ -470,7 +457,7 @@ class MediaCodecDetectorGUI:
                 details['size'] = f"{img.width}x{img.height}"
                 details['type'] = 'image'
         except Exception as e:
-            details['error'] = f"Tidak dapat membaca detail gambar: {e}"
+            details['error'] = f"Cannot read image details: {e}"
         
         return details
     
@@ -488,11 +475,17 @@ class MediaCodecDetectorGUI:
             # Analyze streams
             if 'streams' in probe:
                 for i, stream in enumerate(probe['streams']):
+                    codec_name = stream.get('codec_long_name', stream.get('codec_name', 'N/A'))
                     stream_info = {
                         'index': i,
                         'type': stream.get('codec_type', 'unknown'),
-                        'codec': stream.get('codec_long_name', stream.get('codec_name', 'N/A'))
+                        'codec': codec_name
                     }
+                    
+                    # Add codec description
+                    if codec_name != 'N/A':
+                        codec_desc = self.get_codec_description(codec_name)
+                        stream_info['codec'] = f"{codec_name}\n   └ {codec_desc}"
                     
                     # Add extra details
                     if stream_info['type'] == 'video':
@@ -577,13 +570,13 @@ class MediaCodecDetectorGUI:
                 if details.get('type') == 'image':
                     details_content.extend([
                         ft.Text(f"🖼️ Format: {details.get('format', 'N/A')}", size=12),
-                        ft.Text(f"📐 Ukuran: {details.get('size', 'N/A')}", size=12),
-                        ft.Text(f"🎨 Mode Warna: {details.get('mode', 'N/A')}", size=12),
+                        ft.Text(f"📐 Size: {details.get('size', 'N/A')}", size=12),
+                        ft.Text(f"🎨 Color Mode: {details.get('mode', 'N/A')}", size=12),
                     ])
                 
                 elif details.get('type') == 'video_audio':
                     details_content.append(
-                        ft.Text(f"📦 Kontainer: {details.get('container', 'N/A')}", size=12)
+                        ft.Text(f"📦 Container: {details.get('container', 'N/A')}", size=12)
                     )
                     
                     if details.get('streams'):
@@ -625,100 +618,13 @@ class MediaCodecDetectorGUI:
         
         self.page.run_thread_safe(update_ui)
     
-    def create_dummy_files(self, e):
-        """Create dummy files for testing"""
-        if self.is_processing:
-            return
-        
-        self.is_processing = True
-        self.dummy_button.disabled = True
-        self.progress_bar.visible = True
-        self.status_text.value = "🧪 Membuat file dummy..."
-        self.page.update()
-        
-        # Run in thread
-        threading.Thread(target=self.create_dummy_files_thread, daemon=True).start()
-    
-    def create_dummy_files_thread(self):
-        """Create dummy files (runs in background thread)"""
-        try:
-            dummy_files = []
-            
-            # Create dummy images
-            self.update_status("🖼️ Membuat file gambar dummy...")
-            try:
-                img = Image.new('RGB', (200, 100), color='red')
-                img.save('test_image.png', 'PNG')
-                img.save('test_image.jpg', 'JPEG')
-                dummy_files.extend(['test_image.png', 'test_image.jpg'])
-                self.update_status("✅ File gambar dummy berhasil dibuat")
-            except Exception as e:
-                self.update_status(f"❌ Gagal membuat file gambar: {e}")
-            
-            # Create dummy video and audio using ffmpeg
-            self.update_status("🎬 Membuat file media dummy...")
-            try:
-                # Video: H.264 + AAC dalam .mp4
-                (
-                    ffmpeg
-                    .input('lavfi:testsrc=size=192x108:rate=1:duration=1', format='lavfi')
-                    .input('lavfi:sine=frequency=1000:duration=1', format='lavfi')
-                    .output('test_video.mp4', vcodec='libx264', acodec='aac', shortest=None, loglevel='quiet')
-                    .overwrite_output()
-                    .run()
-                )
-                
-                # Audio: MP3
-                (
-                    ffmpeg
-                    .input('lavfi:sine=frequency=440:duration=2', format='lavfi')
-                    .output('test_audio.mp3', acodec='libmp3lame', loglevel='quiet')
-                    .overwrite_output()
-                    .run()
-                )
-                dummy_files.extend(['test_video.mp4', 'test_audio.mp3'])
-                self.update_status("✅ File media dummy berhasil dibuat")
-                
-            except FileNotFoundError:
-                self.update_status("⚠️ FFmpeg tidak ditemukan, melewatkan file media dummy")
-            except Exception as e:
-                self.update_status(f"❌ Gagal membuat file media: {e}")
-            
-            if dummy_files:
-                self.update_status(f"🎉 {len(dummy_files)} file dummy berhasil dibuat!")
-                self.show_snackbar_safe(f"✅ {len(dummy_files)} file dummy siap untuk dianalisis!", ft.Colors.GREEN)
-                
-                # Auto-select current directory if no path selected
-                if not self.selected_path:
-                    current_dir = os.getcwd()
-                    self.selected_path = current_dir
-                    self.path_text.value = f"📁 {os.path.basename(current_dir)} (auto-selected)"
-                    if self.analysis_mode == "folder":
-                        self.scan_media_files()
-                    else:
-                        # Switch to folder mode for convenience
-                        self.analysis_mode = "folder"
-                        self.mode_radio.value = "folder"
-                        self.select_button.text = "Pilih Folder"
-                        self.select_button.icon = ft.Icons.FOLDER_OPEN
-                        self.files_section.visible = True
-                        self.scan_media_files()
-                    
-                    self.page.update()
-            else:
-                self.update_status("❌ Tidak ada file dummy yang berhasil dibuat")
-                self.show_snackbar_safe("❌ Gagal membuat file dummy", ft.Colors.RED)
-        
-        except Exception as e:
-            self.update_status(f"❌ Error membuat dummy files: {e}")
-            self.show_snackbar_safe(f"❌ Error: {str(e)}", ft.Colors.RED)
-        
-        finally:
-            # Reset UI state
-            self.is_processing = False
-            self.dummy_button.disabled = False
-            self.progress_bar.visible = False
+    def update_progress(self, value):
+        """Update progress bar (thread-safe)"""
+        def update():
+            self.progress_bar.value = value
             self.page.update()
+        
+        self.page.run_thread_safe(update)
     
     def update_status(self, message):
         """Update status text (thread-safe)"""

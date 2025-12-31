@@ -74,19 +74,70 @@ if [ ! -f "venv/bin/python" ]; then
     echo "      ${GREEN}Done!${NC}"
     echo ""
     
-    # Check FFmpeg
+    # Check and download FFmpeg
     echo "[3/3] Checking FFmpeg..."
-    if ! command -v ffmpeg &> /dev/null; then
-        echo "      ${YELLOW}WARNING: FFmpeg not found!${NC}"
-        echo "      Some features may not work without FFmpeg."
-        echo ""
-        echo "      To install FFmpeg:"
-        echo "      - macOS:  brew install ffmpeg"
-        echo "      - Ubuntu: sudo apt install ffmpeg"
-        echo "      - Fedora: sudo dnf install ffmpeg"
-        echo ""
+    
+    # Check if ffmpeg-portable exists
+    if [ -f "ffmpeg-portable/bin/ffmpeg" ]; then
+        echo "      ${GREEN}FFmpeg portable is available!${NC}"
     else
-        echo "      ${GREEN}FFmpeg is available!${NC}"
+        # Check system FFmpeg
+        if ! command -v ffmpeg &> /dev/null; then
+            echo "      ${YELLOW}FFmpeg not found. Downloading portable version...${NC}"
+            echo ""
+            
+            # Detect OS
+            OS_TYPE="$(uname -s)"
+            case "${OS_TYPE}" in
+                Linux*)
+                    echo "      Downloading FFmpeg for Linux..."
+                    # Try to download FFmpeg static build for Linux
+                    curl -L "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz" -o ffmpeg-portable.tar.xz 2>/dev/null
+                    if [ $? -eq 0 ]; then
+                        echo "      Extracting FFmpeg..."
+                        tar -xf ffmpeg-portable.tar.xz
+                        FFMPEG_DIR=$(find . -maxdepth 1 -type d -name "ffmpeg-*-static" | head -n 1)
+                        if [ -n "$FFMPEG_DIR" ]; then
+                            mkdir -p ffmpeg-portable/bin
+                            mv "$FFMPEG_DIR/ffmpeg" ffmpeg-portable/bin/
+                            mv "$FFMPEG_DIR/ffprobe" ffmpeg-portable/bin/
+                            chmod +x ffmpeg-portable/bin/*
+                            rm -rf "$FFMPEG_DIR" ffmpeg-portable.tar.xz
+                            echo "      ${GREEN}FFmpeg ready!${NC}"
+                        else
+                            echo "      ${YELLOW}WARNING: Failed to extract FFmpeg!${NC}"
+                        fi
+                    else
+                        echo "      ${YELLOW}WARNING: Download failed. Installing system FFmpeg...${NC}"
+                        echo "      Run: sudo apt install ffmpeg  (Ubuntu/Debian)"
+                        echo "      Or:  sudo dnf install ffmpeg  (Fedora/RHEL)"
+                    fi
+                    ;;
+                Darwin*)
+                    echo "      Downloading FFmpeg for macOS..."
+                    # Check if Homebrew is available
+                    if command -v brew &> /dev/null; then
+                        echo "      Installing FFmpeg via Homebrew..."
+                        brew install ffmpeg 2>/dev/null
+                        if [ $? -eq 0 ]; then
+                            echo "      ${GREEN}FFmpeg installed!${NC}"
+                        else
+                            echo "      ${YELLOW}WARNING: Failed to install FFmpeg!${NC}"
+                        fi
+                    else
+                        echo "      ${YELLOW}WARNING: Homebrew not found!${NC}"
+                        echo "      Please install Homebrew first: https://brew.sh"
+                        echo "      Then run: brew install ffmpeg"
+                    fi
+                    ;;
+                *)
+                    echo "      ${YELLOW}WARNING: Unsupported OS for auto-download!${NC}"
+                    echo "      Please install FFmpeg manually."
+                    ;;
+            esac
+        else
+            echo "      ${GREEN}System FFmpeg is available!${NC}"
+        fi
     fi
     echo ""
     

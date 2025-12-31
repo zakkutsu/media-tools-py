@@ -207,7 +207,7 @@ def main(page: ft.Page):
 
     btn_pick = ft.ElevatedButton(
         "Pilih File", 
-        icon=ft.icons.FOLDER_OPEN, 
+        icon=ft.Icons.FOLDER_OPEN, 
         on_click=lambda _: file_picker.pick_files(),
         width=200,
         height=45
@@ -222,7 +222,7 @@ def main(page: ft.Page):
     
     btn_convert = ft.ElevatedButton(
         "MULAI KONVERSI", 
-        icon=ft.icons.PLAY_ARROW, 
+        icon=ft.Icons.PLAY_ARROW, 
         disabled=True, 
         on_click=on_convert_click,
         bgcolor=ft.Colors.BLUE_600,
@@ -234,7 +234,7 @@ def main(page: ft.Page):
     # Container dengan styling
     container = ft.Container(
         content=ft.Column([
-            ft.Icon(ft.icons.SWAP_HORIZONTAL_CIRCLE, size=70, color=ft.Colors.BLUE_400),
+            ft.Icon(ft.Icons.SWAP_HORIZONTAL_CIRCLE, size=70, color=ft.Colors.BLUE_400),
             ft.Text("Universal File Converter", size=28, weight="bold"),
             ft.Text("Support: PDF, Gambar, Audio, Video", size=13, color="grey"),
             ft.Divider(height=30),

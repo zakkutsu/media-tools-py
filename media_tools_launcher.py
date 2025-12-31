@@ -66,9 +66,10 @@ playlist_downloader_path = str(current_dir / "yt-playlist-downloader")
 socmed_downloader_path = str(current_dir / "socmed-downloader")
 media_looper_path = str(current_dir / "media-looper")
 universal_converter_path = str(current_dir / "universal-converter")
+spotify_downloader_path = str(current_dir / "spotify-downloader")
 
 # Add all tool paths to sys.path
-tool_paths = [audio_merger_path, media_detector_path, batch_downloader_path, playlist_downloader_path, socmed_downloader_path, media_looper_path, universal_converter_path]
+tool_paths = [audio_merger_path, media_detector_path, batch_downloader_path, playlist_downloader_path, socmed_downloader_path, media_looper_path, universal_converter_path, spotify_downloader_path]
 for path in tool_paths:
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -84,7 +85,8 @@ def check_and_install_dependencies():
         'PIL': 'Pillow>=10.0.0',
         'filetype': 'filetype==1.2.0',
         'yt_dlp': 'yt-dlp',
-        'pdf2image': 'pdf2image>=1.16.3'
+        'pdf2image': 'pdf2image>=1.16.3',
+        'spotdl': 'spotdl>=4.0.0'
     }
     
     for package, install_name in required_packages.items():
@@ -263,6 +265,20 @@ except Exception as e:
     print(f"Failed to import UniversalConverterGUI: {e}")
     UniversalConverterGUI = None
 
+# Import Spotify Downloader (Flet-based)
+try:
+    spotify_downloader_spec = importlib.util.spec_from_file_location(
+        "spotify_downloader_gui_flet",
+        current_dir / "spotify-downloader" / "spotify_downloader_gui_flet.py"
+    )
+    if spotify_downloader_spec and spotify_downloader_spec.loader:
+        spotify_downloader_module = importlib.util.module_from_spec(spotify_downloader_spec)
+        spotify_downloader_spec.loader.exec_module(spotify_downloader_module)
+        SpotifyDownloaderGUI = spotify_downloader_module.main
+except Exception as e:
+    print(f"Failed to import SpotifyDownloaderGUI: {e}")
+    SpotifyDownloaderGUI = None
+
 class MediaToolsLauncher:
     def __init__(self, page: ft.Page):
         self.page = page
@@ -400,6 +416,19 @@ class MediaToolsLauncher:
             on_click=self.launch_universal_converter
         )
         
+        spotify_downloader_card = self.create_tool_card(
+            title="🎵 Spotify Downloader",
+            description="Download music from Spotify without API key using YouTube Music match",
+            features=[
+                "🎵 Single track & playlist support",
+                "🎧 High quality MP3 output",
+                "📝 Auto metadata & lyrics",
+                "🚫 No API key required"
+            ],
+            color=ft.Colors.LIGHT_GREEN_700,
+            on_click=self.launch_spotify_downloader
+        )
+        
         # Tool selection section
         tools_section = ft.Container(
             content=ft.Column([
@@ -422,6 +451,7 @@ class MediaToolsLauncher:
                 ft.Container(height=10),  # Spacing
                 ft.Row([
                     universal_converter_card,
+                    spotify_downloader_card,
                 ], alignment=ft.MainAxisAlignment.CENTER, spacing=20, wrap=True),
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=20),
             margin=ft.margin.only(bottom=30)
@@ -637,6 +667,15 @@ class MediaToolsLauncher:
         
         self.switch_to_app("universal_converter")
     
+    def launch_spotify_downloader(self, e):
+        """Launch Spotify Downloader tool"""
+        if SpotifyDownloaderGUI is None:
+            error_msg = "Spotify Downloader is not available.\n\nMake sure spotify_downloader_gui_flet.py exists in the spotify-downloader/ folder\n\nAlso check that spotdl is installed with:\npip install spotdl"
+            self.show_error(error_msg)
+            return
+        
+        self.switch_to_app("spotify_downloader")
+    
     def switch_to_app(self, app_name):
         """Switch to specific application"""
         self.page.controls.clear()
@@ -687,6 +726,9 @@ class MediaToolsLauncher:
         elif app_name == "universal_converter":
             # Universal Converter (Flet-based)
             UniversalConverterGUI(self.create_app_page(app_container))
+        elif app_name == "spotify_downloader":
+            # Spotify Downloader (Flet-based)
+            SpotifyDownloaderGUI(self.create_app_page(app_container))
         elif app_name == "batch_downloader_tkinter":
             # Fallback Tkinter-based Batch Downloader
             self.launch_tkinter_app("batch_downloader")

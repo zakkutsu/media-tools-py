@@ -12,6 +12,7 @@
 # - SocMed Downloader
 # - Media Looper
 # - Universal Converter
+# - Spotify Downloader
 # ==========================================
 
 # ===== Core GUI Framework =====
